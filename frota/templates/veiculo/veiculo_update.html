@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %} | Frota Check{% endblock %}
+{% block header_title %}Gestão de Frota{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto pb-20">
+    <div class="flex items-center justify-between mb-10">
+        <div>
+            <span class="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mb-1 block">Patrimônio</span>
+            <h2 class="text-4xl font-black text-slate-900 tracking-tight">
+                {% if form.instance.pk %}Editar Veículo{% else %}Cadastrar Veículo{% endif %}
+            </h2>
+        </div>
+        <a href="{% url 'veiculos_list' %}" class="hidden sm:flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors font-bold text-xs uppercase tracking-widest">
+            <i class="fas fa-times text-lg"></i> Cancelar
+        </a>
+    </div>
+
+    {% if form.errors %}
+        <div class="bg-red-50 border border-red-100 p-6 mb-8 rounded-[2rem] text-red-600 text-sm font-bold">
+            <p class="mb-2 uppercase tracking-widest text-[10px]"><i class="fas fa-exclamation-triangle mr-2"></i> Erros no formulário:</p>
+            <ul class="list-disc ml-5">
+                {% for field, error in form.errors.items %}<li>{{ field|title }}: {{ error|striptags }}</li>{% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-10">
+        {% csrf_token %}
+        
+        <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
+            <div class="px-8 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-4">
+                <div class="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-blue-600">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Identificação do Veículo</h3>
+            </div>
+            
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">{{ form.placa.label }}</label>
+                    {{ form.placa }}
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">{{ form.renavam.label }}</label>
+                    {{ form.renavam }}
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">{{ form.marca.label }}</label>
+                    {{ form.marca }}
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">{{ form.modelo.label }}</label>
+                    {{ form.modelo }}
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
+            <div class="px-8 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-4">
+                <div class="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-emerald-500">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Informações Técnicas</h3>
+            </div>
+            
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">{{ form.ano.label }}</label>
+                    {{ form.ano }}
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">{{ form.fipe.label }}</label>
+                    {{ form.fipe }}
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
+            <div class="px-8 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-4">
+                <div class="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-amber-500">
+                    <i class="fas fa-paperclip"></i>
+                </div>
+                <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Arquivos e Anexos</h3>
+            </div>
+            
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Foto do Veículo</label>
+                    {{ form.foto }}
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Documento (PDF)</label>
+                    {{ form.documento_impresso }}
+                </div>
+            </div>
+        </section>
+
+        <div class="fixed bottom-6 left-0 right-0 px-4 md:relative md:bottom-0 md:px-0 z-40">
+            <button type="submit" class="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-black text-lg shadow-2xl hover:bg-blue-600 transition-all flex justify-center items-center gap-4">
+                SALVAR VEÍCULO
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Estilo mantido do seu template base */
+    input[type="text"], input[type="number"], input[type="file"], select, textarea {
+        width: 100% !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 1.25rem !important;
+        padding: 1rem 1.25rem !important;
+        font-weight: 600 !important;
+    }
+    input:focus { border-color: #3b82f6 !important; background-color: #fff !important; }
+</style>
+{% endblock %}

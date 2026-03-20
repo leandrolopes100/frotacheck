@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+{% block title %}Editar Colaborador | Frota Check{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4">
+
+    <div class="mb-10 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Editar Colaborador</h1>
+            <p class="text-sm text-slate-500 font-medium mt-1">Gerencie os acessos e credenciais dos motoristas.</p>
+        </div>
+        <a href="javascript:history.back()" class="text-slate-400 hover:text-slate-900 transition">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+        {% if form.errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p class="text-red-700 text-sm font-bold">
+                Corrija os erros abaixo antes de continuar.
+            </p>
+        </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            {% for error in form.non_field_errors %}
+                <p class="text-red-600 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">Informações de Acesso</div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Login</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">E-mail</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Senha</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+        </section>
+
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">Dados do Motorista</div>
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nome Completo</label>
+                        {{ form.nome_completo }}
+                        {% if form.nome_completo.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.nome_completo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">CPF</label>
+                        {{ form.cpf }}
+                        {% if form.cpf.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.cpf.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">CNH</label>
+                        {{ form.numero_cnh }}
+                        {% if form.numero_cnh.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.numero_cnh.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Validade</label>
+                        {{ form.validade_cnh }}
+                        {% if form.validade_cnh.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.validade_cnh.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Cargo</label>
+                        {{ form.cargo }}
+                        {% if form.cargo.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.cargo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Upload de Habilitação</label>
+                    <div class="relative group">
+                        <input type="file" name="cnh_impressa" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <div class="w-full h-24 border-2 border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center text-slate-400 group-hover:border-blue-400 transition-all">
+                            <i class="fas fa-cloud-upload-alt text-lg mb-1"></i>
+                            <span class="text-[10px] font-bold uppercase">Selecionar Arquivo</span>
+                        </div>
+                    </div>
+                    {% if form.cnh_impressa.errors %}
+                    <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tight">{{ form.cnh_impressa.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition shadow-lg">
+            Registrar Edição
+        </button>
+    </form>
+</div>
+
+<style>
+    input[type="text"], input[type="email"], input[type="password"], input[type="date"], select {
+        width: 100% !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 0.5rem !important;
+        padding: 0.65rem 0.8rem !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Frota Check{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        erp: { sidebar: '#0f172a', active: '#1e293b', accent: '#3b82f6' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+
+<body class="h-full font-sans antialiased text-slate-900">
+    
+    <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/40 z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
+
+    <div class="flex min-h-screen">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-erp-sidebar text-slate-300 sidebar-transition -translate-x-full md:translate-x-0 flex flex-col shadow-2xl">
+            <div class="p-8 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-erp-accent rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fas fa-truck-fast text-white text-lg"></i>
+                    </div>
+                    <span class="text-white text-lg font-black tracking-tighter">FROTA<span class="text-erp-accent font-light">CHECK</span></span>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-400">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+                <p class="px-4 py-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">Menu</p>
+                
+                <a href="{% url 'checklist_list' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {% if request.resolver_match.url_name == 'checklist_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
+                    <i class="fas fa-chart-line w-5 opacity-70"></i> <span class="text-sm">Dashboard</span>
+                </a>
+
+                <a href="{% url 'checklist_add' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {% if request.resolver_match.url_name == 'checklist_add' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
+                    <i class="fas fa-plus-circle w-5 opacity-70"></i> <span class="text-sm">Nova Inspeção</span>
+                </a>
+                {% if user.is_patrao %}
+                        <div class="pt-6 pb-2">
+                            <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Administração</p>
+                        </div>
+
+                        <a href="{% url 'veiculos_list' %}" 
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all 
+                        {% if request.resolver_match.url_name == 'veiculos_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
+                            <i class="fas fa-truck w-5 opacity-70"></i> <span class="text-sm">Gestão de Veículos</span>
+                        </a>
+
+                        <a href="{% url 'funcionario_list' %}" 
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all 
+                        {% if request.resolver_match.url_name == 'funcionario_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
+                            <i class="fas fa-users w-5 opacity-70"></i> <span class="text-sm">Colaboradores</span>
+                        </a>
+                        <a href="{% url 'etiquetas_list' %}" 
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all 
+                        {% if request.resolver_match.url_name == 'etiquetas_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
+                            <i class="fas fa-qrcode w-5"></i>
+                            <span class="text-sm font-bold">Imprimir Etiquetas</span>
+                        </a>
+                                           
+                {% endif %}
+            </nav>
+
+            <div class="p-4 mt-auto border-t border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center font-black text-blue-400 text-xs border border-slate-700">
+                        {{ user.username|slice:":2"|upper }}
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-xs font-bold text-white truncate">{{ user.username }}</p>
+                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{% if user.is_patrao %}Admin{% else %}Operador{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 md:pl-72 flex flex-col">
+            <header class="sticky top-0 z-30 h-16 glass-header px-6 flex items-center justify-between">
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-600"><i class="fas fa-bars"></i></button>
+                <h2 class="text-xs font-black text-slate-800 uppercase tracking-widest">{% block header_title %}Frota Check{% endblock %}</h2>
+                
+                <!-- Botão de Sair que abre o Modal -->
+                <button onclick="openLogoutModal()" class="text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none p-0 cursor-pointer">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </header>
+
+            <main class="flex-1 p-4 sm:p-8">
+                {% if messages %}
+                    <div class="mb-6 space-y-2">
+                        {% for message in messages %}
+                        <div class="flex items-center justify-between p-4 rounded-xl border {% if message.tags == 'error' %}bg-rose-50 border-rose-100 text-rose-700{% else %}bg-emerald-50 border-emerald-100 text-emerald-700{% endif %}">
+                            <div class="flex items-center gap-3 text-xs font-black uppercase tracking-widest">
+                                <i class="fas {% if message.tags == 'error' %}fa-lock{% else %}fa-check-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                            <button onclick="this.parentElement.remove()" class="opacity-40 hover:opacity-100"><i class="fas fa-times"></i></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Logout -->
+    <div id="logoutModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-sign-out-alt text-xl"></i>
+                </div>
+                <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight">Sair do Sistema?</h3>
+                <p class="text-sm text-slate-500 mt-2 font-medium">Sua sessão será encerrada com segurança.</p>
+            </div>
+            
+            <div class="mt-8 flex gap-3">
+                <button onclick="closeLogoutModal()" class="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    Cancelar
+                </button>
+                
+                <form action="{% url 'logout' %}" method="post" class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full py-3 px-4 bg-slate-900 hover:bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-200">
+                        Sair Agora
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+            setTimeout(() => overlay.classList.toggle('opacity-0'), 10);
+        }
+
+        // Funções do Modal de Logout
+        function openLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('hidden');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.add('hidden');
+        }
+
+        // Fechar ao clicar fora do modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('logoutModal');
+            if (event.target == modal) {
+                closeLogoutModal();
+            }
+        }
+    </script>
+</body>
+</html>

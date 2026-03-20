@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Gestão de Funcionários | Frota Check{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 pb-6 border-b border-slate-200">
+        <div>
+            <nav class="flex mb-2" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <li>Administração</li>
+                    <li><i class="fas fa-chevron-right text-[8px] opacity-50"></i></li>
+                    <li class="text-blue-600">Funcionários</li>
+                </ol>
+            </nav>
+            
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <form method="GET" class="relative flex-grow sm:flex-grow-0">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" name="busca" value="{{ request.GET.busca }}" placeholder="Nome ou CPF..." 
+                       class="pl-9 pr-10 py-2.5 bg-slate-100 border-none rounded-xl text-sm font-bold w-full sm:w-72">
+                {% if request.GET.busca %}
+                <a href="?" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500"><i class="fas fa-times"></i></a>
+                {% endif %}
+            </form>
+            <a href="{% url 'funcionario_add' %}" class="flex-shrink-0 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-black uppercase tracking-widest hover:bg-slate-800 transition-all">
+                + Novo Funcionário
+            </a>
+        </div>
+    </div>
+
+   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for f in funcionarios %}
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col p-5">
+        
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-black">
+                {{ f.nome_completo|slice:":1" }}
+            </div>
+            
+            <div class="flex gap-3 text-slate-500 items-center">
+                {% if request.user.is_patrao %}
+                    <a href="{% url 'funcionario_update' f.pk %}" class="p-1 hover:text-amber-600 transition-colors" title="Editar"><i class="fas fa-pen text-xs"></i></a>
+                    <a href="{% url 'funcionario_delete' f.pk %}" class="p-1 hover:text-rose-600 transition-colors" title="Excluir"><i class="fas fa-trash text-xs"></i></a>
+                {% else %}
+                    <i class="fas fa-lock text-[10px] opacity-50" title="Acesso restrito"></i>
+                {% endif %}
+            </div>
+        </div>
+
+        <h3 class="text-sm font-black text-slate-900">{{ f.nome_completo }}</h3>
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{{ f.cargo }}</p> 
+
+        <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-y-4 gap-x-2">
+            <div>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Validade CNH</p>
+                <p class="text-xs font-bold {% if f.validade_cnh < hoje %}text-rose-500{% else %}text-slate-700{% endif %}">
+                    {{ f.validade_cnh|date:"d/m/Y" }}
+                </p>
+            </div>
+            <div class="text-right">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">CNH Nº</p>
+                <p class="text-xs font-bold text-slate-700">{{ f.numero_cnh }}</p>
+            </div>
+            <div>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">CPF</p>
+                <p class="text-xs font-bold text-slate-700">{{ f.cpf }}</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Responsável</p>
+                <p class="text-[10px] font-bold text-slate-500 truncate">{{ f.cadastrado_por|default:"Admin" }}</p>
+            </div>
+        </div>
+
+        <div class="p-4 mt-auto">
+            {% if f.cnh_impressa %}
+                <a href="{{ f.cnh_impressa.url }}" target="_blank" 
+                class="flex items-center justify-center w-full py-2.5 rounded-xl border border-slate-200 text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-900 hover:text-white transition-all gap-2">
+                    <i class="fas fa-address-card text-[10px]"></i>
+                    Visualizar CNH <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            {% else %}
+                <button disabled 
+                        class="flex items-center justify-center w-full py-2.5 rounded-xl border border-slate-100 bg-slate-50 text-slate-300 text-xs font-black uppercase tracking-widest cursor-not-allowed gap-2">
+                    <i class="fas fa-ban text-[10px]"></i>
+                    Sem documento
+                </button>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full py-24 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
+        <i class="fas fa-users text-slate-300 text-4xl mb-4"></i>
+        <h3 class="text-slate-900 font-bold">Nenhum funcionário cadastrado</h3>
+    </div>
+    {% endfor %}
+</div>
+{% if is_paginated %}
+<div class="flex flex-col sm:flex-row items-center justify-between mt-10 pb-10 gap-4 border-t border-slate-100 pt-8">
+    <div class="text-sm text-slate-500 font-medium">
+        Mostrando <span class="text-slate-900 font-bold">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> de <span class="text-slate-900 font-bold">{{ paginator.count }}</span> funcionários
+    </div>
+
+    <nav class="flex items-center gap-1 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+        
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
+            <i class="fas fa-chevron-left text-xs"></i>
+        </a>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white text-sm font-black shadow-lg shadow-slate-200">
+                    {{ num }}
+                </span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                   class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 text-sm font-bold hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
+            <i class="fas fa-chevron-right text-xs"></i>
+        </a>
+        {% endif %}
+
+    </nav>
+</div>
+{% endif %}
+</div>
+{% endblock %}

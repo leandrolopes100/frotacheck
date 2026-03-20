@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %} | Frota Check{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4 pb-24">
+    
+    <div class="mb-10 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">
+                {% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %}
+            </h1>
+            <p class="text-sm text-slate-500 font-medium mt-1">Cadastre e gerencie as informações técnicas da sua frota.</p>
+        </div>
+        <a href="javascript:history.back()" class="text-slate-400 hover:text-slate-900 transition text-xl">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p class="text-red-700 text-sm font-bold">
+                Corrija os erros abaixo antes de continuar.
+            </p>
+        </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            {% for error in form.non_field_errors %}
+                <p class="text-red-600 text-sm font-bold">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
+                Identificação do Veículo 
+            </div>
+
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Placa <label class="font-bold text-red-500">*</label></label>
+                    {{ form.placa }}
+                    {% if form.placa.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.placa.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Renavam <label class="font-bold text-red-500">*</label></label>
+                    {{ form.renavam }}
+                    {% if form.renavam.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.renavam.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Marca <label class="font-bold text-red-500">*</label></label>
+                    {{ form.marca }}
+                    {% if form.marca.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.marca.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Modelo <label class="font-bold text-red-500">*</label></label>
+                    {{ form.modelo }}
+                    {% if form.modelo.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.modelo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
+                Dados Técnicos e Avaliação
+            </div>
+            
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Ano <label class="font-bold text-red-500">*</label></label>
+                    {{ form.ano }}
+                    {% if form.ano.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.ano.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Valor FIPE (Opcional)</label>
+                    {{ form.fipe }}
+                    {% if form.fipe.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.fipe.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
+                Mídia e Documentos
+            </div>
+            
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Foto Principal</label>
+                    {{ form.foto }}
+                    {% if form.foto.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.foto.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Documento Digital (CRLV)</label>
+                    {{ form.documento_impresso }}
+                    {% if form.documento_impresso.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.documento_impresso.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition shadow-lg">
+            Salvar Dados do Veículo
+        </button>
+
+    </form>
+</div>
+
+<style>
+/* Força o estilo consistente para todos os campos injetados pelo Django */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100% !important;
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: .5rem !important;
+    padding: .65rem .8rem !important;
+    font-size: .875rem !important;
+    font-weight: 600 !important;
+    outline: none !important;
+}
+
+input:focus {
+    border-color: #3b82f6 !important;
+    ring: 2px #3b82f6 !important;
+}
+</style>
+{% endblock %}

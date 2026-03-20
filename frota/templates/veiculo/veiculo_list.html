@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Gestão de Frota{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+    
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 pb-6 border-b border-slate-200">
+        <div>
+            <nav class="flex mb-2" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <li>Ativos</li>
+                    <li><i class="fas fa-chevron-right text-[8px] opacity-50"></i></li>
+                    <li class="text-blue-600">Frota de Veículos</li>
+                </ol>
+            </nav>
+          
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <form method="GET" class="relative flex-grow sm:flex-grow-0">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input 
+                    type="text"
+                    name="busca"
+                    placeholder="Filtrar placa ou modelo..."
+                    value="{{ request.GET.busca }}"
+                    class="pl-9 pr-10 py-2.5 bg-slate-100 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 w-full sm:w-72 transition-all">
+                
+                {% if request.GET.busca %}
+                <a href="{% url 'veiculos_list' %}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </form>
+
+            <a href="{% url 'veiculo_add' %}" class="flex-shrink-0 inline-flex items-center justify-center px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg gap-2">
+                <i class="fas fa-plus text-[10px]"></i> Novo Veículo
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for veiculo in veiculos %}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col">
+            
+            <div class="p-5 flex gap-4">
+                <div class="w-20 h-20 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
+                    {% if veiculo.foto %}
+                        <img src="{{ veiculo.foto.url }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex flex-col items-center justify-center space-y-1">
+                            <i class="fas fa-car text-xs text-slate-400 opacity-50"></i> 
+                            <span class="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                                Sem imagem
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="flex-grow min-w-0">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">{{ veiculo.placa }}</span>
+                        
+                        <div class="flex gap-2">
+                            <a href="{% url 'veiculo_update' veiculo.pk %}" class="text-slate-400 hover:text-amber-600 transition-colors"><i class="fas fa-pen text-xs"></i></a>
+                            <a href="{% url 'veiculo_delete' veiculo.pk %}" class="text-slate-400 hover:text-rose-600 transition-colors"><i class="fas fa-trash text-xs"></i></a>
+                        </div>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 mt-2 truncate">{{ veiculo.modelo }}</h3>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ veiculo.ano }}</p>
+                </div>
+            </div>
+
+            <div class="px-5 py-4 bg-slate-50 border-y border-slate-100 grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Valor FIPE</p>
+                    <p class="text-sm font-bold text-slate-700">R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Status</p>
+                    
+                    {% if veiculo.ativo %}
+                        <span class="inline-flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ativo
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Inativo
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="p-4 mt-auto">
+                <a href="{% url 'veiculo_detail' veiculo.pk %}" class="flex items-center justify-center w-full py-2.5 rounded-xl border border-slate-200 text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-900 hover:text-white transition-all gap-2">
+                    Visualizar Detalhes <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-24 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
+            <i class="fas fa-folder-open text-slate-300 text-4xl mb-4"></i>
+            <h3 class="text-slate-900 font-bold">Nenhum veículo encontrado</h3>
+            <p class="text-slate-500 text-sm mt-1">Sua frota está vazia no momento.</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% if is_paginated %}
+<div class="flex flex-col sm:flex-row items-center justify-between mt-10 pb-10 gap-4 border-t border-slate-100 pt-8">
+    <div class="text-sm text-slate-500 font-medium">
+        Mostrando <span class="text-slate-900 font-bold">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> de <span class="text-slate-900 font-bold">{{ paginator.count }}</span> veículos
+    </div>
+
+    <nav class="flex items-center gap-1 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+        
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
+            <i class="fas fa-chevron-left text-xs"></i>
+        </a>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white text-sm font-black shadow-lg shadow-slate-200">
+                    {{ num }}
+                </span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                   class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 text-sm font-bold hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+           class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
+            <i class="fas fa-chevron-right text-xs"></i>
+        </a>
+        {% endif %}
+
+    </nav>
+</div>
+{% endif %}
+</div>
+{% endblock %}

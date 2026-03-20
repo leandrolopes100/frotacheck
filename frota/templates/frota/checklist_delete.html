@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Vistoria #{{ checklist.id }} | Frota Check{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-20 px-4">
+    
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        
+        <div class="bg-rose-50 border-b border-rose-100 p-8 text-center">
+            <div class="w-16 h-16 bg-white text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <i class="fas fa-clipboard-check text-2xl opacity-30 absolute"></i>
+                <i class="fas fa-times text-xl text-rose-600 relative ml-6 mt-4"></i>
+                <i class="fas fa-trash-can text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-black text-rose-900 uppercase tracking-tighter">Excluir Vistoria</h2>
+        </div>
+
+        <div class="p-8 text-center">
+            <p class="text-slate-600 mb-2 font-medium">
+                Você está prestes a remover o registro de:
+            </p>
+            <h3 class="text-lg font-black text-slate-900 mb-1">
+                {{ checklist.veiculo.modelo }}
+            </h3>
+            <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded uppercase tracking-widest">
+                Placa: {{ checklist.veiculo.placa }}
+            </span>
+
+            <div class="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-100 text-left">
+                <div>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Data/Hora</p>
+                    <p class="text-sm font-bold text-slate-700">{{ checklist.data_realizada|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Motorista</p>
+                    <p class="text-sm font-bold text-slate-700">{{ checklist.motorista.nome_completo|default:"---" }}</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mt-6 mb-8 text-left flex gap-3">
+                <i class="fas fa-exclamation-circle text-rose-500 mt-1"></i>
+                <p class="text-[11px] text-slate-500 leading-relaxed font-semibold">
+                    <strong>Ação Crítica:</strong> A exclusão deste registro removerá fotos, notas e conformidades desta inspeção. Isso pode afetar relatórios de auditoria e conformidade da frota.
+                </p>
+            </div>
+
+            <form method="post" class="flex flex-col sm:flex-row gap-3">
+                {% csrf_token %}
+                
+                <a href="{% url 'checklist_detail' checklist.pk %}" 
+                   class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all text-center">
+                    Manter Registro
+                </a>
+                
+                <button type="submit" 
+                        class="flex-1 px-6 py-4 bg-rose-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-200">
+                    Confirmar Exclusão
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-8 text-center">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Identificador do Registro: <span class="text-slate-600">#{{ checklist.id }}</span>
+        </p>
+    </div>
+
+</div>
+{% endblock %}

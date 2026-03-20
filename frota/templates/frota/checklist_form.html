@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Novo Checklist | Frota Check{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4 pb-24 text-slate-900">
+    
+    <div class="mb-10 pb-6 border-b border-slate-200 flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Checklist Veicular</h1>
+            <p class="text-sm text-slate-500 mt-2 font-medium">Validação de conformidade em tempo real.</p>
+        </div>
+        <i class="fas fa-clipboard-check text-4xl text-slate-100"></i>
+    </div>
+
+    <!-- EXIBIÇÃO DETALHADA DE ERROS (Para Debug) -->
+    {% if form.errors or fotos.errors %}
+        <div class="bg-rose-50 border border-rose-200 p-4 mb-8 rounded-xl text-rose-600">
+            <p class="text-[10px] font-black uppercase tracking-widest mb-2"><i class="fas fa-exclamation-triangle"></i> Atenção aos erros:</p>
+            <ul class="text-xs font-bold list-disc pl-5 space-y-1">
+                {% for field, errors in form.errors.items %}<li>{{ field|capfirst }}: {{ errors.0 }}</li>{% endfor %}
+                {% for foto_form in fotos %}
+                    {% if foto_form.errors %}
+                        <li>Foto {{ forloop.counter }}: Verifique se a imagem foi capturada ou se a descrição foi preenchida.</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8" id="main-form">
+        {% csrf_token %}
+        {{ fotos.management_form }}
+        
+        <!-- GPS -->
+        <input type="hidden" name="latitude" id="id_latitude">
+        <input type="hidden" name="longitude" id="id_longitude">
+
+        <!-- Seção 1: Identificação -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 font-black text-slate-800 text-[10px] uppercase tracking-widest">Identificação do Protocolo</div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for field in form %}
+                    {% if field.field.widget.input_type != "checkbox" and field.name != "latitude" and field.name != "longitude" and field.name != "observacoes" %}
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Seção 2: Itens de Segurança -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 font-black text-slate-800 text-[10px] uppercase tracking-widest">Itens de Segurança</div>
+            <div class="divide-y divide-slate-100">
+                {% for field in form %}
+                    {% if field.field.widget.input_type == "checkbox" %}
+                    <label class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group">
+                        <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900">{{ field.label }}</span>
+                        <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" class="w-6 h-6 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" {% if field.value %}checked{% endif %}>
+                    </label>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Seção 3: Evidências Fotográficas -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-black text-slate-800 text-[10px] uppercase tracking-widest">Evidências Fotográficas</h3>
+                <button type="button" id="add-foto" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md">
+                    <i class="fas fa-plus mr-1"></i> Adicionar Foto
+                </button>
+            </div>
+            
+            <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6" id="fotos-container">
+                {% for foto_form in fotos %}
+                <div class="foto-item p-5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col gap-4 relative">
+                    {% for hidden in foto_form.hidden_fields %}{{ hidden }}{% endfor %}
+                    
+                    <button type="button" onclick="removeFoto(this)" class="absolute top-3 right-3 text-slate-300 hover:text-rose-500 transition-colors z-20">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="w-full sm:w-40 shrink-0">
+                            <div class="preview-box w-full h-32 bg-slate-200 rounded-xl flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 cursor-pointer hover:bg-slate-300 transition-all"
+                                 onclick="this.parentElement.querySelector('input[type=file]').click()">
+                                {% if foto_form.instance.imagem %}
+                                    <img src="{{ foto_form.instance.imagem.url }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <i class="fas fa-camera text-2xl text-slate-400"></i>
+                                    <img src="" class="hidden w-full h-full object-cover">
+                                {% endif %}
+                            </div>
+                            <div class="hidden">
+                                {{ foto_form.imagem }}
+                            </div>
+                            <p class="text-[8px] font-black text-slate-400 uppercase text-center mt-2 tracking-widest">Toque para Foto</p>
+                        </div>
+                        <div class="flex-1">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Descrição<label class="text-red-500">*</label></label>
+                            {{ foto_form.descricao }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Notas -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Notas Adicionais</label>
+            {{ form.observacoes }}
+        </section>
+
+        <div class="pt-4">
+            <button type="submit" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl active:scale-[0.98]">
+                FINALIZAR E ENVIAR CHECKLIST
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Template JS -->
+<template id="foto-template">
+    <div class="foto-item p-5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col gap-4 relative animate-fadeIn">
+        <button type="button" onclick="removeFoto(this)" class="absolute top-3 right-3 text-slate-300 hover:text-rose-500 transition-colors z-20">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+        <div class="flex flex-col sm:flex-row gap-4">
+            <div class="w-full sm:w-40 shrink-0">
+                <div class="preview-box w-full h-32 bg-slate-200 rounded-xl flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 cursor-pointer hover:bg-slate-300 transition-all"
+                     onclick="this.parentElement.querySelector('input[type=file]').click()">
+                    <i class="fas fa-camera text-2xl text-slate-400"></i>
+                    <img src="" class="hidden w-full h-full object-cover">
+                </div>
+                <div class="hidden">
+                    <input type="file" name="fotos-__prefix__-imagem" accept="image/*" capture="camera">
+                </div>
+                <p class="text-[8px] font-black text-slate-400 uppercase text-center mt-2 tracking-widest">Toque para Foto</p>
+            </div>
+            <div class="flex-1">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Descrição</label>
+                <input type="text" name="fotos-__prefix__-descricao" class="form-control" placeholder="Descreva a avaria...">
+            </div>
+        </div>
+    </div>
+</template>
+
+<style>
+    input[type="text"], input[type="number"], select, textarea {
+        width: 100% !important; background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important;
+        border-radius: 0.75rem !important; padding: 0.75rem !important; font-size: 0.875rem !important; font-weight: 700 !important;
+    }
+    textarea { height: 100px !important; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+</style>
+
+<script>
+    function setupFotoLogic(element) {
+        const input = element.querySelector('input[type="file"]');
+        const previewBox = element.querySelector('.preview-box');
+        const previewImg = previewBox.querySelector('img');
+        const icon = previewBox.querySelector('i');
+
+        if (input) {
+            input.setAttribute('accept', 'image/*');
+            input.setAttribute('capture', 'camera');
+            input.onchange = function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewImg.src = e.target.result;
+                        previewImg.classList.remove('hidden');
+                        if(icon) icon.classList.add('hidden');
+                        previewBox.classList.remove('border-dashed');
+                        previewBox.classList.add('border-solid', 'border-blue-500');
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            };
+        }
+    }
+
+    function removeFoto(btn) {
+        const item = btn.closest('.foto-item');
+        if (document.querySelectorAll('.foto-item').length > 1) {
+            item.remove();
+        } else {
+            alert("Mantenha pelo menos um registro.");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.foto-item').forEach(setupFotoLogic);
+        const addBtn = document.getElementById('add-foto');
+        const totalForms = document.getElementById('id_fotos-TOTAL_FORMS');
+
+        if (addBtn) {
+            addBtn.onclick = function() {
+                const count = parseInt(totalForms.value);
+                const template = document.getElementById('foto-template').innerHTML.replace(/__prefix__/g, count);
+                const div = document.createElement('div');
+                div.innerHTML = template;
+                document.getElementById('fotos-container').appendChild(div.firstElementChild);
+                totalForms.value = count + 1;
+                setupFotoLogic(document.getElementById('fotos-container').lastElementChild);
+            };
+        }
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((p) => {
+                document.getElementById('id_latitude').value = p.coords.latitude.toFixed(8);
+                document.getElementById('id_longitude').value = p.coords.longitude.toFixed(8);
+            }, null, { enableHighAccuracy: true });
+        }
+    });
+</script>
+{% endblock %}

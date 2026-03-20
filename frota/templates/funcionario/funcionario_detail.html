@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ funcionario.nome_completo }} | Frota Check{% endblock %}
+{% block header_title %}Perfil do Colaborador{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4">
+
+    <div class="flex items-center justify-between mb-8">
+        <a href="{% url 'funcionario_list' %}" class="group flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all">
+            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Voltar à Lista
+        </a>
+        <div class="flex gap-2">
+            <a href="#" class="px-4 py-2 text-[10px] font-black text-slate-600 bg-slate-100 rounded-xl uppercase tracking-widest hover:bg-slate-200 transition-all">
+                Editar Cadastro
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-8 flex items-center gap-6">
+        <div class="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl font-black shadow-lg">
+            {{ funcionario.nome_completo|slice:":1" }}
+        </div>
+        <div>
+            <h1 class="text-2xl font-black text-slate-900">{{ funcionario.nome_completo }}</h1>
+            <p class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block uppercase tracking-widest mt-1">
+                {{ funcionario.cargo }}
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div class="md:col-span-2 space-y-8">
+            <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-8 py-6 border-b border-slate-100">
+                    <h2 class="font-black text-slate-800 uppercase text-[10px] tracking-widest">Informações Gerais</h2>
+                </div>
+                <div class="p-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">CPF</p>
+                        <p class="text-sm font-bold text-slate-800">{{ funcionario.cpf }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Gestor Responsável</p>
+                        <p class="text-sm font-bold text-slate-800">{{ funcionario.cadastrado_por.username|default:"N/A" }}</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="space-y-8">
+            <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 font-black text-slate-800 uppercase text-[10px] tracking-widest">
+                    Documentação
+                </div>
+                <div class="p-6 space-y-6">
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Número CNH</p>
+                        <p class="text-sm font-bold text-slate-700">{{ funcionario.numero_cnh }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Validade CNH</p>
+                        {% now "Y-m-d" as current_date %}
+                        {% if funcionario.validade_cnh|date:"Y-m-d" < current_date %}
+                            <span class="px-3 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-black uppercase">Vencida em {{ funcionario.validade_cnh|date:"d/m/Y" }}</span>
+                        {% else %}
+                            <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase">Válida até {{ funcionario.validade_cnh|date:"d/m/Y" }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if funcionario.cnh_impressa %}
+                    <a href="{{ funcionario.cnh_impressa.url }}" target="_blank" class="flex items-center justify-center gap-2 w-full text-center py-3 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all">
+                        <i class="fas fa-file-pdf"></i> Visualizar CNH
+                    </a>
+                    {% else %}
+                    <div class="p-3 bg-slate-50 border border-slate-100 rounded-lg text-center text-[9px] font-bold text-slate-400">
+                        CNH não digitalizada
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

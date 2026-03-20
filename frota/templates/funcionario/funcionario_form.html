@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Novo Colaborador | Frota Check{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto py-10 px-4">
+
+```
+<div class="mb-10 flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Novo Colaborador</h1>
+        <p class="text-sm text-slate-500 font-medium mt-1">Gerencie os acessos e credenciais dos motoristas.</p>
+    </div>
+    <a href="javascript:history.back()" class="text-slate-400 hover:text-slate-900 transition">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="space-y-8">
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-red-700 text-sm font-bold">
+            Corrija os erros abaixo antes de continuar.
+        </p>
+    </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        {% for error in form.non_field_errors %}
+            <p class="text-red-600 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- INFORMAÇÕES DE ACESSO -->
+
+    <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
+            Informações de Acesso
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    Login <label class="text-red-500">*</label>
+                </label>
+
+                <input type="text" name="username"
+                value="{{ request.POST.username }}"
+                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    E-mail 
+                </label>
+
+                <input type="email" name="email"
+                value="{{ request.POST.email }}"
+                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    Senha 
+                </label>
+
+                <input type="password" name="password"
+                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- DADOS DO MOTORISTA -->
+
+    <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+
+        <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
+            Dados do Motorista
+        </div>
+
+        <div class="p-6 space-y-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                        Nome Completo <label class="text-red-500">*</label>
+                    </label>
+
+                    {{ form.nome_completo }}
+
+                    {% if form.nome_completo.errors %}
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ form.nome_completo.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                        CPF <label class="text-red-500">*</label>
+                    </label>
+
+                    {{ form.cpf }}
+
+                    {% if form.cpf.errors %}
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ form.cpf.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100">
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                        CNH <label class="text-red-500">*</label>
+                    </label>
+
+                    {{ form.numero_cnh }}
+
+                    {% if form.numero_cnh.errors %}
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ form.numero_cnh.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                        Validade <label class="text-red-500">*</label>
+                    </label>
+
+                    {{ form.validade_cnh }}
+
+                    {% if form.validade_cnh.errors %}
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ form.validade_cnh.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                        Cargo
+                    </label>
+
+                    {{ form.cargo }}
+
+                    {% if form.cargo.errors %}
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ form.cargo.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                    Upload de Habilitação
+                </label>
+
+                {{ form.cnh_impressa }}
+
+                {% if form.cnh_impressa.errors %}
+                <p class="text-red-500 text-xs mt-1">
+                    {{ form.cnh_impressa.errors.0 }}
+                </p>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <button type="submit"
+    class="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition shadow-lg">
+        Registrar Colaborador
+    </button>
+
+</form>
+```
+
+</div>
+
+<style>
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+select {
+
+width:100%!important;
+background-color:#f8fafc!important;
+border:1px solid #e2e8f0!important;
+border-radius:.5rem!important;
+padding:.65rem .8rem!important;
+font-size:.875rem!important;
+font-weight:600!important;
+
+}
+</style>
+
+{% endblock %}
