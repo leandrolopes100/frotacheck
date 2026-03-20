@@ -1,6 +1,6 @@
 asgiref==3.11.1
 colorama==0.4.6
-Django==6.0.2
+Django==5.2.11
 django-widget-tweaks==1.5.1
 pillow==12.1.1
 qrcode==8.2
