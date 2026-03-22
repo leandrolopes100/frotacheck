@@ -1,0 +1,4 @@
+# Ignora a pasta de templates e arquivos estáticos no gráfico de linguagens
+templates/** linguist-detectable=false
+static/** linguist-detectable=false
+*.html linguist-detectable=false
