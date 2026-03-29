@@ -2,212 +2,252 @@
 {% block title %}Histórico de Inspeções | Frota Check{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6">
+<!-- Importação da Fonte Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    body { font-family: 'Inter', sans-serif; }
+</style>
+
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 bg-slate-50/50 min-h-screen">
 
     <!-- Cabeçalho -->
-    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-wide flex items-center gap-2">
-                Histórico de Inspeções
+            <nav class="flex mb-3" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2 text-[10px] text-slate-400 uppercase font-black tracking-[0.2em]">
+                    <li>Frota</li>
+                    <li><i class="fas fa-chevron-right text-[8px] opacity-50"></i></li>
+                    <li class="text-blue-600">Histórico</li>
+                </ol>
+            </nav>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight flex items-center gap-4">
+                Inspeções
+                <span class="inline-flex items-center justify-center bg-blue-100 text-blue-700 text-xs font-black px-3 py-1 rounded-full ring-4 ring-blue-50/50">
+                    {{ checklists|length }}
+                </span>
             </h1>
-            <p class="text-sm text-slate-500">Visualize e gerencie todos os checklists realizados</p>
+            <p class="text-slate-500 mt-2 text-sm font-medium">Gestão centralizada de conformidade e segurança da frota.</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <button onclick="window.print()" class="hidden md:flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm">
+                <i class="fas fa-download text-xs"></i> Exportar
+            </button>
+            <a href="{% url 'checklist_add' %}" class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                <i class="fas fa-plus text-xs"></i> Nova Inspeção
+            </a>
         </div>
     </div>
 
-    <!-- Grid de Cards de Indicadores (KPIs) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-        <!-- Card: Total -->
-        <div class="group bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex items-center gap-4">
-            <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform">
-                <i class="fas fa-clipboard-list text-lg"></i>
-            </div>
-            <div>
-                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Total</p>
-                <h3 class="text-2xl font-black text-slate-900 leading-none">{{ total_checklists }}</h3>
-            </div>
-        </div>
-
-        <!-- Card: Sem Avarias -->
-        <div class="group bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex items-center gap-4">
-            <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform">
-                <i class="fas fa-check-double text-lg"></i>
-            </div>
-            <div>
-                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Sem avarias</p>
-                <h3 class="text-2xl font-black text-slate-900 leading-none">{{ total_ok }}</h3>
-            </div>
-        </div>
-
-        <!-- Card: Com Avarias -->
-        <div class="group bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex items-center gap-4">
-            <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 group-hover:scale-110 transition-transform">
-                <i class="fas fa-triangle-exclamation text-lg"></i>
-            </div>
-            <div>
-                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Avarias</p>
-                <h3 class="text-2xl font-black text-slate-900 leading-none">{{ total_avarias }}</h3>
-            </div>
-        </div>
-        {% if user.is_patrao %}
-        <!-- Card: Saúde da Frota -->
-        <div class="group bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex items-center gap-4 border-b-4 {% if saude_frota > 80 %} border-b-emerald-500 {% elif saude_frota > 50 %} border-b-amber-500 {% else %} border-b-rose-500 {% endif %}">
-            <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 group-hover:scale-110 transition-transform">
-                <i class="fas fa-heart-pulse text-lg animate-pulse"></i>
-            </div>
-                <div class="flex-1">
-                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Saúde</p>
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-2xl font-black text-slate-900 leading-none">{{ saude_frota }}%</h3>
-                    </div>
+    <!-- KPI Dashboard -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-4 ring-blue-50/50">
+                    <i class="fas fa-clipboard-list text-xl"></i>
                 </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Total</p>
+                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ total_checklists }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 ring-4 ring-emerald-50/50">
+                    <i class="fas fa-check-double text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Conformes</p>
+                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ total_ok }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-rose-50 text-rose-600 ring-4 ring-rose-50/50">
+                    <i class="fas fa-triangle-exclamation text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Avarias</p>
+                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ total_avarias }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        {% if user.is_patrao %}
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+            <div class="relative z-10 flex items-center gap-5">
+                <div class="w-14 h-14 flex items-center justify-center rounded-2xl {% if saude_frota > 80 %}bg-emerald-50 text-emerald-600 ring-emerald-50/50{% else %}bg-amber-50 text-amber-600 ring-amber-50/50{% endif %} ring-4">
+                    <i class="fas fa-heart-pulse text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Saúde Frota</p>
+                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ saude_frota }}%</h3>
+                </div>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1.5 bg-slate-50">
+                <div class="h-full {% if saude_frota > 80 %}bg-emerald-500{% else %}bg-amber-500{% endif %}" style="width: {{ saude_frota }}%"></div>
+            </div>
         </div>
         {% endif %}
     </div>
 
     <!-- Filtros -->
-    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-4 mb-8">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <input type="text" name="veiculo" value="{{ request.GET.veiculo }}" placeholder="Buscar veículo ou Placa..." 
-                   class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-            <input type="text" name="motorista" value="{{ request.GET.motorista }}" placeholder="Buscar motorista..." 
-                   class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-            <select name="status" 
-                    class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                <option value="">Todos os Status</option>
-                <option value="ok" {% if request.GET.status == 'ok' %}selected{% endif %}>Sem Avaria</option>
-                <option value="avaria" {% if request.GET.status == 'avaria' %}selected{% endif %}>Com Avaria</option>
+    <div class="bg-white border border-slate-200/60 rounded-3xl shadow-sm p-3 mb-8">
+        <form method="GET" action="." class="flex flex-wrap md:flex-nowrap items-center gap-3">
+            <div class="relative flex-1 min-w-[240px]">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" name="veiculo" value="{{ request.GET.veiculo }}" placeholder="Buscar por placa ou modelo..." 
+                       class="w-full bg-slate-50/50 border-none rounded-2xl pl-11 pr-4 py-3 text-sm font-medium focus:ring-4 focus:ring-blue-500/10 transition-all">
+            </div>
+            
+            <select name="status" class="bg-slate-50/50 border-none rounded-2xl px-5 py-3 text-sm font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10 cursor-pointer min-w-[160px]">
+                <option value="">Todos Status</option>
+                <option value="ok" {% if request.GET.status == 'ok' %}selected{% endif %}>✅ Sem Avaria</option>
+                <option value="avaria" {% if request.GET.status == 'avaria' %}selected{% endif %}>⚠️ Com Avaria</option>
             </select>
-            <div class="flex gap-2">
-                <button type="submit" 
-                        class="flex-1 bg-slate-900 text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-slate-800 transition shadow-sm">
-                    <i class="fa-solid fa-magnifying-glass text-xs opacity-80"></i> Buscar 
+
+            <div class="flex gap-2 w-full md:w-auto">
+                <button type="submit" class="flex-1 md:flex-none bg-slate-900 text-white rounded-2xl px-8 py-3 text-sm font-bold hover:bg-slate-800 transition-all shadow-md shadow-slate-200">
+                    Filtrar
                 </button>
-                <a href="?" 
-                   class="flex items-center justify-center px-4 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-700 transition">
-                    <i class="fas fa-times"></i>
+                {% if request.GET.veiculo or request.GET.status %}
+                <a href="?" class="flex items-center justify-center w-12 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all">
+                    <i class="fas fa-filter-circle-xmark text-lg"></i>
                 </a>
+                {% endif %}
             </div>
         </form>
     </div>
-    <!-- Tabela Desktop -->
-    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+
+    <!-- Tabela Estática (Sem Hover) -->
+    <div class="bg-white border border-slate-200/60 rounded-[2rem] shadow-xl shadow-slate-200/40 overflow-hidden">
         <div class="hidden md:block overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-slate-50/50">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Data / Hora</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Motorista</th>
-                        <th class="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Veículo</th>
-                        <th class="px-6 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ações</th>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Data & Hora</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Motorista</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Veículo</th>
+                        <th class="px-8 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
+                        <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Ações</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-50">
                     {% for c in checklists %}
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="px-6 py-4">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-semibold text-slate-800">{{ c.data_realizada|date:"d/m/Y" }}</span>
-                                <span class="text-[10px] text-slate-400 font-medium">{{ c.data_realizada|date:"H:i" }}</span>
+                    <tr class="bg-white">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-4">
+                                <div class="w-11 h-11 rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-500">
+                                    <span class="text-[9px] font-black leading-none mb-0.5">{{ c.data_realizada|date:"M"|upper }}</span>
+                                    <span class="text-base font-black leading-none">{{ c.data_realizada|date:"d" }}</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-slate-800">{{ c.data_realizada|date:"H:i" }}</span>
+                                    <span class="text-[10px] text-slate-400 font-bold uppercase">{{ c.data_realizada|date:"l" }}</span>
+                                </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm font-semibold text-slate-700">{{ c.motorista.nome_completo|default:"Administrador" }}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-slate-800">{{ c.veiculo.modelo }}</span>
-                                <span class="text-[10px] text-blue-600 font-bold uppercase tracking-tight">{{ c.veiculo.placa }}</span>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-user text-[10px]"></i>
+                                </div>
+                                <span class="text-sm font-bold text-slate-700">{{ c.motorista.nome_completo|default:"Admin" }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-8 py-5">
+                            <div class="px-4 py-2 bg-slate-50 rounded-2xl inline-block border border-slate-100">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <i class="fas fa-truck-moving text-[10px] text-slate-400"></i>
+                                    <p class="text-xs font-black text-slate-800 tracking-tight uppercase">{{ c.veiculo.modelo }}</p>
+                                </div>
+                                <p class="text-[10px] text-blue-600 font-black tracking-widest">{{ c.veiculo.placa }}</p>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5 text-center">
                             {% if c.tem_avaria %}
-                                <span class="text-rose-600 text-xs font-bold flex items-center gap-1.5 justify-center">
-                                    <i class="fas fa-triangle-exclamation"></i> AVARIA
+                                <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-wider ring-1 ring-rose-200/50">
+                                    <i class="fas fa-exclamation-triangle"></i> AVARIA
                                 </span>
                             {% else %}
-                                <span class="text-emerald-600 text-xs font-bold flex items-center gap-1.5 justify-center">
-                                    <i class="fas fa-circle-check"></i> OK
+                                <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider ring-1 ring-emerald-200/50">
+                                    <i class="fas fa-check-circle"></i> CONFORME
                                 </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-2 text-slate-400">
-                                <a href="{% url 'checklist_detail' c.id %}" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-blue-50 hover:text-blue-600 transition" title="Visualizar">
-                                    <i class="far fa-eye text-sm"></i>
+                        <td class="px-8 py-5 text-right">
+                            <div class="flex justify-end items-center gap-1">
+                                <a href="{% url 'checklist_detail' c.id %}" class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                                    <i class="far fa-eye text-base"></i>
                                 </a>
-                                <a href="{% url 'checklist_update' c.id %}" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition" title="Editar">
-                                    <i class="far fa-edit text-sm"></i>
+                                <a href="{% url 'checklist_update' c.id %}" class="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+                                    <i class="far fa-edit text-base"></i>
                                 </a>
-                                <a href="{% url 'checklist_delete' c.id %}" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-rose-50 hover:text-rose-600 transition" title="Excluir">
-                                    <i class="far fa-trash-alt text-sm"></i>
-                                </a>
+                                <form action="{% url 'checklist_delete' c.id %}" method="POST" class="inline" onsubmit="return confirm('Excluir?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                                        <i class="far fa-trash-alt text-base"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="py-20 text-center text-slate-400 italic">Nenhum checklist encontrado para esta busca.</td></tr>
+                    <tr>
+                        <td colspan="5" class="py-24 text-center">
+                            <div class="flex flex-col items-center gap-3 text-slate-300">
+                                <i class="fas fa-folder-open text-5xl"></i>
+                                <p class="text-sm font-bold">Nenhuma inspeção encontrada.</p>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        <!-- Versão Mobile (Cards Compactos) -->
-        <div class="md:hidden p-4 space-y-3">
+        
+        <!-- Mobile -->
+        <div class="md:hidden divide-y divide-slate-100">
             {% for c in checklists %}
-            <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden flex">
-                <div class="w-1.5 {% if c.tem_avaria %}bg-rose-500{% else %}bg-emerald-500{% endif %}"></div>
-                <div class="flex-1 p-4">
-                    <div class="flex justify-between items-start mb-2">
+            <div class="p-6 bg-white">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-500">
+                            <span class="text-[8px] font-black leading-none">{{ c.data_realizada|date:"M"|upper }}</span>
+                            <span class="text-sm font-black leading-none">{{ c.data_realizada|date:"d" }}</span>
+                        </div>
                         <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ c.data_realizada|date:"d/m/Y - H:i" }}</p>
-                            <h4 class="text-sm font-bold text-slate-800">{{ c.veiculo.modelo }} <span class="text-blue-600 text-xs ml-1">{{ c.veiculo.placa }}</span></h4>
+                            <h4 class="font-black text-slate-800 text-sm uppercase">{{ c.veiculo.modelo }}</h4>
+                            <p class="text-blue-600 text-[10px] font-bold tracking-widest">{{ c.veiculo.placa }}</p>
                         </div>
-                        {% if c.tem_avaria %}
-                            <i class="fas fa-triangle-exclamation text-rose-500"></i>
-                        {% else %}
-                            <i class="fas fa-circle-check text-emerald-500"></i>
-                        {% endif %}
                     </div>
-                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-50">
-                        <span class="text-xs text-slate-500 font-medium">{{ c.motorista.nome_completo|truncatechars:20 }}</span>
-                        <div class="flex gap-4 text-slate-400">
-                            <a href="{% url 'checklist_detail' c.id %}" class="hover:text-blue-600"><i class="far fa-eye"></i></a>
-                            <a href="{% url 'checklist_update' c.id %}" class="hover:text-emerald-600"><i class="far fa-edit"></i></a>
-                            <a href="{% url 'checklist_delete' c.id %}" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-rose-50 hover:text-rose-600 transition" title="Excluir">
-                                    <i class="far fa-trash-alt text-sm"></i>
-                                </a>
-                        </div>
+                    {% if c.tem_avaria %}
+                        <span class="text-rose-600 text-[10px] font-black uppercase tracking-widest italic">Avaria</span>
+                    {% else %}
+                        <span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest italic">OK</span>
+                    {% endif %}
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2 text-slate-500">
+                        <i class="fas fa-user text-[10px]"></i>
+                        <span class="text-xs font-bold">{{ c.motorista.nome_completo|default:"Admin" }}</span>
+                    </div>
+                    <div class="flex gap-4 text-slate-400">
+                        <a href="{% url 'checklist_detail' c.id %}"><i class="far fa-eye"></i></a>
+                        <a href="{% url 'checklist_update' c.id %}"><i class="far fa-edit"></i></a>
+                        <form action="{% url 'checklist_delete' c.id %}" method="POST" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('Excluir?')"><i class="far fa-trash-alt"></i></button>
+                        </form>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
-
-    <!-- Paginação (Se houver) -->
-    {% if is_paginated %}
-    <div class="mt-6 flex justify-center">
-        <!-- Adicione seu componente de paginação aqui -->
-    </div>
-    {% endif %}
-
 </div>
-
-<!-- Alerta Crítico Flutuante -->
-{% if alerta_critico %}
-<div class="fixed bottom-6 right-6 z-50 animate-bounce">
-    <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-4 max-w-xs">
-        <div class="bg-rose-500 p-2 rounded-lg">
-            <i class="fas fa-bolt-lightning text-white"></i>
-        </div>
-        <div>
-            <p class="text-[10px] font-bold uppercase text-rose-400 tracking-tighter leading-none mb-1">Alerta de Avaria</p>
-            <p class="text-xs text-slate-300">Veículo <span class="text-white font-bold">{{ ultimo_veiculo_avaria }}</span> detectou avarias.</p>
-        </div>
-        <button onclick="this.parentElement.parentElement.remove()" class="text-slate-500 hover:text-white ml-2">
-            <i class="fas fa-times text-xs"></i>
-        </button>
-    </div>
-</div>
-{% endif %}
-
 {% endblock %}

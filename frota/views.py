@@ -1,7 +1,6 @@
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 
-import os
 from io import BytesIO
 
 import qrcode
@@ -20,6 +19,7 @@ from django.views.generic import (
 
 from .forms import ChecklistForm, NovoFuncionarioForm, VeiculoForm
 from .models import Checklist, FotoAvaria, Funcionario, Usuario, Veiculo
+from .utils import get_filtro_avaria, get_filtro_ok
 
 class GestorRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -68,73 +68,50 @@ class ChecklistListView(LoginRequiredMixin, CheckListBaseView, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs_base = self.get_queryset()
+        qs_base = self.object_list
         total = qs_base.count()
+
+        avarias_qs = qs_base.filter(get_filtro_avaria()).distinct() 
+        total_avarias = avarias_qs.count()
+        total_ok = total - total_avarias
+
         context['total_checklists'] = total
+        context['total_avarias'] = total_avarias
+        context['total_ok'] = total_ok
+        context['saude_frota'] = round((total_ok / total * 100), 1) if total > 0 else 0
 
-        # Filtro de avarias (mesma lógica sua)
-        avarias_qs = qs_base.filter(
-            Q(farol=False) | Q(lanterna=False) | Q(re_freio=False) | Q(piscas=False) |
-            Q(pneus=False) | Q(amortecedor=False) | Q(bateria=False) | Q(oleo=False) |
-            Q(arrefecimento_radiador=False) | Q(vazamentos=False) | Q(limpadores=False) |
-            Q(vidros=False) | Q(retrovisor=False) | Q(estepe=False) | Q(macaco=False) |
-            Q(chave_roda=False) | Q(lataria=False) | Q(buzina=False) | 
-            Q(iluminacao_interna=False) | Q(bancos=False) | Q(tapetes=False) | 
-            Q(freio_mao=False) | Q(ar_condicionado=False) | Q(som=False) | Q(teto=False)
-        ).distinct()
+        checklist_com_avaria = qs_base.filter(get_filtro_avaria()).first()
+        if checklist_com_avaria:
+            context['alerta_critico'] = True
+            context['ultimo_veiculo_avaria'] = checklist_com_avaria.veiculo.placa
 
-        context['total_avarias'] = avarias_qs.count()
-        context['total_ok'] = total - context['total_avarias']
-        context['saude_frota'] = round((context['total_ok'] / total * 100), 1) if total > 0 else 0
-        
-        ultimo_checklist = qs_base.first()
-        if ultimo_checklist:
-            context['alerta_critico'] = ultimo_checklist.tem_avaria 
-            context['ultimo_veiculo_avaria'] = ultimo_checklist.veiculo.placa
-            
         return context
 
     def get_queryset(self):
         user = self.request.user
         queryset = Checklist.objects.select_related('veiculo', 'motorista').order_by('-data_realizada')
 
+        termo_busca = self.request.GET.get('veiculo')
         motorista = self.request.GET.get('motorista')
         status = self.request.GET.get('status')
-        termo_busca = self.request.GET.get('veiculo') 
 
         if termo_busca:
-            queryset = queryset.filter(Q(veiculo__modelo__icontains=termo_busca) | 
-                                    Q(veiculo__placa__icontains=termo_busca))
-            
+            queryset = queryset.filter(
+                Q(veiculo__modelo__icontains=termo_busca) |
+                Q(veiculo__placa__icontains=termo_busca)
+            )
+
         if motorista:
-            queryset = queryset.filter(Q(motorista__nome_completo__icontains=motorista))
+            queryset = queryset.filter(motorista__nome_completo__icontains=motorista)
 
         if status == 'avaria':
-            # Filtra onde QUALQUER um desses campos for False
-            queryset = queryset.filter(
-                Q(farol=False) | Q(lanterna=False) | Q(re_freio=False) | Q(piscas=False) |
-                Q(pneus=False) | Q(amortecedor=False) | Q(bateria=False) | Q(oleo=False) |
-                Q(arrefecimento_radiador=False) | Q(vazamentos=False) | Q(limpadores=False) |
-                Q(vidros=False) | Q(retrovisor=False) | Q(estepe=False) | Q(macaco=False) |
-                Q(chave_roda=False) | Q(lataria=False) | Q(buzina=False) | 
-                Q(iluminacao_interna=False) | Q(bancos=False) | Q(tapetes=False) | 
-                Q(freio_mao=False) | Q(ar_condicionado=False) | Q(som=False) | Q(teto=False)
-            )
+            queryset = queryset.filter(get_filtro_avaria())     
         elif status == 'ok':
-            queryset = queryset.filter(
-                farol=True, lanterna=True, re_freio=True, piscas=True,
-                pneus=True, amortecedor=True, bateria=True, oleo=True,
-                arrefecimento_radiador=True, vazamentos=True, limpadores=True,
-                vidros=True, retrovisor=True, estepe=True, macaco=True,
-                chave_roda=True, lataria=True, buzina=True, 
-                iluminacao_interna=True, bancos=True, tapetes=True, 
-                freio_mao=True, ar_condicionado=True, som=True, teto=True
-            )
-        
+            queryset = queryset.filter(**get_filtro_ok())   
+
         if user.is_superuser or user.is_patrao:
             return queryset
         return queryset.filter(motorista__usuario=user)
-
 
 class ChecklistCreateView(LoginRequiredMixin, QrCodeMixin, CheckListBaseView, CreateView):
     template_name = 'frota/checklist_form.html'
@@ -169,10 +146,6 @@ class ChecklistCreateView(LoginRequiredMixin, QrCodeMixin, CheckListBaseView, Cr
 class CheckListDetailView(LoginRequiredMixin, CheckListBaseView, DetailView):
     template_name = 'frota/checklist_detail.html'
     
-    def get(self, request, pk):
-        checklist = get_object_or_404(Checklist, pk=pk)
-        context = { 'checklist': checklist}
-        return render(request, self.template_name, context)
     
 class CheckListUpdateView(LoginRequiredMixin, GestorRequiredMixin, UpdateView):
     model = Checklist

@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-cfehpe=s%2ub(q7lx5m&h&1t7^-j&)u(#=p&4(+pdmn)b$o4e0'
 DEBUG = True
-ALLOWED_HOSTS = ['192.168.27.100', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.27.100', '127.0.0.1', '172.20.10.3']
 AUTH_USER_MODEL = 'frota.Usuario'
 
 LOGIN_REDIRECT_URL = 'checklist_list' 

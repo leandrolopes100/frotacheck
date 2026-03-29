@@ -112,6 +112,8 @@ class Checklist(models.Model):
     ar_condicionado = models.BooleanField(default=False, verbose_name="Ar Condicionado OK?")
     som = models.BooleanField(default=False, verbose_name="Som OK?")
     teto = models.BooleanField(default=False, verbose_name="Teto OK?")
+    tacografo = models.BooleanField(default=False, verbose_name="Tacógrafo Ok?")
+    carga = models.BooleanField(default=False, verbose_name="Carga Ok?")
     
     observacoes = models.TextField(blank=True, null=True)
 
@@ -120,7 +122,8 @@ class Checklist(models.Model):
             "Iluminação": [("Faróis", self.farol), ("Lanterna", self.lanterna), ("Ré/Freio", self.re_freio), ("Piscas", self.piscas)],
             "Mecânica": [("Pneus", self.pneus), ("Amortecedor", self.amortecedor), ("Bateria", self.bateria), ("Óleo", self.oleo), ("Arrefecimento", self.arrefecimento_radiador), ("Vazamentos", self.vazamentos)],
             "Externa/Segurança": [("Limpadores", self.limpadores), ("Vidros", self.vidros), ("Retrovisores", self.retrovisor), ("Estepe", self.estepe), ("Macaco", self.macaco), ("Chave de Roda", self.chave_roda), ("Lataria", self.lataria)],
-            "Interna": [("Buzina", self.buzina), ("Luz Interna", self.iluminacao_interna), ("Bancos", self.bancos), ("Tapetes", self.tapetes), ("Freio de Mão", self.freio_mao), ("Ar Condicionado", self.ar_condicionado), ("Som", self.som), ("Teto", self.teto)]
+            "Interna": [("Buzina", self.buzina), ("Luz Interna", self.iluminacao_interna), ("Bancos", self.bancos), ("Tapetes", self.tapetes), ("Freio de Mão", self.freio_mao), ("Ar Condicionado", self.ar_condicionado), ("Som", self.som), ("Teto", self.teto),
+                        ("Tacógrafo", self.tacografo), ("Carga", self.carga)]
         }
 
     @property
