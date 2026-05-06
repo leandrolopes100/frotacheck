@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Ordens de Manutenção | Frota Check{% endblock %}
+{% block header_title %}Ordens de Manutenção{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-8">
+        <div>
+            <nav class="flex mb-2"><ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <li><a href="{% url 'checklist_list' %}" class="hover:text-blue-600 transition-colors">Início</a></li>
+                <li><i class="fas fa-chevron-right text-[9px] opacity-40 mx-1"></i></li>
+                <li class="text-blue-600">Manutenção</li>
+            </ol></nav>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Ordens de Manutenção</h1>
+        </div>
+        <a href="{% url 'ordem_manutencao_add' %}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+            <i class="fas fa-plus text-xs"></i> Nova Ordem
+        </a>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500"><i class="fas fa-folder-open text-lg"></i></div>
+            <div><p class="text-xs font-black text-slate-400 uppercase tracking-wider">Abertas</p><p class="text-2xl font-black text-slate-900">{{ total_abertas }}</p></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500"><i class="fas fa-gears text-lg"></i></div>
+            <div><p class="text-xs font-black text-slate-400 uppercase tracking-wider">Em Andamento</p><p class="text-2xl font-black text-slate-900">{{ total_andamento }}</p></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500"><i class="fas fa-coins text-lg"></i></div>
+            <div><p class="text-xs font-black text-slate-400 uppercase tracking-wider">Custo Total (Concluídas)</p><p class="text-2xl font-black text-emerald-600">R$ {{ custo_total|floatformat:2|intcomma }}</p></div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-3 mb-6">
+        <form method="GET" class="flex flex-wrap gap-3 items-center">
+            <div class="relative flex-1 min-w-[200px]">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" name="veiculo" value="{{ request.GET.veiculo }}" placeholder="Placa ou modelo..."
+                       class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/10 outline-none">
+            </div>
+            <select name="status" class="bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10 min-w-[160px]">
+                <option value="">Todos</option>
+                <option value="aberta" {% if request.GET.status == 'aberta' %}selected{% endif %}>Aberta</option>
+                <option value="agendada" {% if request.GET.status == 'agendada' %}selected{% endif %}>Agendada</option>
+                <option value="em_andamento" {% if request.GET.status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                <option value="concluida" {% if request.GET.status == 'concluida' %}selected{% endif %}>Concluída</option>
+            </select>
+            <button type="submit" class="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all">Filtrar</button>
+            {% if request.GET.status or request.GET.veiculo %}<a href="?" class="w-10 h-10 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all"><i class="fas fa-times"></i></a>{% endif %}
+        </form>
+    </div>
+
+    <!-- Tabela -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-100">
+                    <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">OS #</th>
+                    <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Veículo</th>
+                    <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Descrição</th>
+                    <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Responsável</th>
+                    <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Agendado</th>
+                    <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Status</th>
+                    <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Custo</th>
+                    <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+                {% for ordem in ordens %}
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-6 py-4"><span class="text-xs font-black text-slate-500">#{{ ordem.pk }}</span></td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm font-black text-slate-900">{{ ordem.veiculo.modelo }}</p>
+                        <p class="text-xs text-blue-600 font-black tracking-widest">{{ ordem.veiculo.placa }}</p>
+                    </td>
+                    <td class="px-6 py-4 max-w-[200px]">
+                        <p class="text-sm font-medium text-slate-700 truncate">{{ ordem.descricao }}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm font-medium text-slate-600">{{ ordem.responsavel|default:"—" }}</p>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <p class="text-sm font-medium text-slate-600">{{ ordem.data_agendada|date:"d/m/Y"|default:"—" }}</p>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        {% if ordem.status == 'aberta' %}<span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 text-[10px] font-black border border-rose-200">Aberta</span>
+                        {% elif ordem.status == 'agendada' %}<span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black border border-blue-200">Agendada</span>
+                        {% elif ordem.status == 'em_andamento' %}<span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] font-black border border-amber-200">Em Andamento</span>
+                        {% elif ordem.status == 'concluida' %}<span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">Concluída</span>
+                        {% else %}<span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black">{{ ordem.get_status_display }}</span>{% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <p class="text-sm font-bold {% if ordem.custo %}text-emerald-600{% else %}text-slate-400{% endif %}">
+                            {% if ordem.custo %}R$ {{ ordem.custo|floatformat:2|intcomma }}{% else %}—{% endif %}
+                        </p>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'ordem_manutencao_update' ordem.pk %}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all inline-flex" title="Editar"><i class="fas fa-pen text-sm"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="py-16 text-center text-slate-400 text-sm font-bold">Nenhuma ordem de manutenção encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
+        <p class="text-sm text-slate-500">Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ paginator.count }}</p>
+        <nav class="flex items-center gap-1 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+            {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 transition-all"><i class="fas fa-chevron-left text-xs"></i></a>{% endif %}
+            {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 transition-all"><i class="fas fa-chevron-right text-xs"></i></a>{% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

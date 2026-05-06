@@ -1,7 +1,7 @@
-Frota Check é um sistema de gestão de ativos e conformidade veicular em tempo real. Desenvolvido para transportadoras que buscam eliminar falhas operacionais, reduzir custos com manutenção e garantir segurança jurídica através de vistorias digitais auditáveis.
+    Frota Check é um sistema de gestão de ativos e conformidade veicular em tempo real. Desenvolvido para transportadoras que buscam eliminar falhas operacionais, reduzir custos com manutenção e garantir segurança jurídica através de vistorias digitais auditáveis.
 
 * Funcionalidades Core
-Checklist Digital Inteligente: Substituição total do papel por formulários dinâmicos e intuitivos.
+Checklist Dig       ital Inteligente: Substituição total do papel por formulários dinâmicos e intuitivos.
 
  Validação por GPS Obrigatória: O sistema impede o envio da vistoria caso o motorista não esteja fisicamente presente no local do veículo, garantindo a veracidade dos dados.
  Evidências Fotográficas: Captura direta de fotos para registro de avarias com descrições obrigatórias.

@@ -1,234 +1,804 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Novo Checklist | Frota Check{% endblock %}
+{% block title %}Nova Inspeção | FrotaCheck{% endblock %}
+{% block header_title %}Nova Inspeção{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-10 px-4 pb-24 text-slate-900">
-    
-    <div class="mb-10 pb-6 border-b border-slate-200 flex justify-between items-end">
+<div class="max-w-3xl mx-auto pb-28">
+
+    <!-- ── Cabeçalho ── -->
+    <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Checklist Veicular</h1>
-            <p class="text-sm text-slate-500 mt-2 font-medium">Validação de conformidade em tempo real.</p>
+            <div class="flex items-center gap-2 mb-1">
+                <a href="{% url 'checklist_list' %}" class="text-xs text-slate-400 font-medium hover:text-blue-600 transition-colors">Dashboard</a>
+                <i class="fas fa-chevron-right text-slate-300 text-[9px]"></i>
+                <span class="text-xs text-blue-600 font-semibold">Nova Inspeção</span>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Checklist Veicular</h2>
+            <p class="text-sm text-slate-500 mt-0.5">Preencha todos os campos para registrar a vistoria.</p>
         </div>
-        <i class="fas fa-clipboard-check text-4xl text-slate-100"></i>
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+             style="background:#eff6ff">
+            <i class="fas fa-clipboard-check text-blue-500 text-base"></i>
+        </div>
     </div>
 
+    <!-- ── Stepper ── -->
+    <div class="card p-4 mb-6">
+        <div class="flex items-center gap-0">
+
+            <!-- Step 1 -->
+            <div class="step-item flex-1 flex flex-col items-center gap-1.5" data-step="1">
+                <div class="step-circle w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 text-xs font-bold
+                            bg-blue-600 text-white" style="box-shadow:0 0 0 3px rgba(37,99,235,0.15)">
+                    <i class="fas fa-id-card text-[11px]"></i>
+                </div>
+                <span class="step-label text-[10px] font-semibold text-blue-600 uppercase tracking-wider hidden sm:block">Identificação</span>
+            </div>
+
+            <!-- Connector -->
+            <div class="step-connector flex-1 h-0.5 mb-4 transition-all duration-300" style="background:#e2e8f0">
+                <div class="step-fill h-full w-0 transition-all duration-400" style="background:#2563eb"></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-item flex-1 flex flex-col items-center gap-1.5" data-step="2">
+                <div class="step-circle w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 text-xs font-bold
+                            bg-slate-100 text-slate-400">
+                    <i class="fas fa-shield-halved text-[11px]"></i>
+                </div>
+                <span class="step-label text-[10px] font-semibold text-slate-400 uppercase tracking-wider hidden sm:block">Vistoria</span>
+            </div>
+
+            <!-- Connector -->
+            <div class="step-connector flex-1 h-0.5 mb-4 transition-all duration-300" style="background:#e2e8f0">
+                <div class="step-fill h-full w-0 transition-all duration-400" style="background:#2563eb"></div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-item flex-1 flex flex-col items-center gap-1.5" data-step="3">
+                <div class="step-circle w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 text-xs font-bold
+                            bg-slate-100 text-slate-400">
+                    <i class="fas fa-camera text-[11px]"></i>
+                </div>
+                <span class="step-label text-[10px] font-semibold text-slate-400 uppercase tracking-wider hidden sm:block">Evidências</span>
+            </div>
+
+            <!-- Connector -->
+            <div class="step-connector flex-1 h-0.5 mb-4 transition-all duration-300" style="background:#e2e8f0">
+                <div class="step-fill h-full w-0 transition-all duration-400" style="background:#2563eb"></div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-item flex-1 flex flex-col items-center gap-1.5" data-step="4">
+                <div class="step-circle w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 text-xs font-bold
+                            bg-slate-100 text-slate-400">
+                    <i class="fas fa-paper-plane text-[11px]"></i>
+                </div>
+                <span class="step-label text-[10px] font-semibold text-slate-400 uppercase tracking-wider hidden sm:block">Envio</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── Alerta: veículo bloqueado ── -->
+    {% if veiculo_qr and veiculo_qr.bloqueado %}
+    <div class="flex items-center gap-3 p-4 mb-5 rounded-xl border" style="background:#fff1f2; border-color:#fecdd3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(220,38,38,0.1)">
+            <i class="fas fa-lock text-red-500"></i>
+        </div>
+        <div>
+            <p class="text-sm font-semibold text-red-700">Veículo {{ veiculo_qr.placa }} bloqueado para despacho</p>
+            <p class="text-xs text-red-500 mt-0.5">{{ veiculo_qr.motivo_bloqueio|default:"Consulte o gestor antes de prosseguir." }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Erros ── -->
     {% if form.errors or fotos.errors %}
-        <div class="bg-rose-50 border border-rose-200 p-4 mb-8 rounded-xl text-rose-600">
-            <p class="text-[10px] font-black uppercase tracking-widest mb-2"><i class="fas fa-exclamation-triangle"></i> Atenção aos erros:</p>
-            <ul class="text-xs font-bold list-disc pl-5 space-y-1">
+    <div class="flex items-start gap-3 p-4 mb-5 rounded-xl border" style="background:#fff1f2; border-color:#fecdd3">
+        <i class="fas fa-triangle-exclamation text-red-500 mt-0.5 flex-shrink-0"></i>
+        <div>
+            <p class="text-sm font-semibold text-red-700 mb-1">Corrija os erros antes de enviar:</p>
+            <ul class="text-xs text-red-600 space-y-0.5 list-disc pl-4">
                 {% for field, errors in form.errors.items %}<li>{{ field|capfirst }}: {{ errors.0 }}</li>{% endfor %}
                 {% for foto_form in fotos %}
-                    {% if foto_form.errors %}
-                        <li>Foto {{ forloop.counter }}: Verifique a imagem ou descrição.</li>
-                    {% endif %}
+                    {% if foto_form.errors %}<li>Foto {{ forloop.counter }}: Verifique a imagem ou descrição.</li>{% endif %}
                 {% endfor %}
             </ul>
         </div>
+    </div>
     {% endif %}
 
-    <form method="post" enctype="multipart/form-data" class="space-y-8" id="main-form">
+    <form method="post" enctype="multipart/form-data" id="main-form">
         {% csrf_token %}
         {{ fotos.management_form }}
-        
-        <input type="hidden" name="latitude" id="id_latitude">
+        <input type="hidden" name="latitude"  id="id_latitude">
         <input type="hidden" name="longitude" id="id_longitude">
 
-        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 font-black text-slate-800 text-[10px] uppercase tracking-widest">Identificação do Protocolo</div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-5">
+
+        <!-- ════════════════════════════════════
+             PASSO 1 — Identificação
+        ════════════════════════════════════ -->
+        <section id="step-identificacao" class="card overflow-hidden scroll-mt-20">
+
+            <div class="flex items-center gap-3 px-5 py-3.5 border-b border-slate-50">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
+                     style="background:#2563eb">1</div>
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Identificação do Protocolo</span>
+            </div>
+
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {% for field in form %}
                     {% if field.field.widget.input_type != "checkbox" and field.name != "latitude" and field.name != "longitude" and field.name != "observacoes" %}
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ field.label }}</label>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="text-red-400 ml-0.5">*</span>{% endif %}
+                        </label>
                         {{ field }}
+                        {% if field.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ field.errors.0 }}</p>
+                        {% endif %}
                     </div>
                     {% endif %}
                 {% endfor %}
             </div>
         </section>
 
-        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 font-black text-slate-800 text-[10px] uppercase tracking-widest">Itens de Segurança</div>
-            <div class="divide-y divide-slate-100">
-                {% for field in form %}
-                    {% if field.field.widget.input_type == "checkbox" %}
-                    <label class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group">
-                        <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900">{{ field.label }}</span>
-                        <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" class="w-6 h-6 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" {% if field.value %}checked{% endif %}>
-                    </label>
-                    {% endif %}
-                {% endfor %}
+        <!-- ════════════════════════════════════
+             PASSO 2 — Itens de Vistoria
+        ════════════════════════════════════ -->
+        <section id="step-vistoria" class="card overflow-hidden scroll-mt-20">
+
+            <div class="flex items-center gap-3 px-5 py-3.5 border-b border-slate-50">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
+                     style="background:#2563eb">2</div>
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Itens de Segurança</span>
+                <span class="ml-auto text-[10px] font-semibold text-slate-400">27 itens no total</span>
             </div>
+
+            <!-- ── Grupo: Iluminação ── -->
+            <div class="border-b border-slate-50">
+
+                <div class="group-header flex items-center justify-between px-5 py-3"
+                     style="background:#fffbeb">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                             style="background:rgba(251,191,36,0.2)">
+                            <i class="fas fa-lightbulb text-amber-500" style="font-size:11px"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-700">Iluminação</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 transition-all"
+                              data-total="4">0/4</span>
+                        <button type="button" onclick="marcarTodos('group-iluminacao', this)"
+                                class="text-[10px] font-semibold text-blue-600 hover:text-blue-800 px-2.5 py-1 rounded-lg hover:bg-blue-50 transition-colors">
+                            Marcar todos
+                        </button>
+                    </div>
+                </div>
+
+                <div id="group-iluminacao" class="divide-y divide-slate-50/80">
+                    {% include "frota/_checklist_item.html" with field=form.farol %}
+                    {% include "frota/_checklist_item.html" with field=form.lanterna %}
+                    {% include "frota/_checklist_item.html" with field=form.re_freio %}
+                    {% include "frota/_checklist_item.html" with field=form.piscas %}
+                </div>
+            </div>
+
+            <!-- ── Grupo: Mecânica ── -->
+            <div class="border-b border-slate-50">
+
+                <div class="group-header flex items-center justify-between px-5 py-3"
+                     style="background:#eff6ff">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                             style="background:rgba(59,130,246,0.15)">
+                            <i class="fas fa-gears text-blue-500" style="font-size:11px"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-700">Mecânica</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 transition-all"
+                              data-total="6">0/6</span>
+                        <button type="button" onclick="marcarTodos('group-mecanica', this)"
+                                class="text-[10px] font-semibold text-blue-600 hover:text-blue-800 px-2.5 py-1 rounded-lg hover:bg-blue-50 transition-colors">
+                            Marcar todos
+                        </button>
+                    </div>
+                </div>
+
+                <div id="group-mecanica" class="divide-y divide-slate-50/80">
+                    {% include "frota/_checklist_item.html" with field=form.pneus %}
+                    {% include "frota/_checklist_item.html" with field=form.amortecedor %}
+                    {% include "frota/_checklist_item.html" with field=form.bateria %}
+                    {% include "frota/_checklist_item.html" with field=form.oleo %}
+                    {% include "frota/_checklist_item.html" with field=form.arrefecimento_radiador %}
+                    {% include "frota/_checklist_item.html" with field=form.vazamentos %}
+                </div>
+            </div>
+
+            <!-- ── Grupo: Externa / Segurança ── -->
+            <div class="border-b border-slate-50">
+
+                <div class="group-header flex items-center justify-between px-5 py-3"
+                     style="background:#f0fdf4">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                             style="background:rgba(34,197,94,0.15)">
+                            <i class="fas fa-shield-halved text-emerald-500" style="font-size:11px"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-700">Externa / Segurança</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 transition-all"
+                              data-total="7">0/7</span>
+                        <button type="button" onclick="marcarTodos('group-externa', this)"
+                                class="text-[10px] font-semibold text-blue-600 hover:text-blue-800 px-2.5 py-1 rounded-lg hover:bg-blue-50 transition-colors">
+                            Marcar todos
+                        </button>
+                    </div>
+                </div>
+
+                <div id="group-externa" class="divide-y divide-slate-50/80">
+                    {% include "frota/_checklist_item.html" with field=form.limpadores %}
+                    {% include "frota/_checklist_item.html" with field=form.vidros %}
+                    {% include "frota/_checklist_item.html" with field=form.retrovisor %}
+                    {% include "frota/_checklist_item.html" with field=form.estepe %}
+                    {% include "frota/_checklist_item.html" with field=form.macaco %}
+                    {% include "frota/_checklist_item.html" with field=form.chave_roda %}
+                    {% include "frota/_checklist_item.html" with field=form.lataria %}
+                </div>
+            </div>
+
+            <!-- ── Grupo: Interna ── -->
+            <div>
+
+                <div class="group-header flex items-center justify-between px-5 py-3"
+                     style="background:#f5f3ff">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                             style="background:rgba(139,92,246,0.15)">
+                            <i class="fas fa-car-side text-violet-500" style="font-size:11px"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-700">Interna</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 transition-all"
+                              data-total="10">0/10</span>
+                        <button type="button" onclick="marcarTodos('group-interna', this)"
+                                class="text-[10px] font-semibold text-blue-600 hover:text-blue-800 px-2.5 py-1 rounded-lg hover:bg-blue-50 transition-colors">
+                            Marcar todos
+                        </button>
+                    </div>
+                </div>
+
+                <div id="group-interna" class="divide-y divide-slate-50/80">
+                    {% include "frota/_checklist_item.html" with field=form.buzina %}
+                    {% include "frota/_checklist_item.html" with field=form.iluminacao_interna %}
+                    {% include "frota/_checklist_item.html" with field=form.bancos %}
+                    {% include "frota/_checklist_item.html" with field=form.tapetes %}
+                    {% include "frota/_checklist_item.html" with field=form.freio_mao %}
+                    {% include "frota/_checklist_item.html" with field=form.ar_condicionado %}
+                    {% include "frota/_checklist_item.html" with field=form.som %}
+                    {% include "frota/_checklist_item.html" with field=form.teto %}
+                    {% include "frota/_checklist_item.html" with field=form.tacografo %}
+                    {% include "frota/_checklist_item.html" with field=form.carga %}
+                </div>
+            </div>
+
         </section>
 
-        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <h3 class="font-black text-slate-800 text-[10px] uppercase tracking-widest">Evidências Fotográficas</h3>
-                <button type="button" id="add-foto" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md">
-                    <i class="fas fa-plus mr-1"></i> Adicionar Foto
+        <!-- ════════════════════════════════════
+             PASSO 3 — Evidências Fotográficas
+        ════════════════════════════════════ -->
+        <section id="step-evidencias" class="card overflow-hidden scroll-mt-20">
+
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
+                         style="background:#2563eb">3</div>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Evidências Fotográficas</span>
+                    <span class="text-[10px] text-slate-400 font-medium">Opcional</span>
+                </div>
+                <button type="button" id="add-foto"
+                        class="btn-primary text-xs">
+                    <i class="fas fa-plus"></i> Adicionar foto
                 </button>
             </div>
-            
-            <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6" id="fotos-container">
+
+            <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4" id="fotos-container">
                 {% for foto_form in fotos %}
-                <div class="foto-item p-5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col gap-4 relative">
+                <div class="foto-item relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 transition-all">
                     {% for hidden in foto_form.hidden_fields %}{{ hidden }}{% endfor %}
-                    
-                    <button type="button" onclick="removeFoto(this)" class="absolute top-3 right-3 text-slate-300 hover:text-rose-500 transition-colors z-20">
-                        <i class="fas fa-trash-alt"></i>
+
+                    <!-- Remove button -->
+                    <button type="button" onclick="removeFoto(this)"
+                            class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                        <i class="fas fa-xmark text-sm"></i>
                     </button>
 
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <div class="w-full sm:w-40 shrink-0">
-                            <div class="preview-box w-full h-32 bg-slate-200 rounded-xl flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 cursor-pointer hover:bg-slate-300 transition-all"
-                                 onclick="this.parentElement.querySelector('input[type=file]').click()">
-                                {% if foto_form.instance.imagem %}
-                                    <img src="{{ foto_form.instance.imagem.url }}" class="w-full h-full object-cover">
-                                {% else %}
-                                    <i class="fas fa-camera text-2xl text-slate-400"></i>
-                                    <img src="" class="hidden w-full h-full object-cover">
-                                {% endif %}
+                    <!-- Preview area -->
+                    <div class="preview-box aspect-video bg-slate-100 flex items-center justify-center overflow-hidden cursor-pointer relative"
+                         onclick="this.parentElement.querySelector('input[type=file]').click()">
+                        {% if foto_form.instance.imagem %}
+                            <img src="{{ foto_form.instance.imagem.url }}"
+                                 class="w-full h-full object-cover preview-img">
+                        {% else %}
+                            <div class="foto-placeholder flex flex-col items-center gap-2 text-slate-400">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                                     style="background:rgba(100,116,139,0.1)">
+                                    <i class="fas fa-camera text-lg"></i>
+                                </div>
+                                <span class="text-xs font-medium">Toque para fotografar</span>
                             </div>
-                            <div class="hidden">
-                                {{ foto_form.imagem }}
-                            </div>
-                            <p class="text-[8px] font-black text-slate-400 uppercase text-center mt-2 tracking-widest">Toque para Foto</p>
+                            <img src="" class="hidden preview-img w-full h-full object-cover">
+                        {% endif %}
+
+                        <!-- Hover overlay -->
+                        <div class="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <i class="fas fa-camera-rotate text-white opacity-0 hover:opacity-100 transition-opacity drop-shadow text-lg"></i>
                         </div>
-                        <div class="flex-1">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Descrição<label class="text-red-500">*</label></label>
-                            {{ foto_form.descricao }}
-                        </div>
+                    </div>
+
+                    <!-- Hidden input -->
+                    <div class="hidden">{{ foto_form.imagem }}</div>
+
+                    <!-- Description -->
+                    <div class="p-3">
+                        <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                            Descrição <span class="text-red-400">*</span>
+                        </label>
+                        {{ foto_form.descricao }}
+                        {% if foto_form.errors.descricao %}
+                        <p class="text-red-500 text-xs mt-1">{{ foto_form.errors.descricao.0 }}</p>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             </div>
+
         </section>
 
-        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Notas Adicionais</label>
-            {{ form.observacoes }}
+        <!-- ════════════════════════════════════
+             PASSO 4 — Observações e Envio
+        ════════════════════════════════════ -->
+        <section id="step-envio" class="card overflow-hidden scroll-mt-20">
+
+            <div class="flex items-center gap-3 px-5 py-3.5 border-b border-slate-50">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
+                     style="background:#2563eb">4</div>
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Observações do Condutor</span>
+            </div>
+
+            <div class="p-5">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Observações <span class="text-slate-300 font-normal">(opcional)</span>
+                </label>
+                {{ form.observacoes }}
+            </div>
+
         </section>
 
-        <div class="pt-4 space-y-3">
+        <!-- ── GPS Status + Botão de Envio ── -->
+        <div class="card p-5">
+
+            <!-- GPS Status -->
+            <div id="gps-status" class="flex items-center gap-3 mb-4 p-3 rounded-xl border transition-all duration-300"
+                 style="background:#fef9ec; border-color:#fde68a">
+                <div id="gps-icon-wrap" class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background:rgba(217,119,6,0.1)">
+                    <i id="gps-icon" class="fas fa-spinner fa-spin text-amber-600 text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p id="gps-title" class="text-sm font-semibold text-amber-700">Aguardando localização GPS...</p>
+                    <p id="gps-desc" class="text-xs text-amber-500 mt-0.5">O GPS é necessário para finalizar a vistoria.</p>
+                </div>
+                <div id="gps-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0"></div>
+            </div>
+
+            <!-- Submit button -->
             <button type="submit" id="submit-btn" disabled
-                    class="w-full py-5 bg-slate-400 text-white rounded-2xl font-black text-xs uppercase tracking-widest cursor-not-allowed transition-all shadow-xl">
-                <i class="fas fa-spinner fa-spin mr-2" id="gps-icon"></i>
-                <span id="btn-text">Aguardando GPS...</span>
+                    class="w-full py-4 rounded-xl text-sm font-bold text-white transition-all duration-200 relative overflow-hidden"
+                    style="background:#94a3b8; cursor:not-allowed">
+                <span id="btn-text" class="flex items-center justify-center gap-2">
+                    <i class="fas fa-lock text-sm"></i>
+                    Aguardando GPS para finalizar
+                </span>
             </button>
-            <p id="gps-msg" class="text-center text-[9px] font-black uppercase tracking-tighter text-rose-500 animate-pulse">
-                O GPS é obrigatório para finalizar a vistoria.
+
+            <p class="text-center text-xs text-slate-400 mt-3">
+                Todos os campos marcados com <span class="text-red-400">*</span> são obrigatórios.
             </p>
+
         </div>
+
+        </div><!-- /.space-y-5 -->
+
     </form>
 </div>
 
-<template id="foto-template">...</template>
+<!-- ────────────────────────────────────────────
+     Template de nova foto (hidden)
+──────────────────────────────────────────────── -->
+<template id="foto-template">
+    <div class="foto-item relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 foto-new">
+        <button type="button" onclick="removeFoto(this)"
+                class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <i class="fas fa-xmark text-sm"></i>
+        </button>
 
+        <div class="preview-box aspect-video bg-slate-100 flex items-center justify-center overflow-hidden cursor-pointer relative"
+             onclick="this.parentElement.querySelector('input[type=file]').click()">
+            <div class="foto-placeholder flex flex-col items-center gap-2 text-slate-400">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                     style="background:rgba(100,116,139,0.1)">
+                    <i class="fas fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Toque para fotografar</span>
+            </div>
+            <img src="" class="hidden preview-img w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors"></div>
+        </div>
+
+        <div class="hidden">
+            <input type="file"
+                   name="fotos-__prefix__-imagem"
+                   id="id_fotos-__prefix__-imagem"
+                   accept="image/*"
+                   capture="camera">
+        </div>
+
+        <div class="p-3">
+            <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                Descrição <span class="text-red-400">*</span>
+            </label>
+            <textarea name="fotos-__prefix__-descricao"
+                      id="id_fotos-__prefix__-descricao"
+                      placeholder="Descreva a avaria ou evidência..."
+                      rows="2"
+                      class="w-full rounded-lg border border-slate-200 bg-white text-sm p-2.5 resize-none"
+                      style="outline:none; font-family:inherit"></textarea>
+        </div>
+
+        <input type="hidden" name="fotos-__prefix__-id" id="id_fotos-__prefix__-id">
+    </div>
+</template>
+
+<!-- ────────────────────────────────────────────
+     Estilos do formulário
+──────────────────────────────────────────────── -->
 <style>
-    input[type="text"], input[type="number"], select, textarea {
-        width: 100% !important; background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important;
-        border-radius: 0.75rem !important; padding: 0.75rem !important; font-size: 0.875rem !important; font-weight: 700 !important;
+    /* Checklist rows */
+    .checklist-row { min-height: 52px; }
+    .checklist-row .check-visual { border: 2px solid #cbd5e1; border-radius: 5px; }
+    .checklist-row .check-visual.is-checked {
+        background: #10b981 !important;
+        border-color: #10b981 !important;
     }
-    textarea { height: 100px !important; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
-    
-    /* Estados do GPS */
-    .btn-active { background-color: #0f172a !important; cursor: pointer !important; }
-    .btn-active:hover { background-color: #059669 !important; }
+    .checklist-row.is-checked {
+        background: rgba(240,253,244,0.7);
+        border-left-color: #34d399 !important;
+    }
+    .checklist-row.is-checked .check-label { color: #6b7280; }
+
+    /* Foto new animation */
+    @keyframes fotoIn {
+        from { opacity: 0; transform: scale(0.96) translateY(8px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .foto-new { animation: fotoIn 0.2s ease forwards; }
+
+    /* GPS status states */
+    .gps-ok  { background: #f0fdf4 !important; border-color: #bbf7d0 !important; }
+    .gps-err { background: #fff1f2 !important; border-color: #fecdd3 !important; }
+
+    /* Submit button enabled */
+    .btn-submit-ok {
+        background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+        cursor: pointer !important;
+    }
+    .btn-submit-ok:hover {
+        background: linear-gradient(135deg, #059669, #047857) !important;
+        box-shadow: 0 4px 14px rgba(5,150,105,0.3) !important;
+    }
+
+    /* Step states */
+    .step-done .step-circle { background: #10b981 !important; color: white !important; }
+    .step-active .step-circle { background: #2563eb; color: white; }
+    .step-done .step-label { color: #059669 !important; }
+    .step-active .step-label { color: #2563eb !important; }
+    .connector-done { background: #10b981 !important; }
+
+    /* Override global form styles for textarea in foto */
+    .foto-item textarea {
+        width: 100% !important;
+        padding: 8px 10px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+    }
+    .foto-item textarea:focus {
+        border-color: #93c5fd !important;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
+        outline: none !important;
+    }
 </style>
 
+<!-- ────────────────────────────────────────────
+     JavaScript
+──────────────────────────────────────────────── -->
 <script>
-    function setupFotoLogic(element) {
-        const input = element.querySelector('input[type="file"]');
-        const previewBox = element.querySelector('.preview-box');
-        const previewImg = previewBox.querySelector('img');
-        const icon = previewBox.querySelector('i');
+/* ── Item toggle ──────────────────────────────────────────── */
+function onItemToggle(cb) {
+    const row      = cb.closest('.checklist-row');
+    const visual   = row.querySelector('.check-visual');
+    const mark     = row.querySelector('.check-mark');
+    const badge    = row.querySelector('.check-badge');
+    const label    = row.querySelector('.check-label');
 
-        if (input) {
-            input.setAttribute('accept', 'image/*');
-            input.setAttribute('capture', 'camera');
-            input.onchange = function() {
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewImg.src = e.target.result;
-                        previewImg.classList.remove('hidden');
-                        if(icon) icon.classList.add('hidden');
-                        previewBox.classList.remove('border-dashed');
-                        previewBox.classList.add('border-solid', 'border-blue-500');
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-            };
-        }
+    if (cb.checked) {
+        row.classList.add('is-checked');
+        row.style.borderLeftColor = '#34d399';
+        if (visual)  { visual.style.background = '#10b981'; visual.style.borderColor = '#10b981'; }
+        if (mark)    { mark.classList.remove('opacity-0', 'scale-50'); mark.classList.add('opacity-100', 'scale-100'); }
+        if (badge)   { badge.textContent = 'OK'; badge.style.cssText = 'background:#dcfce7;color:#16a34a'; }
+        if (label)   label.style.color = '#9ca3af';
+    } else {
+        row.classList.remove('is-checked');
+        row.style.borderLeftColor = 'transparent';
+        if (visual)  { visual.style.background = 'white'; visual.style.borderColor = '#cbd5e1'; }
+        if (mark)    { mark.classList.add('opacity-0', 'scale-50'); mark.classList.remove('opacity-100', 'scale-100'); }
+        if (badge)   { badge.textContent = '—'; badge.style.cssText = 'color:#cbd5e1'; }
+        if (label)   label.style.color = '';
     }
 
-    function removeFoto(btn) {
-        const item = btn.closest('.foto-item');
-        if (document.querySelectorAll('.foto-item').length > 1) {
-            item.remove();
+    atualizarContador(cb);
+}
+
+/* ── Contador de grupo ────────────────────────────────────── */
+function atualizarContador(cb) {
+    const group   = cb.closest('[id^="group-"]');
+    if (!group) return;
+    const header  = group.previousElementSibling;
+    const counter = header?.querySelector('.group-counter');
+    if (!counter) return;
+
+    const total   = group.querySelectorAll('.checklist-cb').length;
+    const checked = group.querySelectorAll('.checklist-cb:checked').length;
+    counter.textContent = `${checked}/${total}`;
+
+    if (checked === total && total > 0) {
+        counter.style.cssText = 'background:#dcfce7; color:#16a34a';
+    } else if (checked > 0) {
+        counter.style.cssText = 'background:#eff6ff; color:#2563eb';
+    } else {
+        counter.style.cssText = 'background:#f1f5f9; color:#94a3b8';
+    }
+}
+
+/* ── Marcar todos de um grupo ─────────────────────────────── */
+function marcarTodos(groupId, btn) {
+    const group   = document.getElementById(groupId);
+    const cbs     = group.querySelectorAll('.checklist-cb');
+    const anyOff  = Array.from(cbs).some(cb => !cb.checked);
+
+    cbs.forEach(cb => {
+        cb.checked = anyOff;
+        onItemToggle(cb);
+    });
+
+    btn.textContent = anyOff ? 'Desmarcar todos' : 'Marcar todos';
+}
+
+/* ── Inicializar contadores ───────────────────────────────── */
+function initContadores() {
+    document.querySelectorAll('[id^="group-"]').forEach(group => {
+        const first = group.querySelector('.checklist-cb');
+        if (first) atualizarContador(first);
+    });
+}
+
+/* ── Inicializar estados visuais dos já marcados ──────────── */
+function initCheckboxVisuals() {
+    document.querySelectorAll('.checklist-cb:checked').forEach(cb => {
+        const row    = cb.closest('.checklist-row');
+        const visual = row?.querySelector('.check-visual');
+        const mark   = row?.querySelector('.check-mark');
+        const badge  = row?.querySelector('.check-badge');
+        const label  = row?.querySelector('.check-label');
+
+        if (row)    { row.classList.add('is-checked'); row.style.borderLeftColor = '#34d399'; }
+        if (visual) { visual.style.background = '#10b981'; visual.style.borderColor = '#10b981'; }
+        if (mark)   { mark.classList.remove('opacity-0', 'scale-50'); }
+        if (badge)  { badge.textContent = 'OK'; badge.style.cssText = 'background:#dcfce7;color:#16a34a'; }
+        if (label)  label.style.color = '#9ca3af';
+    });
+}
+
+/* ── Stepper ──────────────────────────────────────────────── */
+const STEP_SECTIONS = ['step-identificacao', 'step-vistoria', 'step-evidencias', 'step-envio'];
+const STEP_ITEMS    = document.querySelectorAll('.step-item');
+const CONNECTORS    = document.querySelectorAll('.step-connector .step-fill');
+
+function activateStep(idx) {
+    STEP_ITEMS.forEach((item, i) => {
+        const circle = item.querySelector('.step-circle');
+        const label  = item.querySelector('.step-label');
+        circle.classList.remove('bg-blue-600', 'bg-slate-100', 'bg-emerald-500', 'text-white', 'text-slate-400');
+
+        if (i < idx) {
+            circle.classList.add('bg-emerald-500', 'text-white');
+            circle.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 12 9" fill="none"><path d="M1.5 4.5L4.5 7.5L10.5 1.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            if (label) { label.classList.remove('text-slate-400','text-blue-600'); label.classList.add('text-emerald-600'); }
+        } else if (i === idx) {
+            circle.classList.add('bg-blue-600', 'text-white');
+            if (label) { label.classList.remove('text-slate-400','text-emerald-600'); label.classList.add('text-blue-600'); }
         } else {
-            alert("Mantenha pelo menos um registro.");
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll('.foto-item').forEach(setupFotoLogic);
-        
-        const submitBtn = document.getElementById('submit-btn');
-        const btnText = document.getElementById('btn-text');
-        const gpsMsg = document.getElementById('gps-msg');
-        const gpsIcon = document.getElementById('gps-icon');
-        const latInput = document.getElementById('id_latitude');
-        const lngInput = document.getElementById('id_longitude');
-
-        function capturarLocalizacao() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (p) => {
-                        latInput.value = p.coords.latitude.toFixed(8);
-                        lngInput.value = p.coords.longitude.toFixed(8);
-                        
-                        // Liberação Visual
-                        submitBtn.disabled = false;
-                        submitBtn.classList.add('btn-active');
-                        btnText.innerText = "FINALIZAR E ENVIAR CHECKLIST";
-                        gpsIcon.classList.replace('fa-spinner', 'fa-map-marker-alt');
-                        gpsIcon.classList.remove('fa-spin');
-                        
-                        gpsMsg.innerText = "📍 Localização confirmada!";
-                        gpsMsg.classList.replace('text-rose-500', 'text-emerald-500');
-                        gpsMsg.classList.remove('animate-pulse');
-                    },
-                    (err) => {
-                        btnText.innerText = "GPS BLOQUEADO OU DESLIGADO";
-                        gpsMsg.innerText = "Por favor, autorize o acesso ao GPS para continuar.";
-                        setTimeout(capturarLocalizacao, 5000);
-                    },
-                    { enableHighAccuracy: true, timeout: 15000 }
-                );
-            }
-        }
-
-        capturarLocalizacao();
-
-        // Add Foto Logic
-        const addBtn = document.getElementById('add-foto');
-        const totalForms = document.getElementById('id_fotos-TOTAL_FORMS');
-        if (addBtn) {
-            addBtn.onclick = function() {
-                const count = parseInt(totalForms.value);
-                const template = document.getElementById('foto-template').innerHTML.replace(/__prefix__/g, count);
-                const div = document.createElement('div');
-                div.innerHTML = template;
-                document.getElementById('fotos-container').appendChild(div.firstElementChild);
-                totalForms.value = count + 1;
-                setupFotoLogic(document.getElementById('fotos-container').lastElementChild);
-            };
+            circle.classList.add('bg-slate-100', 'text-slate-400');
+            if (label) { label.classList.remove('text-blue-600','text-emerald-600'); label.classList.add('text-slate-400'); }
         }
     });
+
+    CONNECTORS.forEach((fill, i) => {
+        fill.style.width = i < idx ? '100%' : '0%';
+    });
+}
+
+const stepObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const idx = STEP_SECTIONS.indexOf(entry.target.id);
+            if (idx >= 0) activateStep(idx);
+        }
+    });
+}, { threshold: 0.4, rootMargin: '-60px 0px -40% 0px' });
+
+/* ── GPS ──────────────────────────────────────────────────── */
+function setupGPS() {
+    const btn       = document.getElementById('submit-btn');
+    const btnText   = document.getElementById('btn-text');
+    const gpsStatus = document.getElementById('gps-status');
+    const gpsIcon   = document.getElementById('gps-icon');
+    const gpsIconW  = document.getElementById('gps-icon-wrap');
+    const gpsTitle  = document.getElementById('gps-title');
+    const gpsDesc   = document.getElementById('gps-desc');
+    const gpsDot    = document.getElementById('gps-dot');
+    const latInput  = document.getElementById('id_latitude');
+    const lngInput  = document.getElementById('id_longitude');
+
+    if (!('geolocation' in navigator)) {
+        gpsTitle.textContent = 'GPS não disponível neste dispositivo';
+        gpsDesc.textContent  = 'Seu dispositivo não suporta geolocalização.';
+        return;
+    }
+
+    function onSuccess(pos) {
+        latInput.value = pos.coords.latitude.toFixed(8);
+        lngInput.value = pos.coords.longitude.toFixed(8);
+
+        // GPS ok state
+        gpsStatus.classList.add('gps-ok');
+        gpsStatus.classList.remove('gps-err');
+        gpsStatus.style.background   = '#f0fdf4';
+        gpsStatus.style.borderColor  = '#bbf7d0';
+        gpsIconW.style.background    = 'rgba(22,163,74,0.1)';
+        gpsIcon.className            = 'fas fa-location-dot text-emerald-600 text-sm';
+        gpsTitle.textContent         = 'Localização confirmada';
+        gpsTitle.style.color         = '#15803d';
+        gpsDesc.textContent          = `Lat: ${pos.coords.latitude.toFixed(5)}, Lon: ${pos.coords.longitude.toFixed(5)}`;
+        gpsDesc.style.color          = '#16a34a';
+        gpsDot.classList.remove('animate-pulse', 'bg-amber-400');
+        gpsDot.classList.add('bg-emerald-400');
+
+        // Enable submit
+        btn.disabled = false;
+        btn.classList.add('btn-submit-ok');
+        btn.style.background = 'linear-gradient(135deg,#0f172a,#1e293b)';
+        btn.style.cursor = 'pointer';
+        btnText.innerHTML = '<i class="fas fa-check-circle text-sm"></i> Finalizar e Enviar Checklist';
+    }
+
+    function onError() {
+        gpsStatus.style.background  = '#fff1f2';
+        gpsStatus.style.borderColor = '#fecdd3';
+        gpsIconW.style.background   = 'rgba(220,38,38,0.1)';
+        gpsIcon.className           = 'fas fa-triangle-exclamation text-red-500 text-sm';
+        gpsTitle.textContent        = 'GPS bloqueado — aguardando permissão';
+        gpsTitle.style.color        = '#dc2626';
+        gpsDesc.textContent         = 'Permita o acesso à localização nas configurações do navegador.';
+        gpsDesc.style.color         = '#ef4444';
+        gpsDot.classList.add('bg-red-400');
+        gpsDot.classList.remove('bg-amber-400');
+        setTimeout(tryGPS, 6000);
+    }
+
+    function tryGPS() {
+        navigator.geolocation.getCurrentPosition(onSuccess, onError,
+            { enableHighAccuracy: true, timeout: 15000 });
+    }
+
+    tryGPS();
+}
+
+/* ── Fotos ────────────────────────────────────────────────── */
+function setupFotoInput(fotoItem) {
+    const input      = fotoItem.querySelector('input[type="file"]');
+    const previewBox = fotoItem.querySelector('.preview-box');
+    if (!input || !previewBox) return;
+
+    const previewImg   = previewBox.querySelector('.preview-img');
+    const placeholder  = previewBox.querySelector('.foto-placeholder');
+
+    input.addEventListener('change', function () {
+        if (!this.files?.length) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            previewImg.src = e.target.result;
+            previewImg.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+}
+
+function removeFoto(btn) {
+    const item  = btn.closest('.foto-item');
+    const total = document.querySelectorAll('.foto-item').length;
+    if (total > 1) {
+        item.style.opacity    = '0';
+        item.style.transform  = 'scale(0.95)';
+        item.style.transition = 'all 0.15s';
+        setTimeout(() => item.remove(), 160);
+    }
+}
+
+/* ── Inicialização ────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function () {
+
+    initCheckboxVisuals();
+    initContadores();
+
+    STEP_SECTIONS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) stepObserver.observe(el);
+    });
+
+    document.querySelectorAll('.foto-item').forEach(setupFotoInput);
+
+    setupGPS();
+
+    // Adicionar foto
+    const addBtn     = document.getElementById('add-foto');
+    const totalForms = document.getElementById('id_fotos-TOTAL_FORMS');
+
+    if (addBtn) {
+        addBtn.addEventListener('click', function () {
+            const count    = parseInt(totalForms.value);
+            const tpl      = document.getElementById('foto-template').innerHTML
+                                .replace(/__prefix__/g, count);
+            const wrapper  = document.createElement('div');
+            wrapper.innerHTML = tpl;
+            const newItem  = wrapper.firstElementChild;
+            document.getElementById('fotos-container').appendChild(newItem);
+            totalForms.value = count + 1;
+            setupFotoInput(newItem);
+            newItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    }
+
+    // Submit: show loading
+    document.getElementById('main-form').addEventListener('submit', function () {
+        const btn  = document.getElementById('submit-btn');
+        const text = document.getElementById('btn-text');
+        if (btn) {
+            btn.disabled = true;
+            text.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i> Enviando vistoria...';
+        }
+    });
+});
 </script>
 {% endblock %}

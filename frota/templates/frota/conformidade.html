@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Conformidade da Frota | Frota Check{% endblock %}
+{% block header_title %}Conformidade da Frota{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+
+    <div class="mb-8">
+        <nav class="flex mb-2">
+            <ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <li><a href="{% url 'checklist_list' %}" class="hover:text-blue-600 transition-colors">Início</a></li>
+                <li><i class="fas fa-chevron-right text-[9px] opacity-40 mx-1"></i></li>
+                <li class="text-blue-600">Conformidade</li>
+            </ol>
+        </nav>
+        <div class="flex items-end justify-between">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Conformidade da Frota</h1>
+                <p class="text-sm text-slate-500 font-medium mt-1">Situação de inspeções do dia — {{ hoje|date:"d/m/Y" }}</p>
+            </div>
+            <a href="{% url 'checklist_add' %}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+                <i class="fas fa-plus text-xs"></i> Nova Inspeção
+            </a>
+        </div>
+    </div>
+
+    <!-- KPIs do dia -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Total Ativos</p>
+            <p class="text-3xl font-black text-slate-900">{{ total_veiculos }}</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Inspecionados Hoje</p>
+            <p class="text-3xl font-black text-emerald-600">{{ inspecionados_hoje }}</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Pendentes</p>
+            <p class="text-3xl font-black {% if pendentes_hoje > 0 %}text-rose-600{% else %}text-slate-900{% endif %}">{{ pendentes_hoje }}</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
+            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Conformidade</p>
+            <p class="text-3xl font-black {% if conformidade_pct >= 80 %}text-emerald-600{% else %}text-amber-600{% endif %}">{{ conformidade_pct }}%</p>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-slate-100">
+                <div class="h-full {% if conformidade_pct >= 80 %}bg-emerald-500{% else %}bg-amber-500{% endif %}" style="width: {{ conformidade_pct }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100">
+                        <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Veículo</th>
+                        <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Última Inspeção</th>
+                        <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Hoje</th>
+                        <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Ocorrências</th>
+                        <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Bloqueado</th>
+                        <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for s in situacao %}
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div>
+                                <p class="text-sm font-black text-slate-900">{{ s.veiculo.modelo }}</p>
+                                <p class="text-xs text-blue-600 font-black tracking-widest">{{ s.veiculo.placa }}</p>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if s.ultima_inspecao %}
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">{{ s.ultima_inspecao.data_realizada|date:"d/m/Y H:i" }}</p>
+                                <p class="text-xs text-slate-400">{{ s.ultima_inspecao.get_tipo_display }} · {{ s.ultima_inspecao.motorista.nome_completo|default:"—" }}</p>
+                            </div>
+                            {% else %}
+                            <span class="text-xs text-slate-400 italic">Nenhuma inspeção registrada</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            {% if s.inspecionado_hoje %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">
+                                <i class="fas fa-check text-[10px]"></i> Sim
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-black border border-rose-200">
+                                <i class="fas fa-times text-[10px]"></i> Não
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            {% if s.ocorrencias_abertas > 0 %}
+                            <a href="{% url 'ocorrencias_list' %}?veiculo={{ s.veiculo.placa }}" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-black border border-amber-200 hover:bg-amber-100 transition-colors">
+                                <i class="fas fa-triangle-exclamation text-[10px]"></i> {{ s.ocorrencias_abertas }}
+                            </a>
+                            {% else %}
+                            <span class="text-xs text-slate-300 font-bold">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            {% if s.veiculo.bloqueado %}
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-black border border-rose-200">
+                                <i class="fas fa-lock text-[10px]"></i> Sim
+                            </span>
+                            {% else %}
+                            <span class="text-xs text-slate-300 font-bold">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <a href="{% url 'veiculo_detail' s.veiculo.pk %}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Detalhes do veículo">
+                                    <i class="fas fa-truck text-sm"></i>
+                                </a>
+                                {% if s.ultima_inspecao %}
+                                <a href="{% url 'checklist_detail' s.ultima_inspecao.pk %}" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Ver última inspeção">
+                                    <i class="far fa-eye text-sm"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'checklist_add' %}?veiculo_id={{ s.veiculo.pk }}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Nova inspeção">
+                                    <i class="fas fa-plus text-sm"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="py-16 text-center text-slate-400 text-sm font-bold">Nenhum veículo ativo cadastrado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

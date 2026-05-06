@@ -1,77 +1,70 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Checklist, Usuario, Funcionario, FotoAvaria, Veiculo
+from .models import (
+    Checklist, Usuario, Funcionario, FotoAvaria, Veiculo,
+    OcorrenciaAvaria, OrdemManutencao, Abastecimento,
+)
+
+_INPUT = 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50 text-sm font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition'
+_SELECT = _INPUT
+_FILE = 'mt-1 block w-full text-sm text-slate-500 file:rounded-xl file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-blue-700 file:font-semibold'
+
+
+# ── CHECKLIST ─────────────────────────────────────────────────────────────────
 
 class ChecklistForm(forms.ModelForm):
     class Meta:
         model = Checklist
         exclude = ['motorista', 'data_realizada']
-        
         widgets = {
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
             'nome_checklist': forms.TextInput(attrs={'placeholder': 'Ex: Check-in Segunda-feira'}),
             'km_atual': forms.NumberInput(attrs={'placeholder': '000000'}),
             'nivel_combustivel': forms.Select(),
+            'tipo': forms.Select(),
             'observacoes': forms.Textarea(attrs={
-                'rows': 4, 
-                'placeholder': 'Descreva detalhes sobre o estado do veículo...'
+                'rows': 4,
+                'placeholder': 'Descreva detalhes sobre o estado do veículo...',
             }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Aplica classes Tailwind automaticamente em campos que não são checkbox
         for name, field in self.fields.items():
             if not isinstance(field.widget, forms.CheckboxInput):
-                field.widget.attrs.update({
-                    'class': 'w-full rounded-2xl border-slate-200 bg-slate-50 focus:border-blue-500 focus:ring-blue-500'
-                })
+                field.widget.attrs.update({'class': _INPUT})
 
 
-# --------------------------------------------------------------------------------------------------
-# --- FOTO AVARIA FORMS --------------------------------------------------------------------------------
+# ── FOTO AVARIA ───────────────────────────────────────────────────────────────
 
 FotoAvariaFormSet = inlineformset_factory(
-    Checklist, 
-    FotoAvaria,
+    Checklist, FotoAvaria,
     fields=('descricao', 'imagem'),
-    extra=1,
-    can_delete=True,
+    extra=1, can_delete=True,
     widgets={
         'descricao': forms.TextInput(attrs={
-            'class':'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-white shadow-sm focus:ring-blue-500',
-            'placeholder': 'Ex: Risco na porta lateral'
+            'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-white shadow-sm focus:ring-blue-500',
+            'placeholder': 'Ex: Risco na porta lateral',
         }),
-        'imagem': forms.FileInput(attrs={
-            'class': 'block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700'
-        })
-    }
+        'imagem': forms.FileInput(attrs={'class': _FILE}),
+    },
 )
 
-# --------------------------------------------------------------------------------------------------
-# --- FUNCIONÁRIO FORMS --------------------------------------------------------------------------------
+
+# ── FUNCIONÁRIO ───────────────────────────────────────────────────────────────
 
 class NovoFuncionarioForm(forms.ModelForm):
-    username = forms.CharField(
-        label="Usuário (Login)", 
-        widget=forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'})
-    )
-    password = forms.CharField(
-        label="Senha Inicial", 
-        widget=forms.PasswordInput(attrs={'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'})
-    )
-    email = forms.EmailField(
-        label="E-mail", 
-        widget=forms.EmailInput(attrs={'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'})
-    )
+    username = forms.CharField(label="Usuário (Login)", widget=forms.TextInput(attrs={'class': _INPUT}))
+    password = forms.CharField(label="Senha Inicial", widget=forms.PasswordInput(attrs={'class': _INPUT}))
+    email = forms.EmailField(label="E-mail", widget=forms.EmailInput(attrs={'class': _INPUT}))
 
     def clean_nome_completo(self):
         nome = self.cleaned_data.get("nome_completo")
         if len(nome) < 5:
             raise forms.ValidationError("O nome deve ter pelo menos 5 caracteres.")
         return nome
-    
+
     def clean_cpf(self):
         cpf = self.cleaned_data.get("cpf")
         if cpf:
@@ -94,49 +87,131 @@ class NovoFuncionarioForm(forms.ModelForm):
         model = Funcionario
         fields = ['nome_completo', 'cpf', 'numero_cnh', 'validade_cnh', 'cnh_impressa', 'cargo']
         widgets = {
-            'validade_cnh': forms.DateInput(attrs={'type': 'date', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'nome_completo': forms.TextInput(attrs={'placeholder': 'Ex: João', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'cpf': forms.TextInput(attrs={'placeholder': '000.000.000-00', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'numero_cnh': forms.TextInput(attrs={'placeholder': '06966757801','class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'cargo': forms.Select(attrs={'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'cnh_impressa': forms.FileInput(attrs={'class': 'mt-1 block w-full text-sm text-slate-500 file:rounded-xl file:border-0 file:bg-blue-50 file:px-4 file:py-2'})
+            'validade_cnh': forms.DateInput(attrs={'type': 'date', 'class': _INPUT}),
+            'nome_completo': forms.TextInput(attrs={'placeholder': 'Ex: João Silva', 'class': _INPUT}),
+            'cpf': forms.TextInput(attrs={'placeholder': '00000000000', 'class': _INPUT}),
+            'numero_cnh': forms.TextInput(attrs={'placeholder': '06966757801', 'class': _INPUT}),
+            'cargo': forms.Select(attrs={'class': _SELECT}),
+            'cnh_impressa': forms.FileInput(attrs={'class': _FILE}),
         }
 
 
-
-# --------------------------------------------------------------------------------------------------
-# --- VEÍCULO FORMS --------------------------------------------------------------------------------
+# ── VEÍCULO ───────────────────────────────────────────────────────────────────
 
 class VeiculoForm(forms.ModelForm):
     class Meta:
         model = Veiculo
-        fields = ['placa', 'marca', 'modelo', 'ano', 'renavam', 'documento_impresso', 'fipe', 'foto']
+        fields = [
+            'placa', 'marca', 'modelo', 'ano', 'renavam',
+            'documento_impresso', 'fipe', 'foto',
+            'vencimento_crlv', 'vencimento_seguro', 'km_proxima_revisao',
+        ]
         widgets = {
-            'placa': forms.TextInput(attrs={'placeholder': 'ABC1D23', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'marca': forms.TextInput(attrs={'placeholder': 'Ex: Toyota', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'modelo': forms.TextInput(attrs={'placeholder': 'Ex: Hilux', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'ano': forms.TextInput(attrs={'placeholder': '2024', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'renavam': forms.TextInput(attrs={'placeholder': '18976898765','class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'fipe': forms.TextInput(attrs={'placeholder': 'Valor de mercado', 'class': 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50'}),
-            'foto': forms.FileInput(attrs={'class': 'mt-1 block w-full text-sm text-slate-500 file:rounded-xl file:border-0 file:bg-blue-50 file:px-4 file:py-2'}),
-            'documento_impresso': forms.FileInput(attrs={'class': 'mt-1 block w-full text-sm text-slate-500 file:rounded-xl file:border-0 file:bg-blue-50 file:px-4 file:py-2'}),
+            'placa': forms.TextInput(attrs={'placeholder': 'ABC1D23', 'class': _INPUT}),
+            'marca': forms.TextInput(attrs={'placeholder': 'Ex: Toyota', 'class': _INPUT}),
+            'modelo': forms.TextInput(attrs={'placeholder': 'Ex: Hilux', 'class': _INPUT}),
+            'ano': forms.TextInput(attrs={'placeholder': '2024', 'class': _INPUT}),
+            'renavam': forms.TextInput(attrs={'placeholder': '18976898765', 'class': _INPUT}),
+            'fipe': forms.TextInput(attrs={'placeholder': 'Valor de mercado', 'class': _INPUT}),
+            'foto': forms.FileInput(attrs={'class': _FILE}),
+            'documento_impresso': forms.FileInput(attrs={'class': _FILE}),
+            'vencimento_crlv': forms.DateInput(attrs={'type': 'date', 'class': _INPUT}),
+            'vencimento_seguro': forms.DateInput(attrs={'type': 'date', 'class': _INPUT}),
+            'km_proxima_revisao': forms.NumberInput(attrs={'placeholder': 'Ex: 150000', 'class': _INPUT}),
         }
 
-   
     def clean_renavam(self):
         renavam = self.cleaned_data.get("renavam")
         if renavam:
-            # Remove espaços se houver
             renavam = renavam.strip()
             if len(renavam) not in [9, 11]:
                 raise forms.ValidationError("Renavam deve conter 9 ou 11 dígitos.")
         return renavam
-    
+
     def clean_placa(self):
         placa = self.cleaned_data.get("placa")
         if placa:
-            # Converte para maiúsculo automaticamente e remove espaços
             placa = placa.strip().upper()
             if len(placa) != 7:
                 raise forms.ValidationError("A placa deve conter exatamente 7 caracteres.")
         return placa
+
+
+# ── OCORRÊNCIA DE AVARIA ──────────────────────────────────────────────────────
+
+class OcorrenciaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = OcorrenciaAvaria
+        fields = ['status', 'nota_resolucao']
+        widgets = {
+            'status': forms.Select(attrs={'class': _SELECT}),
+            'nota_resolucao': forms.Textarea(attrs={
+                'rows': 3,
+                'class': _INPUT,
+                'placeholder': 'Descreva o que foi feito para resolver...',
+            }),
+        }
+
+
+# ── ORDEM DE MANUTENÇÃO ───────────────────────────────────────────────────────
+
+class OrdemManutencaoForm(forms.ModelForm):
+    class Meta:
+        model = OrdemManutencao
+        fields = ['veiculo', 'ocorrencia', 'descricao', 'responsavel', 'status', 'data_agendada', 'custo']
+        widgets = {
+            'veiculo': forms.Select(attrs={'class': _SELECT}),
+            'ocorrencia': forms.Select(attrs={'class': _SELECT}),
+            'descricao': forms.Textarea(attrs={
+                'rows': 3, 'class': _INPUT,
+                'placeholder': 'Descreva o serviço a ser realizado...',
+            }),
+            'responsavel': forms.TextInput(attrs={
+                'class': _INPUT, 'placeholder': 'Nome da oficina ou mecânico responsável',
+            }),
+            'status': forms.Select(attrs={'class': _SELECT}),
+            'data_agendada': forms.DateInput(attrs={'type': 'date', 'class': _INPUT}),
+            'custo': forms.NumberInput(attrs={'class': _INPUT, 'placeholder': '0.00', 'step': '0.01'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Só mostra ocorrências não resolvidas no dropdown
+        self.fields['ocorrencia'].queryset = OcorrenciaAvaria.objects.exclude(
+            status='resolvida'
+        ).select_related('veiculo').order_by('-criada_em')
+        self.fields['ocorrencia'].required = False
+        self.fields['ocorrencia'].empty_label = "— Nenhuma (opcional) —"
+        self.fields['custo'].required = False
+
+
+# ── ABASTECIMENTO ─────────────────────────────────────────────────────────────
+
+class AbastecimentoForm(forms.ModelForm):
+    class Meta:
+        model = Abastecimento
+        fields = ['veiculo', 'motorista', 'data', 'km_atual', 'litros', 'valor_total', 'tipo_combustivel']
+        widgets = {
+            'veiculo': forms.Select(attrs={'class': _SELECT}),
+            'motorista': forms.Select(attrs={'class': _SELECT}),
+            'data': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': _INPUT}),
+            'km_atual': forms.NumberInput(attrs={'class': _INPUT, 'placeholder': '000000'}),
+            'litros': forms.NumberInput(attrs={'class': _INPUT, 'placeholder': '0.00', 'step': '0.01'}),
+            'valor_total': forms.NumberInput(attrs={'class': _INPUT, 'placeholder': '0.00', 'step': '0.01'}),
+            'tipo_combustivel': forms.Select(attrs={'class': _SELECT}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['motorista'].required = False
+        self.fields['motorista'].empty_label = "— Selecionar motorista (opcional) —"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        litros = cleaned_data.get('litros')
+        valor = cleaned_data.get('valor_total')
+        if litros is not None and litros <= 0:
+            self.add_error('litros', 'Litros deve ser maior que zero.')
+        if valor is not None and valor <= 0:
+            self.add_error('valor_total', 'Valor deve ser maior que zero.')
+        return cleaned_data

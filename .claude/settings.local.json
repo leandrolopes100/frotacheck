@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python manage.py makemigrations --name=\"fix_veiculo_atualizado_em\")",
+      "Bash(python manage.py migrate)",
+      "Bash(python manage.py check)",
+      "Bash(python -c ' *)",
+      "Bash(python manage.py show_urls)",
+      "Bash(python manage.py runserver)",
+      "Bash(python manage.py runserver --noreload)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8000/login/)",
+      "Bash(python manage.py makemigrations --name=\"add_ocorrencia_manutencao_abastecimento_veiculo_docs\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Computador\\\\Desktop\\\\MEUS PROJETOS\\\\DJANGO\\\\FROTACHECK\" -Recurse -Force)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}

@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
-from .models import Usuario, Funcionario, Veiculo, Checklist, FotoAvaria
+from .models import (
+    Usuario, Funcionario, Veiculo, Checklist, FotoAvaria,
+    OcorrenciaAvaria, OrdemManutencao, Abastecimento,
+)
 
 # --- INLINES ---
 class FotoAvariaInline(admin.TabularInline):
@@ -76,7 +79,7 @@ class VeiculoAdmin(admin.ModelAdmin):
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
     list_display = ('username', 'email', 'is_patrao', 'is_motorista', 'is_staff')
-    
+
     fieldsets = UserAdmin.fieldsets + (
         ('Permissões Frota Check', {'fields': ('is_patrao', 'is_motorista')}),
     )
@@ -86,3 +89,23 @@ class UsuarioAdmin(UserAdmin):
 
     def has_module_permission(self, request):
         return request.user.is_authenticated and (request.user.is_patrao or request.user.is_superuser)
+
+
+@admin.register(OcorrenciaAvaria)
+class OcorrenciaAvariaAdmin(admin.ModelAdmin):
+    list_display = ('veiculo', 'status', 'descricao', 'criada_em', 'resolvida_por')
+    list_filter = ('status', 'veiculo')
+    readonly_fields = ('criada_em', 'atualizada_em')
+
+
+@admin.register(OrdemManutencao)
+class OrdemManutencaoAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'veiculo', 'status', 'responsavel', 'data_agendada', 'custo')
+    list_filter = ('status', 'veiculo')
+    readonly_fields = ('criada_em', 'atualizada_em')
+
+
+@admin.register(Abastecimento)
+class AbastecimentoAdmin(admin.ModelAdmin):
+    list_display = ('veiculo', 'data', 'litros', 'valor_total', 'tipo_combustivel', 'motorista')
+    list_filter = ('veiculo', 'tipo_combustivel')

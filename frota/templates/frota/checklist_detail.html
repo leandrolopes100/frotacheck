@@ -1,100 +1,167 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Checklist #{{ checklist.id }} | {{ checklist.veiculo.placa }}{% endblock %}
+{% block title %}Inspeção #{{ checklist.id }} | {{ checklist.veiculo.placa }}{% endblock %}
+{% block header_title %}Inspeção — {{ checklist.veiculo.placa }}{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto py-10 px-4">
+<div class="max-w-5xl mx-auto">
 
-    <!-- Navegação e Ações -->
-    <div class="mb-6 flex justify-between items-center">
-        <a href="{% url 'checklist_list' %}" class="group flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all">
-            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Voltar para o Histórico
+    <!-- ── Nav ── -->
+    <div class="flex items-center justify-between mb-6">
+        <a href="{% url 'checklist_list' %}"
+           class="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-blue-600 transition-colors group">
+            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+            Voltar ao Dashboard
         </a>
-        <button onclick="window.print()" class="hidden md:flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-slate-800 transition-all">
-            <i class="fas fa-print"></i> Imprimir Relatório
-        </button>
-    </div>
-
-    <!-- Header Consolidado -->
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 print:shadow-none print:border-slate-300">
-        <div>
-            <div class="flex flex-wrap items-center gap-3 mb-2">
-                <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{{ checklist.nome_checklist }}</h1>
-                {% if checklist.tem_avaria %}
-                    <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-200 uppercase tracking-widest">Avarias Detectadas</span>
-                {% else %}
-                    <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-200 uppercase tracking-widest">Veículo Conforme</span>
-                {% endif %}
-            </div>
-            <p class="text-sm font-bold text-slate-500">{{ checklist.veiculo.marca }} {{ checklist.veiculo.modelo }} · <span class="text-blue-600">{{ checklist.veiculo.placa }}</span></p>
-        </div>
-        
-        <div class="border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-8">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Protocolo de Registro</p>
-            <div class="flex items-center gap-2 text-slate-900">
-                <i class="far fa-calendar-check text-blue-500"></i>
-                <p class="text-sm font-bold">{{ checklist.data_realizada|date:"d/m/Y | H:i" }}</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Seção de Mapa -->
-    {% if checklist.latitude and checklist.longitude %}
-    <div class="mb-8 print:hidden">
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Local da Inspeção</h3>
-        <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-sm h-60 w-full relative bg-slate-100">
-            <iframe id="mapa-osm" width="100%" height="100%" frameborder="0" scrolling="no" src=""></iframe>
-            <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}" 
-               target="_blank" 
-               class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-xl text-[10px] font-black text-slate-900 uppercase tracking-widest border border-slate-100 hover:bg-white transition-all flex items-center gap-2 z-10">
-                <i class="fas fa-external-link-alt text-blue-500"></i> Abrir no Google Maps
+        <div class="flex items-center gap-2">
+            {% if user.is_patrao %}
+            <a href="{% url 'checklist_update' checklist.id %}" class="btn-secondary text-xs">
+                <i class="fas fa-pen"></i> Editar
             </a>
+            {% endif %}
+            <button onclick="window.print()"
+                    class="btn-secondary text-xs hidden sm:inline-flex">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Header card ── -->
+    <div class="card p-6 mb-5 print:shadow-none">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+
+            <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-3 mb-2">
+                    {% if checklist.tem_avaria %}
+                        <span class="badge badge-danger">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            Avarias Detectadas
+                        </span>
+                    {% else %}
+                        <span class="badge badge-success">
+                            <i class="fas fa-check text-[9px]"></i>
+                            Veículo Conforme
+                        </span>
+                    {% endif %}
+                    <span class="badge badge-info" style="font-size:10px">
+                        {% if checklist.tipo == 'pre_viagem' %}Pré-Viagem
+                        {% elif checklist.tipo == 'pos_viagem' %}Pós-Viagem
+                        {% else %}Geral{% endif %}
+                    </span>
+                </div>
+                <h1 class="text-xl font-bold text-slate-900 tracking-tight">{{ checklist.nome_checklist }}</h1>
+                <p class="text-sm text-slate-500 mt-1">
+                    {{ checklist.veiculo.marca }} {{ checklist.veiculo.modelo }}
+                    <span class="mx-2 text-slate-300">·</span>
+                    <span class="text-blue-600 font-semibold">{{ checklist.veiculo.placa }}</span>
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4 md:border-l md:border-slate-100 md:pl-6 flex-shrink-0">
+                <div class="text-center">
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Data</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ checklist.data_realizada|date:"d/m/Y" }}</p>
+                </div>
+                <div class="w-px h-10 bg-slate-100"></div>
+                <div class="text-center">
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Horário</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ checklist.data_realizada|date:"H:i" }}</p>
+                </div>
+                <div class="w-px h-10 bg-slate-100"></div>
+                <div class="text-center">
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">ID</p>
+                    <p class="text-sm font-semibold text-slate-800">#{{ checklist.id }}</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── Info grid ── -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+
+        <div class="card p-4">
+            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                <i class="fas fa-user mr-1 opacity-60"></i>Motorista
+            </p>
+            <p class="text-sm font-semibold text-slate-800 truncate">{{ checklist.motorista.nome_completo|default:"Administrador" }}</p>
+        </div>
+
+        <div class="card p-4">
+            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                <i class="fas fa-tachometer-alt mr-1 opacity-60"></i>Odômetro
+            </p>
+            <p class="text-sm font-semibold text-slate-800">{{ checklist.km_atual|intcomma }} km</p>
+        </div>
+
+        <div class="card p-4">
+            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                <i class="fas fa-gas-pump mr-1 opacity-60"></i>Combustível
+            </p>
+            <p class="text-sm font-semibold text-slate-800">{{ checklist.nivel_combustivel }}</p>
+        </div>
+
+        <div class="card p-4 flex items-center justify-center">
+            {% if checklist.latitude %}
+                <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}"
+                   target="_blank"
+                   class="flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                    <i class="fas fa-location-dot"></i> Ver GPS
+                </a>
+            {% else %}
+                <span class="text-xs text-slate-400">Sem GPS</span>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- ── Mapa ── -->
+    {% if checklist.latitude and checklist.longitude %}
+    <div class="card mb-5 overflow-hidden print:hidden">
+        <div class="px-5 py-3 border-b border-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded flex items-center justify-center"
+                     style="background:#eff6ff; color:#2563eb; font-size:10px">
+                    <i class="fas fa-map-pin"></i>
+                </div>
+                <span class="text-xs font-semibold text-slate-700">Local da Inspeção</span>
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}"
+               target="_blank"
+               class="text-xs text-blue-600 font-semibold hover:text-blue-800 transition-colors flex items-center gap-1">
+                <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
+                Abrir no Google Maps
+            </a>
+        </div>
+        <div class="h-56 bg-slate-100">
+            <iframe id="mapa-osm" width="100%" height="100%" frameborder="0" scrolling="no" src=""></iframe>
         </div>
     </div>
     {% endif %}
 
-    <!-- Info Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Motorista</p>
-            <p class="text-sm font-bold text-slate-900 truncate">{{ checklist.motorista.nome_completo|default:"Administrador" }}</p>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Odômetro</p>
-            <p class="text-sm font-bold text-slate-900">{{ checklist.km_atual|intcomma }} km</p>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Combustível</p>
-            <p class="text-sm font-bold text-slate-900">{{ checklist.nivel_combustivel }}</p>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
-            {% if checklist.latitude %}
-                <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}" target="_blank" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors">
-                    <i class="fas fa-location-dot mr-1"></i> Ver GPS
-                </a>
-            {% else %}
-                <span class="text-slate-400 text-[10px] font-black uppercase tracking-widest italic">Sem GPS</span>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Checklist Items -->
-    <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <!-- ── Checklist items ── -->
+    <div class="grid md:grid-cols-2 gap-4 mb-5">
         {% for cat, itens in checklist.get_campos_agrupados.items %}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden break-inside-avoid">
-            <div class="px-6 py-3 border-b border-slate-100 bg-slate-50 font-black text-[10px] text-slate-500 uppercase tracking-widest">{{ cat }}</div>
-            <div class="p-6 space-y-3">
+        <div class="card overflow-hidden break-inside-avoid">
+            <div class="px-5 py-3 border-b border-slate-50 bg-slate-50/50">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ cat }}</span>
+            </div>
+            <div class="p-5 space-y-2.5">
                 {% for nome, valor in itens %}
-                <div class="flex justify-between items-center group">
-                    <span class="text-sm font-bold {% if not valor %}text-rose-600{% else %}text-slate-700{% endif %}">{{ nome }}</span>
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-sm font-medium {% if not valor %}text-red-600{% else %}text-slate-700{% endif %} leading-tight">
+                        {{ nome }}
+                    </span>
                     {% if valor %}
-                        <div class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-[10px]">
+                        <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                             style="background:#f0fdf4; color:#16a34a; font-size:10px">
                             <i class="fas fa-check"></i>
                         </div>
                     {% else %}
-                        <div class="w-5 h-5 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-[10px] animate-pulse">
-                            <i class="fas fa-times"></i>
+                        <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse"
+                             style="background:#fff1f2; color:#dc2626; font-size:10px">
+                            <i class="fas fa-xmark"></i>
                         </div>
                     {% endif %}
                 </div>
@@ -104,19 +171,35 @@
         {% endfor %}
     </div>
 
-    <!-- Registro Fotográfico -->
+    <!-- ── Fotos ── -->
     {% if checklist.fotos_avarias.all %}
-    <div class="mb-8 print:break-inside-avoid">
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Registro Fotográfico</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="card mb-5 overflow-hidden print:break-inside-avoid">
+        <div class="px-5 py-3 border-b border-slate-50">
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded flex items-center justify-center"
+                     style="background:#fef2f2; color:#dc2626; font-size:10px">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <span class="text-xs font-semibold text-slate-700">
+                    Registro Fotográfico
+                    <span class="ml-1.5 text-slate-400 font-normal">({{ checklist.fotos_avarias.all|length }} foto{{ checklist.fotos_avarias.all|length|pluralize }})</span>
+                </span>
+            </div>
+        </div>
+        <div class="p-5 grid grid-cols-2 md:grid-cols-4 gap-3">
             {% for foto in checklist.fotos_avarias.all %}
             <div class="group">
-                <div class="aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm cursor-zoom-in relative" onclick="openModal('{{ foto.imagem.url }}')">
-                    <img src="{{ foto.imagem.url }}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
-                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all"></div>
+                <div class="aspect-video rounded-xl overflow-hidden border border-slate-100 cursor-zoom-in relative"
+                     onclick="openModal('{{ foto.imagem.url }}')">
+                    <img src="{{ foto.imagem.url }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                         alt="Foto de avaria">
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
+                        <i class="fas fa-magnifying-glass-plus text-white opacity-0 group-hover:opacity-100 transition-opacity text-lg drop-shadow-lg"></i>
+                    </div>
                 </div>
                 {% if foto.descricao %}
-                    <p class="mt-2 text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight px-1">{{ foto.descricao }}</p>
+                <p class="mt-1.5 text-[10px] font-medium text-slate-500 leading-tight px-0.5">{{ foto.descricao }}</p>
                 {% endif %}
             </div>
             {% endfor %}
@@ -124,21 +207,38 @@
     </div>
     {% endif %}
 
-    <!-- Observações -->
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Observações do Condutor</h3>
-        <p class="text-sm font-medium text-slate-700 leading-relaxed italic border-l-4 border-slate-100 pl-4">
-            "{{ checklist.observacoes|default:"Nenhuma observação registrada pelo condutor neste protocolo." }}"
+    <!-- ── Observações ── -->
+    <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3">
+            <div class="w-5 h-5 rounded flex items-center justify-center"
+                 style="background:#f8fafc; color:#64748b; font-size:10px">
+                <i class="fas fa-message"></i>
+            </div>
+            <span class="text-xs font-semibold text-slate-700">Observações do Condutor</span>
+        </div>
+        {% if checklist.observacoes %}
+        <p class="text-sm font-medium text-slate-700 leading-relaxed bg-slate-50 border border-slate-100 rounded-xl px-5 py-4">
+            {{ checklist.observacoes }}
         </p>
+        {% else %}
+        <p class="text-sm text-slate-400 italic bg-slate-50 border border-slate-100 rounded-xl px-5 py-4">
+            Nenhuma observação registrada pelo condutor neste protocolo.
+        </p>
+        {% endif %}
     </div>
+
 </div>
 
-<!-- Modal de Foto (Lightbox) -->
-<div id="photoModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="closeModal()">
+<!-- ── Lightbox ── -->
+<div id="photoModal"
+     class="fixed inset-0 z-50 hidden items-center justify-center p-4"
+     style="background:rgba(15,23,42,0.92); backdrop-filter:blur(8px)"
+     onclick="closeModal()">
     <div class="relative max-w-5xl w-full" onclick="event.stopPropagation()">
-        <img id="modalImg" src="" class="w-full h-auto rounded-xl shadow-2xl ring-1 ring-white/20">
-        <button onclick="closeModal()" class="absolute -top-12 right-0 text-white font-black text-[10px] uppercase tracking-widest flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all">
-            Fechar <i class="fas fa-times"></i>
+        <img id="modalImg" src="" class="w-full h-auto rounded-xl shadow-2xl" style="ring:1px solid rgba(255,255,255,0.1)">
+        <button onclick="closeModal()"
+                class="absolute -top-11 right-0 flex items-center gap-2 text-white/70 hover:text-white text-xs font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-white/10">
+            <i class="fas fa-xmark"></i> Fechar
         </button>
     </div>
 </div>
@@ -147,33 +247,38 @@
     document.addEventListener("DOMContentLoaded", function() {
         const lat = parseFloat("{{ checklist.latitude|stringformat:"f" }}");
         const lng = parseFloat("{{ checklist.longitude|stringformat:"f" }}");
-        if (!isNaN(lat) && !isNaN(lng)) {
-            const margin = 0.005; 
-            const bbox = `${lng - margin},${lat - margin},${lng + margin},${lat + margin}`;
+        if (!isNaN(lat) && !isNaN(lng) && lat !== 0) {
+            const margin = 0.005;
+            const bbox   = `${lng - margin},${lat - margin},${lng + margin},${lat + margin}`;
             const marker = `${lat},${lng}`;
-            document.getElementById('mapa-osm').src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${marker}`;
+            document.getElementById('mapa-osm').src =
+                `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${marker}`;
         }
     });
 
     function openModal(url) {
+        const modal = document.getElementById('photoModal');
         document.getElementById('modalImg').src = url;
-        document.getElementById('photoModal').classList.remove('hidden');
-        document.getElementById('photoModal').classList.add('flex');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
         document.body.style.overflow = 'hidden';
     }
+
     function closeModal() {
-        document.getElementById('photoModal').classList.add('hidden');
-        document.getElementById('photoModal').classList.remove('flex');
-        document.body.style.overflow = 'auto';
+        const modal = document.getElementById('photoModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
     }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 
 <style>
-    @media print {
-        body { background: white !important; }
-        .print\:hidden { display: none !important; }
-        .print\:shadow-none { shadow: none !important; }
-        .rounded-2xl, .rounded-xl { border-radius: 4px !important; }
-    }
+@media print {
+    body { background: white !important; }
+    .print\:hidden { display: none !important; }
+    .print\:shadow-none { box-shadow: none !important; }
+}
 </style>
 {% endblock %}

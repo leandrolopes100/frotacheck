@@ -1,182 +1,685 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="h-full bg-slate-50">
+<html lang="pt-br" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Frota Check{% endblock %}</title>
+    <title>{% block title %}FrotaCheck{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚚</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        erp: { sidebar: '#0f172a', active: '#1e293b', accent: '#3b82f6' }
-                    }
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
                 }
             }
         }
     </script>
     <style>
-        .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        /* ============================================
+           FROTACHECK — DESIGN SYSTEM
+        ============================================ */
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Sidebar ── */
+        #sidebar {
+            background: #0b1628;
+            width: 256px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #1a3050; border-radius: 10px; }
+        .sidebar-transition { transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .nav-section {
+            padding: 0 8px;
+            margin-top: 20px;
+            margin-bottom: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #2d4a6e;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: #5d7fa8;
+            transition: background 0.12s, color 0.12s;
+            text-decoration: none;
+            position: relative;
+            margin-left: 2px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: #a8c4e0;
+        }
+
+        .nav-item.active {
+            background: rgba(37,99,235,0.14);
+            color: #93c5fd;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 6px;
+            bottom: 6px;
+            width: 2.5px;
+            background: #3b82f6;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: background 0.12s;
+        }
+
+        .nav-item:hover .nav-icon {
+            opacity: 1;
+        }
+
+        /* ── Header ── */
+        .app-header {
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+            box-shadow: 0 1px 2px rgba(37,99,235,0.25);
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+        }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            background: white;
+            color: #374151;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.12s, border-color 0.12s;
+        }
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* ── Badges ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-success { background: #f0fdf4; color: #16a34a; }
+        .badge-danger  { background: #fff1f2; color: #dc2626; }
+        .badge-warning { background: #fffbeb; color: #d97706; }
+        .badge-info    { background: #eff6ff; color: #2563eb; }
+        .badge-neutral { background: #f8fafc; color: #475569; }
+
+        /* ── Alert banners ── */
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border-width: 1px;
+        }
+        .alert-danger  { background: #fff1f2; border-color: #fecdd3; }
+        .alert-warning { background: #fffbeb; border-color: #fde68a; }
+        .alert-neutral { background: #f8fafc; border-color: #e2e8f0; }
+
+        /* ── Toasts ── */
+        @keyframes toastIn  { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
+        .toast-enter { animation: toastIn  0.32s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .toast-exit  { animation: toastOut 0.22s ease-in forwards; }
+
+        /* ── Table ── */
+        .data-table { border-collapse: collapse; width: 100%; }
+        .data-table thead th {
+            padding: 12px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: #94a3b8;
+            background: #f8fafc;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .data-table tbody td {
+            padding: 14px 20px;
+            font-size: 13.5px;
+            border-bottom: 1px solid #f8fafc;
+            color: #334155;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover td { background: #f8fafc; }
+
+        /* ── KPI Cards ── */
+        .kpi-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 22px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ── Forms ── */
+        .form-input {
+            width: 100%;
+            padding: 9px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #0f172a;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            outline: none;
+        }
+        .form-input:focus {
+            background: white;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+        .form-input::placeholder { color: #94a3b8; }
+
+        /* ── Pagination ── */
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 4px;
+        }
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.12s;
+            text-decoration: none;
+        }
+        .page-btn:hover { background: white; color: #2563eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .page-btn.active { background: #0f172a; color: white; font-weight: 700; }
+
+        /* ── Global form styles (applies to all templates) ── */
+        .main-area input[type="text"],
+        .main-area input[type="number"],
+        .main-area input[type="email"],
+        .main-area input[type="date"],
+        .main-area input[type="time"],
+        .main-area input[type="url"],
+        .main-area input[type="tel"],
+        .main-area input[type="password"],
+        .main-area select,
+        .main-area textarea {
+            width: 100%;
+            padding: 9px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #0f172a;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            outline: none;
+        }
+        .main-area input:focus,
+        .main-area select:focus,
+        .main-area textarea:focus {
+            background: white;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+        .main-area input::placeholder,
+        .main-area textarea::placeholder { color: #94a3b8; }
+        .main-area select { cursor: pointer; }
+        .main-area label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        /* ── Page animations ── */
+        @keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .page-content { animation: pageIn 0.18s ease forwards; }
+
+        /* ── Divider ── */
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.04);
+            margin: 10px 12px;
+        }
     </style>
+
+    <!-- Toast logic -->
+    <script>
+        function showToast(message, type) {
+            const styles = {
+                success: { bg: 'bg-emerald-600', icon: 'fa-circle-check' },
+                error:   { bg: 'bg-red-600',     icon: 'fa-circle-exclamation' },
+                warning: { bg: 'bg-amber-500',   icon: 'fa-triangle-exclamation' },
+                info:    { bg: 'bg-blue-600',     icon: 'fa-circle-info' },
+            };
+            const s = styles[type] || styles.info;
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast-enter pointer-events-auto flex items-start gap-3 ${s.bg} text-white px-4 py-3 rounded-xl shadow-2xl text-sm font-medium max-w-[320px] w-full`;
+            toast.innerHTML = `
+                <i class="fas ${s.icon} text-sm mt-0.5 flex-shrink-0 opacity-90"></i>
+                <span class="flex-1 leading-snug">${message}</span>
+                <button class="toast-close ml-1 mt-0.5 opacity-50 hover:opacity-100 flex-shrink-0 transition-opacity">
+                    <i class="fas fa-xmark text-xs"></i>
+                </button>`;
+            container.appendChild(toast);
+
+            const dismiss = () => {
+                toast.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => toast.remove(), 240);
+            };
+            const timer = setTimeout(dismiss, 5000);
+            toast.querySelector('.toast-close').addEventListener('click', () => { clearTimeout(timer); dismiss(); });
+        }
+    </script>
 </head>
 
-<body class="h-full font-sans antialiased text-slate-900">
-    
-    <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/40 z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
+<body class="h-full antialiased">
+
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[300] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Mobile overlay -->
+    <div id="mobile-overlay"
+         class="fixed inset-0 bg-slate-950/50 backdrop-blur-[2px] z-40 hidden opacity-0 transition-opacity duration-300"
+         onclick="closeSidebar()"></div>
 
     <div class="flex min-h-screen">
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-erp-sidebar text-slate-300 sidebar-transition -translate-x-full md:translate-x-0 flex flex-col shadow-2xl">
-            <div class="p-8 flex items-center justify-between">
+
+        <!-- ══════════════════════════
+             SIDEBAR
+        ══════════════════════════ -->
+        <aside id="sidebar"
+               class="fixed inset-y-0 left-0 z-50 flex flex-col sidebar-transition -translate-x-full md:translate-x-0 shadow-2xl"
+               style="width:256px">
+
+            <!-- Logo -->
+            <div class="flex items-center justify-between px-4 py-4 border-b" style="border-color:rgba(255,255,255,0.05)">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-erp-accent rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <i class="fas fa-truck-fast text-white text-lg"></i>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                         style="background:linear-gradient(135deg,#3b82f6,#1d4ed8); box-shadow:0 4px 12px rgba(37,99,235,0.4)">
+                        <i class="fas fa-truck-fast text-white text-sm"></i>
                     </div>
-                    <span class="text-white text-lg font-black tracking-tighter">FROTA<span class="text-erp-accent font-light">CHECK</span></span>
+                    <div>
+                        <span class="text-white font-bold text-sm tracking-tight leading-none">FROTA<span style="color:#60a5fa;font-weight:300">CHECK</span></span>
+                        <p style="font-size:9px;color:#2d4a6e;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-top:1px">Gestão de Frota</p>
+                    </div>
                 </div>
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-400">
-                    <i class="fas fa-times text-xl"></i>
+                <button onclick="closeSidebar()"
+                        class="md:hidden w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
+                        style="color:#4a6a8a"
+                        onmouseover="this.style.background='rgba(255,255,255,0.06)'"
+                        onmouseout="this.style.background='transparent'">
+                    <i class="fas fa-xmark text-sm"></i>
                 </button>
             </div>
 
-            <nav class="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-                <p class="px-4 py-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">Menu</p>
-                
-                <a href="{% url 'checklist_list' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {% if request.resolver_match.url_name == 'checklist_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
-                    <i class="fas fa-chart-line w-5 opacity-70"></i> <span class="text-sm">Dashboard</span>
+            <!-- Nav CTA -->
+            <div class="px-3 pt-4 pb-2">
+                <a href="{% url 'checklist_add' %}"
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
+                   style="background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; box-shadow:0 2px 8px rgba(37,99,235,0.3)">
+                    <i class="fas fa-plus text-xs"></i>
+                    Nova Inspeção
+                </a>
+            </div>
+
+            <!-- Nav -->
+            <nav class="flex-1 px-3 pb-3 overflow-y-auto sidebar-scroll">
+
+                <p class="nav-section" style="margin-top:12px">Menu</p>
+
+                <a href="{% url 'checklist_list' %}"
+                   class="nav-item {% if request.resolver_match.url_name == 'checklist_list' %}active{% endif %}">
+                    <span class="nav-icon {% if request.resolver_match.url_name == 'checklist_list' %}{% else %}{% endif %}"
+                          style="background:rgba(59,130,246,0.12); color:#60a5fa">
+                        <i class="fas fa-chart-line"></i>
+                    </span>
+                    <span>Dashboard</span>
                 </a>
 
-                <a href="{% url 'checklist_add' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {% if request.resolver_match.url_name == 'checklist_add' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
-                    <i class="fas fa-plus-circle w-5 opacity-70"></i> <span class="text-sm">Nova Inspeção</span>
+                <a href="{% url 'abastecimento_list' %}"
+                   class="nav-item {% if 'abastecimento' in request.resolver_match.url_name %}active{% endif %}">
+                    <span class="nav-icon" style="background:rgba(20,184,166,0.12); color:#2dd4bf">
+                        <i class="fas fa-gas-pump"></i>
+                    </span>
+                    <span>Abastecimentos</span>
                 </a>
+
                 {% if user.is_patrao %}
-                        <div class="pt-6 pb-2">
-                            <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Administração</p>
-                        </div>
+                <p class="nav-section">Administração</p>
 
-                        <a href="{% url 'veiculos_list' %}" 
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all 
-                        {% if request.resolver_match.url_name == 'veiculos_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
-                            <i class="fas fa-truck w-5 opacity-70"></i> <span class="text-sm">Gestão de Veículos</span>
-                        </a>
+                <a href="{% url 'veiculos_list' %}"
+                   class="nav-item {% if 'veiculo' in request.resolver_match.url_name %}active{% endif %}">
+                    <span class="nav-icon" style="background:rgba(251,146,60,0.12); color:#fb923c">
+                        <i class="fas fa-truck"></i>
+                    </span>
+                    <span>Frota de Veículos</span>
+                </a>
 
-                        <a href="{% url 'funcionario_list' %}" 
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all 
-                        {% if request.resolver_match.url_name == 'funcionario_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
-                            <i class="fas fa-users w-5 opacity-70"></i> <span class="text-sm">Colaboradores</span>
-                        </a>
-                        <a href="{% url 'etiquetas_list' %}" 
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all 
-                        {% if request.resolver_match.url_name == 'etiquetas_list' %}bg-erp-accent text-white font-bold{% else %}hover:bg-erp-active hover:text-white{% endif %}">
-                            <i class="fas fa-qrcode w-5"></i>
-                            <span class="text-sm font-bold">Imprimir Etiquetas</span>
-                        </a>
-                                           
+                <a href="{% url 'funcionario_list' %}"
+                   class="nav-item {% if 'funcionario' in request.resolver_match.url_name %}active{% endif %}">
+                    <span class="nav-icon" style="background:rgba(139,92,246,0.12); color:#a78bfa">
+                        <i class="fas fa-users"></i>
+                    </span>
+                    <span>Colaboradores</span>
+                    {% if alertas_cnh_total > 0 %}
+                    <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md"
+                          style="background:rgba(220,38,38,0.15); color:#f87171">{{ alertas_cnh_total }}</span>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'conformidade_frota' %}"
+                   class="nav-item {% if request.resolver_match.url_name == 'conformidade_frota' %}active{% endif %}">
+                    <span class="nav-icon" style="background:rgba(34,197,94,0.12); color:#4ade80">
+                        <i class="fas fa-calendar-check"></i>
+                    </span>
+                    <span>Conformidade</span>
+                </a>
+
+                <a href="{% url 'ocorrencias_list' %}"
+                   class="nav-item {% if request.resolver_match.url_name == 'ocorrencias_list' or request.resolver_match.url_name == 'ocorrencia_update' %}active{% endif %}">
+                    <span class="nav-icon" style="background:rgba(239,68,68,0.12); color:#f87171">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </span>
+                    <span>Ocorrências</span>
+                    {% if alertas_ocorrencias > 0 %}
+                    <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md"
+                          style="background:rgba(220,38,38,0.15); color:#f87171">{{ alertas_ocorrencias }}</span>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'ordem_manutencao_list' %}"
+                   class="nav-item {% if 'ordem_manutencao' in request.resolver_match.url_name %}active{% endif %}">
+                    <span class="nav-icon" style="background:rgba(234,179,8,0.12); color:#facc15">
+                        <i class="fas fa-wrench"></i>
+                    </span>
+                    <span>Manutenção</span>
+                </a>
+
+                <a href="{% url 'etiquetas_list' %}"
+                   class="nav-item {% if request.resolver_match.url_name == 'etiquetas_list' %}active{% endif %}">
+                    <span class="nav-icon" style="background:rgba(99,102,241,0.12); color:#818cf8">
+                        <i class="fas fa-qrcode"></i>
+                    </span>
+                    <span>Etiquetas QR Code</span>
+                </a>
                 {% endif %}
+
             </nav>
 
-            <div class="p-4 mt-auto border-t border-slate-800">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center font-black text-blue-400 text-xs border border-slate-700">
+            <!-- User card -->
+            <div class="px-3 py-3 border-t" style="border-color:rgba(255,255,255,0.05)">
+                <div class="flex items-center gap-3 px-2 py-2">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0"
+                         style="background:linear-gradient(135deg,#1e3a5f,#0f2440); color:#60a5fa; border:1px solid rgba(96,165,250,0.15)">
                         {{ user.username|slice:":2"|upper }}
                     </div>
-                    <div class="flex-1 overflow-hidden">
-                        <p class="text-xs font-bold text-white truncate">{{ user.username }}</p>
-                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{% if user.is_patrao %}Admin{% else %}Operador{% endif %}</p>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-medium text-xs truncate leading-tight">{{ user.username }}</p>
+                        <p class="text-[10px] truncate mt-0.5" style="color:#2d4a6e">
+                            {% if user.is_patrao %}Gestor · Administrador{% else %}Motorista · Operador{% endif %}
+                        </p>
                     </div>
+                    <button onclick="openLogoutModal()"
+                            class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors flex-shrink-0"
+                            style="color:#2d4a6e"
+                            title="Sair"
+                            onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.color='#f87171'"
+                            onmouseout="this.style.background='transparent';this.style.color='#2d4a6e'">
+                        <i class="fas fa-arrow-right-from-bracket text-xs"></i>
+                    </button>
                 </div>
             </div>
         </aside>
 
-        <div class="flex-1 md:pl-72 flex flex-col">
-            <header class="sticky top-0 z-30 h-16 glass-header px-6 flex items-center justify-between">
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-600"><i class="fas fa-bars"></i></button>
-                <h2 class="text-xs font-black text-slate-800 uppercase tracking-widest">{% block header_title %}Frota Check{% endblock %}</h2>
-                
-                <!-- Botão de Sair que abre o Modal -->
-                <button onclick="openLogoutModal()" class="text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none p-0 cursor-pointer">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </header>
+        <!-- ══════════════════════════
+             CONTENT AREA
+        ══════════════════════════ -->
+        <div class="flex-1 flex flex-col min-w-0" style="margin-left:0" id="main-container">
+            <div class="md:pl-64 flex flex-col flex-1">
 
-            <main class="flex-1 p-4 sm:p-8">
-                {% if messages %}
-                    <div class="mb-6 space-y-2">
-                        {% for message in messages %}
-                        <div class="flex items-center justify-between p-4 rounded-xl border {% if message.tags == 'error' %}bg-rose-50 border-rose-100 text-rose-700{% else %}bg-emerald-50 border-emerald-100 text-emerald-700{% endif %}">
-                            <div class="flex items-center gap-3 text-xs font-black uppercase tracking-widest">
-                                <i class="fas {% if message.tags == 'error' %}fa-lock{% else %}fa-check-circle{% endif %}"></i>
-                                {{ message }}
-                            </div>
-                            <button onclick="this.parentElement.remove()" class="opacity-40 hover:opacity-100"><i class="fas fa-times"></i></button>
+                <!-- Header -->
+                <header class="app-header sticky top-0 z-30 h-14 px-4 sm:px-6 flex items-center gap-4">
+
+                    <!-- Mobile hamburger -->
+                    <button onclick="openSidebar()"
+                            class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all flex-shrink-0">
+                        <i class="fas fa-bars-staggered text-sm"></i>
+                    </button>
+
+                    <!-- Page title -->
+                    <h1 class="flex-1 text-sm font-semibold text-slate-800 truncate">
+                        {% block header_title %}FrotaCheck{% endblock %}
+                    </h1>
+
+                    <!-- Right actions -->
+                    <div class="flex items-center gap-2 flex-shrink-0">
+
+                        <!-- Alert bell (managers) -->
+                        {% if user.is_patrao and alertas_total_geral > 0 %}
+                        <div class="relative w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-default"
+                             title="{{ alertas_total_geral }} alerta(s) pendente(s)">
+                            <i class="fas fa-bell text-sm"></i>
+                            <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-white">
+                                {{ alertas_total_geral }}
+                            </span>
                         </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                        {% endif %}
 
-                {% block content %}{% endblock %}
-            </main>
+                        <!-- User menu -->
+                        <div class="relative" id="user-menu">
+                            <button onclick="toggleUserMenu()"
+                                    class="flex items-center gap-2 pl-2 pr-3 h-9 rounded-xl hover:bg-slate-100 transition-all">
+                                <div class="w-6 h-6 rounded-lg bg-slate-900 flex items-center justify-center text-blue-400 text-[10px] font-bold flex-shrink-0">
+                                    {{ user.username|slice:":2"|upper }}
+                                </div>
+                                <span class="hidden sm:block text-xs font-semibold text-slate-700 truncate max-w-[100px]">{{ user.username }}</span>
+                                <i class="fas fa-chevron-down text-[9px] text-slate-400"></i>
+                            </button>
+
+                            <div id="user-dropdown"
+                                 class="hidden absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50"
+                                 style="box-shadow:0 8px 30px rgba(0,0,0,0.12)">
+                                <div class="px-4 py-3 border-b border-slate-50">
+                                    <p class="text-xs font-semibold text-slate-900 truncate">{{ user.username }}</p>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">
+                                        {% if user.is_patrao %}Gestor / Administrador{% else %}Motorista / Operador{% endif %}
+                                    </p>
+                                </div>
+                                <button onclick="openLogoutModal()"
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 font-medium hover:bg-red-50 transition-colors">
+                                    <i class="fas fa-arrow-right-from-bracket text-sm"></i>
+                                    Sair do sistema
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Main content -->
+                <main class="main-area flex-1 p-4 sm:p-6 lg:p-8 page-content">
+                    {% block content %}{% endblock %}
+                </main>
+
+            </div>
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Logout -->
-    <div id="logoutModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <!-- ══════════════════════════
+         LOGOUT MODAL
+    ══════════════════════════ -->
+    <div id="logoutModal"
+         class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4"
+         style="background:rgba(15,23,42,0.6); backdrop-filter:blur(4px)">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
             <div class="text-center">
-                <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-sign-out-alt text-xl"></i>
+                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-arrow-right-from-bracket text-lg"></i>
                 </div>
-                <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight">Sair do Sistema?</h3>
-                <p class="text-sm text-slate-500 mt-2 font-medium">Sua sessão será encerrada com segurança.</p>
+                <h3 class="text-base font-bold text-slate-900">Sair do Sistema?</h3>
+                <p class="text-sm text-slate-500 mt-1.5">Sua sessão será encerrada com segurança.</p>
             </div>
-            
-            <div class="mt-8 flex gap-3">
-                <button onclick="closeLogoutModal()" class="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+            <div class="mt-6 flex gap-3">
+                <button onclick="closeLogoutModal()"
+                        class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-medium transition-colors">
                     Cancelar
                 </button>
-                
                 <form action="{% url 'logout' %}" method="post" class="flex-1">
                     {% csrf_token %}
-                    <button type="submit" class="w-full py-3 px-4 bg-slate-900 hover:bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-200">
-                        Sair Agora
+                    <button type="submit"
+                            class="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                        Confirmar Saída
                     </button>
                 </form>
             </div>
         </div>
     </div>
 
+    {% block extra_scripts %}{% endblock %}
+
     <script>
-        function toggleSidebar() {
+        // ── Sidebar ──
+        function openSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-            setTimeout(() => overlay.classList.toggle('opacity-0'), 10);
+            overlay.classList.remove('hidden');
+            requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.remove('opacity-0')));
+            sidebar.classList.remove('-translate-x-full');
+        }
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
         }
 
-        // Funções do Modal de Logout
-        function openLogoutModal() {
-            document.getElementById('logoutModal').classList.remove('hidden');
-        }
+        // ── Logout modal ──
+        function openLogoutModal()  { document.getElementById('logoutModal').classList.remove('hidden'); }
+        function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
+        window.addEventListener('click', e => {
+            if (e.target === document.getElementById('logoutModal')) closeLogoutModal();
+        });
 
-        function closeLogoutModal() {
-            document.getElementById('logoutModal').classList.add('hidden');
+        // ── User dropdown ──
+        function toggleUserMenu() {
+            document.getElementById('user-dropdown').classList.toggle('hidden');
         }
-
-        // Fechar ao clicar fora do modal
-        window.onclick = function(event) {
-            const modal = document.getElementById('logoutModal');
-            if (event.target == modal) {
-                closeLogoutModal();
-            }
-        }
+        document.addEventListener('click', e => {
+            const menu = document.getElementById('user-menu');
+            if (menu && !menu.contains(e.target))
+                document.getElementById('user-dropdown').classList.add('hidden');
+        });
     </script>
+
+    <!-- Django messages → toasts -->
+    {% if messages %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for message in messages %}
+        showToast("{{ message|escapejs }}", "{{ message.tags|lower }}");
+        {% endfor %}
+    });
+    </script>
+    {% endif %}
+
 </body>
 </html>

@@ -1,207 +1,399 @@
 {% extends 'base.html' %}
-{% block title %}Histórico de Inspeções | Frota Check{% endblock %}
+{% block title %}Dashboard de Inspeções | FrotaCheck{% endblock %}
+{% block header_title %}Dashboard{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
 
 {% block content %}
-<!-- Importação da Fonte Inter -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-    body { font-family: 'Inter', sans-serif; }
-</style>
+<div class="max-w-7xl mx-auto">
 
-<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 bg-slate-50/50 min-h-screen">
-
-    <!-- Cabeçalho -->
-    <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <!-- ── Page header ── -->
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div>
-            <nav class="flex mb-3" aria-label="Breadcrumb">
-                <ol class="flex items-center space-x-2 text-[10px] text-slate-400 uppercase font-black tracking-[0.2em]">
-                    <li>Frota</li>
-                    <li><i class="fas fa-chevron-right text-[8px] opacity-50"></i></li>
-                    <li class="text-blue-600">Histórico</li>
-                </ol>
-            </nav>
-            <h1 class="text-4xl font-black text-slate-900 tracking-tight flex items-center gap-4">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs text-slate-400 font-medium">Frota</span>
+                <i class="fas fa-chevron-right text-slate-300 text-[9px]"></i>
+                <span class="text-xs text-blue-600 font-semibold">Dashboard</span>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
                 Inspeções
-                <span class="inline-flex items-center justify-center bg-blue-100 text-blue-700 text-xs font-black px-3 py-1 rounded-full ring-4 ring-blue-50/50">
-                    {{ checklists|length }}
-                </span>
-            </h1>
-            <p class="text-slate-500 mt-2 text-sm font-medium">Gestão centralizada de conformidade e segurança da frota.</p>
+                <span class="text-sm font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">{{ total_checklists }}</span>
+            </h2>
+            <p class="text-sm text-slate-500 mt-0.5">Conformidade e segurança da frota em tempo real.</p>
         </div>
-        
-        <div class="flex items-center gap-3">
-            <button onclick="window.print()" class="hidden md:flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm">
-                <i class="fas fa-download text-xs"></i> Exportar
-            </button>
-            <a href="{% url 'checklist_add' %}" class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
-                <i class="fas fa-plus text-xs"></i> Nova Inspeção
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <a href="{% url 'checklist_export_csv' %}"
+               class="btn-secondary hidden sm:inline-flex text-xs">
+                <i class="fas fa-arrow-down-to-line"></i>
+                Exportar CSV
+            </a>
+            <a href="{% url 'checklist_add' %}" class="btn-primary text-xs">
+                <i class="fas fa-plus"></i>
+                Nova Inspeção
             </a>
         </div>
     </div>
 
-    <!-- KPI Dashboard -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-4 ring-blue-50/50">
-                    <i class="fas fa-clipboard-list text-xl"></i>
+    <!-- ── Alertas (gestores) ── -->
+    {% if user.is_patrao %}
+        {% if cnh_expiradas or cnh_vencendo or docs_vencidos or combustivel_critico or veiculos_sem_inspecao_hoje %}
+        <div class="card p-4 mb-6 space-y-2">
+            <div class="flex items-center gap-2 pb-2 border-b border-slate-50">
+                <div class="w-5 h-5 rounded bg-amber-100 flex items-center justify-center">
+                    <i class="fas fa-bell text-amber-600" style="font-size:10px"></i>
                 </div>
-                <div>
-                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Total</p>
-                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ total_checklists }}</h3>
-                </div>
+                <span class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Alertas do Sistema</span>
             </div>
-        </div>
 
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 ring-4 ring-emerald-50/50">
-                    <i class="fas fa-check-double text-xl"></i>
+            {% if cnh_expiradas %}
+            <div class="alert-item alert-danger">
+                <div class="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0" style="background:rgba(220,38,38,0.1)">
+                    <i class="fas fa-id-card text-red-500 text-sm"></i>
                 </div>
-                <div>
-                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Conformes</p>
-                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ total_ok }}</h3>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-red-700">{{ cnh_expiradas }} CNH{{ cnh_expiradas|pluralize }} vencida{{ cnh_expiradas|pluralize }}</p>
+                    <p class="text-xs text-red-500 mt-0.5">Motoristas com habilitação vencida não devem conduzir.</p>
                 </div>
+                <a href="{% url 'funcionario_list' %}" class="btn-secondary text-xs flex-shrink-0 border-red-200 text-red-600 hover:bg-red-50">
+                    Ver <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-        </div>
+            {% endif %}
 
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-rose-50 text-rose-600 ring-4 ring-rose-50/50">
-                    <i class="fas fa-triangle-exclamation text-xl"></i>
+            {% if cnh_vencendo %}
+            <div class="alert-item alert-warning">
+                <div class="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0" style="background:rgba(217,119,6,0.1)">
+                    <i class="fas fa-clock text-amber-600 text-sm"></i>
                 </div>
-                <div>
-                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Avarias</p>
-                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ total_avarias }}</h3>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-amber-700">{{ cnh_vencendo }} CNH{{ cnh_vencendo|pluralize }} vencendo em 30 dias</p>
+                    <p class="text-xs text-amber-500 mt-0.5">Providencie a renovação com antecedência.</p>
                 </div>
+                <a href="{% url 'funcionario_list' %}" class="btn-secondary text-xs flex-shrink-0 border-amber-200 text-amber-600 hover:bg-amber-50">
+                    Ver <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-        </div>
-        
-        {% if user.is_patrao %}
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
-            <div class="relative z-10 flex items-center gap-5">
-                <div class="w-14 h-14 flex items-center justify-center rounded-2xl {% if saude_frota > 80 %}bg-emerald-50 text-emerald-600 ring-emerald-50/50{% else %}bg-amber-50 text-amber-600 ring-amber-50/50{% endif %} ring-4">
-                    <i class="fas fa-heart-pulse text-xl"></i>
+            {% endif %}
+
+            {% if docs_vencidos %}
+            <div class="alert-item alert-danger">
+                <div class="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0" style="background:rgba(220,38,38,0.1)">
+                    <i class="fas fa-file-circle-exclamation text-red-500 text-sm"></i>
                 </div>
-                <div>
-                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">Saúde Frota</p>
-                    <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ saude_frota }}%</h3>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-red-700">{{ docs_vencidos }} veículo{{ docs_vencidos|pluralize }} com documentação vencida</p>
+                    <p class="text-xs text-red-500 mt-0.5">CRLV ou Seguro irregular — regularize antes de circular.</p>
                 </div>
+                <a href="{% url 'veiculos_list' %}" class="btn-secondary text-xs flex-shrink-0 border-red-200 text-red-600 hover:bg-red-50">
+                    Ver <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-            <div class="absolute bottom-0 left-0 w-full h-1.5 bg-slate-50">
-                <div class="h-full {% if saude_frota > 80 %}bg-emerald-500{% else %}bg-amber-500{% endif %}" style="width: {{ saude_frota }}%"></div>
+            {% endif %}
+
+            {% if combustivel_critico %}
+            <div class="alert-item" style="background:#fff7ed; border-color:#fed7aa">
+                <div class="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0" style="background:rgba(234,88,12,0.1)">
+                    <i class="fas fa-gas-pump text-orange-600 text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-orange-700">{{ combustivel_critico }} veículo{{ combustivel_critico|pluralize }} com combustível na reserva</p>
+                    <p class="text-xs text-orange-500 mt-0.5">Verifique o abastecimento antes da próxima viagem.</p>
+                </div>
+                <a href="{% url 'abastecimento_add' %}" class="btn-secondary text-xs flex-shrink-0 border-orange-200 text-orange-600 hover:bg-orange-50">
+                    Registrar <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
+            {% endif %}
+
+            {% if veiculos_sem_inspecao_hoje %}
+            <div class="alert-item alert-neutral">
+                <div class="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 bg-slate-100">
+                    <i class="fas fa-truck text-slate-500 text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-700">{{ veiculos_sem_inspecao_hoje }} veículo{{ veiculos_sem_inspecao_hoje|pluralize }} sem inspeção hoje</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Verifique a conformidade da frota.</p>
+                </div>
+                <a href="{% url 'conformidade_frota' %}" class="btn-secondary text-xs flex-shrink-0">
+                    Ver <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% endif %}
+
         </div>
         {% endif %}
+    {% endif %}
+
+    <!-- ── KPI Cards ── -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+        <!-- Total -->
+        <div class="kpi-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:#eff6ff; color:#2563eb">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total</span>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 tracking-tight">{{ total_checklists }}</p>
+            <p class="text-xs text-slate-400 mt-1">inspeções registradas</p>
+        </div>
+
+        <!-- Conformes -->
+        <div class="kpi-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:#f0fdf4; color:#16a34a">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Conformes</span>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 tracking-tight">{{ total_ok }}</p>
+            <p class="text-xs text-slate-400 mt-1">sem avarias detectadas</p>
+        </div>
+
+        <!-- Avarias -->
+        <div class="kpi-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:#fff1f2; color:#dc2626">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Avarias</span>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 tracking-tight">{{ total_avarias }}</p>
+            <p class="text-xs text-slate-400 mt-1">problemas encontrados</p>
+        </div>
+
+        <!-- Saúde da frota (gestores) / Minhas inspeções (motoristas) -->
+        {% if user.is_patrao %}
+        <div class="kpi-card" style="border-color:{% if saude_frota > 80 %}#bbf7d0{% else %}#fde68a{% endif %}">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:{% if saude_frota > 80 %}#f0fdf4{% else %}#fffbeb{% endif %}; color:{% if saude_frota > 80 %}#16a34a{% else %}#d97706{% endif %}">
+                    <i class="fas fa-heart-pulse"></i>
+                </div>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Saúde</span>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 tracking-tight">{{ saude_frota }}%</p>
+            <div class="mt-3 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all"
+                     style="width:{{ saude_frota }}%; background:{% if saude_frota > 80 %}#22c55e{% else %}#f59e0b{% endif %}"></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="kpi-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:#f5f3ff; color:#7c3aed">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Minhas</span>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 tracking-tight">{{ total_checklists }}</p>
+            <p class="text-xs text-slate-400 mt-1">inspeções realizadas</p>
+        </div>
+        {% endif %}
+
     </div>
 
-    <!-- Filtros -->
-    <div class="bg-white border border-slate-200/60 rounded-3xl shadow-sm p-3 mb-8">
-        <form method="GET" action="." class="flex flex-wrap md:flex-nowrap items-center gap-3">
-            <div class="relative flex-1 min-w-[240px]">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input type="text" name="veiculo" value="{{ request.GET.veiculo }}" placeholder="Buscar por placa ou modelo..." 
-                       class="w-full bg-slate-50/50 border-none rounded-2xl pl-11 pr-4 py-3 text-sm font-medium focus:ring-4 focus:ring-blue-500/10 transition-all">
+    <!-- ── Gráficos (gestores) ── -->
+    {% if user.is_patrao %}
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
+
+        <!-- Tendência semanal -->
+        <div class="card lg:col-span-3 p-5">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-0.5">Tendência</p>
+                    <h3 class="text-sm font-semibold text-slate-800">Inspeções — Últimos 7 dias</h3>
+                </div>
+                <div class="flex items-center gap-4 text-[10px] font-semibold text-slate-400">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:#22c55e"></span>Conformes
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:#ef4444"></span>Avarias
+                    </span>
+                </div>
             </div>
-            
-            <select name="status" class="bg-slate-50/50 border-none rounded-2xl px-5 py-3 text-sm font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10 cursor-pointer min-w-[160px]">
-                <option value="">Todos Status</option>
-                <option value="ok" {% if request.GET.status == 'ok' %}selected{% endif %}>✅ Sem Avaria</option>
-                <option value="avaria" {% if request.GET.status == 'avaria' %}selected{% endif %}>⚠️ Com Avaria</option>
+            <canvas id="weeklyChart" height="140"></canvas>
+        </div>
+
+        <!-- Top veículos -->
+        <div class="card lg:col-span-2 p-5">
+            <div class="mb-5">
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-0.5">Ranking</p>
+                <h3 class="text-sm font-semibold text-slate-800">Veículos com Mais Avarias</h3>
+            </div>
+            {% if top_veiculos_data != "[]" %}
+                <canvas id="topVehiclesChart" height="190"></canvas>
+            {% else %}
+                <div class="flex flex-col items-center justify-center h-40 text-slate-300 gap-2">
+                    <i class="fas fa-chart-bar text-3xl"></i>
+                    <p class="text-xs font-medium text-slate-400">Nenhuma avaria registrada</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- ── Filtros ── -->
+    <div class="card p-3 mb-4">
+        <form method="GET" action="." class="flex flex-wrap md:flex-nowrap items-center gap-2">
+
+            <div class="relative flex-1 min-w-[200px]">
+                <i class="fas fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" name="veiculo" value="{{ request.GET.veiculo }}"
+                       placeholder="Buscar por placa ou modelo..."
+                       class="form-input pl-10 text-sm">
+            </div>
+
+            <select name="status"
+                    class="form-input min-w-[140px] text-sm cursor-pointer">
+                <option value="">Todos os Status</option>
+                <option value="ok"     {% if request.GET.status == 'ok' %}selected{% endif %}>Sem Avaria</option>
+                <option value="avaria" {% if request.GET.status == 'avaria' %}selected{% endif %}>Com Avaria</option>
             </select>
 
-            <div class="flex gap-2 w-full md:w-auto">
-                <button type="submit" class="flex-1 md:flex-none bg-slate-900 text-white rounded-2xl px-8 py-3 text-sm font-bold hover:bg-slate-800 transition-all shadow-md shadow-slate-200">
-                    Filtrar
+            <select name="tipo"
+                    class="form-input min-w-[140px] text-sm cursor-pointer">
+                <option value="">Todos os Tipos</option>
+                <option value="pre_viagem" {% if request.GET.tipo == 'pre_viagem' %}selected{% endif %}>Pré-Viagem</option>
+                <option value="pos_viagem" {% if request.GET.tipo == 'pos_viagem' %}selected{% endif %}>Pós-Viagem</option>
+                <option value="geral"      {% if request.GET.tipo == 'geral' %}selected{% endif %}>Geral</option>
+            </select>
+
+            <div class="flex gap-2 flex-shrink-0">
+                <button type="submit" class="btn-primary text-xs">
+                    <i class="fas fa-filter"></i> Filtrar
                 </button>
-                {% if request.GET.veiculo or request.GET.status %}
-                <a href="?" class="flex items-center justify-center w-12 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all">
-                    <i class="fas fa-filter-circle-xmark text-lg"></i>
+                {% if request.GET.veiculo or request.GET.status or request.GET.tipo %}
+                <a href="?" class="btn-secondary text-xs text-red-600 border-red-200 hover:bg-red-50">
+                    <i class="fas fa-xmark"></i>
                 </a>
                 {% endif %}
             </div>
+
         </form>
     </div>
 
-    <!-- Tabela Estática (Sem Hover) -->
-    <div class="bg-white border border-slate-200/60 rounded-[2rem] shadow-xl shadow-slate-200/40 overflow-hidden">
+    <!-- ── Tabela ── -->
+    <div class="card overflow-hidden">
+
+        <!-- Desktop table -->
         <div class="hidden md:block overflow-x-auto">
-            <table class="w-full border-collapse">
+            <table class="data-table">
                 <thead>
-                    <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Data & Hora</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Motorista</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Veículo</th>
-                        <th class="px-8 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
-                        <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Ações</th>
+                    <tr>
+                        <th>Data & Hora</th>
+                        <th>Motorista</th>
+                        <th>Veículo</th>
+                        <th class="text-center">Tipo</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-right">Ações</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
+                <tbody>
                     {% for c in checklists %}
-                    <tr class="bg-white">
-                        <td class="px-8 py-5">
-                            <div class="flex items-center gap-4">
-                                <div class="w-11 h-11 rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-500">
-                                    <span class="text-[9px] font-black leading-none mb-0.5">{{ c.data_realizada|date:"M"|upper }}</span>
-                                    <span class="text-base font-black leading-none">{{ c.data_realizada|date:"d" }}</span>
-                                </div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-slate-800">{{ c.data_realizada|date:"H:i" }}</span>
-                                    <span class="text-[10px] text-slate-400 font-bold uppercase">{{ c.data_realizada|date:"l" }}</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-5">
+                    <tr>
+                        <td>
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                                    <i class="fas fa-user text-[10px]"></i>
+                                <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-slate-500 flex-shrink-0">
+                                    <span class="text-[9px] font-semibold leading-none mb-0.5 text-slate-400">{{ c.data_realizada|date:"M"|upper }}</span>
+                                    <span class="text-sm font-bold leading-none text-slate-700">{{ c.data_realizada|date:"d" }}</span>
                                 </div>
-                                <span class="text-sm font-bold text-slate-700">{{ c.motorista.nome_completo|default:"Admin" }}</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-800">{{ c.data_realizada|date:"H:i" }}</p>
+                                    <p class="text-xs text-slate-400">{{ c.data_realizada|date:"l" }}</p>
+                                </div>
                             </div>
                         </td>
-                        <td class="px-8 py-5">
-                            <div class="px-4 py-2 bg-slate-50 rounded-2xl inline-block border border-slate-100">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <i class="fas fa-truck-moving text-[10px] text-slate-400"></i>
-                                    <p class="text-xs font-black text-slate-800 tracking-tight uppercase">{{ c.veiculo.modelo }}</p>
+
+                        <td>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-user text-slate-400 text-xs"></i>
                                 </div>
-                                <p class="text-[10px] text-blue-600 font-black tracking-widest">{{ c.veiculo.placa }}</p>
+                                <span class="text-sm font-medium text-slate-700">{{ c.motorista.nome_completo|default:"Admin" }}</span>
                             </div>
                         </td>
-                        <td class="px-8 py-5 text-center">
+
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-truck text-slate-300 text-xs flex-shrink-0"></i>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-800">{{ c.veiculo.modelo }}</p>
+                                    <p class="text-xs font-semibold text-blue-600 tracking-wider">{{ c.veiculo.placa }}</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <span class="badge badge-info" style="font-size:10px">
+                                {% if c.tipo == 'pre_viagem' %}Pré-Viagem
+                                {% elif c.tipo == 'pos_viagem' %}Pós-Viagem
+                                {% else %}Geral{% endif %}
+                            </span>
+                        </td>
+
+                        <td class="text-center">
                             {% if c.tem_avaria %}
-                                <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-wider ring-1 ring-rose-200/50">
-                                    <i class="fas fa-exclamation-triangle"></i> AVARIA
+                                <span class="badge badge-danger" style="font-size:10px">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> AVARIA
                                 </span>
                             {% else %}
-                                <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider ring-1 ring-emerald-200/50">
-                                    <i class="fas fa-check-circle"></i> CONFORME
+                                <span class="badge badge-success" style="font-size:10px">
+                                    <i class="fas fa-check text-[9px]"></i> CONFORME
                                 </span>
                             {% endif %}
                         </td>
-                        <td class="px-8 py-5 text-right">
+
+                        <td class="text-right">
                             <div class="flex justify-end items-center gap-1">
-                                <a href="{% url 'checklist_detail' c.id %}" class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                                    <i class="far fa-eye text-base"></i>
+                                <a href="{% url 'checklist_detail' c.id %}"
+                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                   title="Visualizar">
+                                    <i class="fas fa-eye text-sm"></i>
                                 </a>
-                                <a href="{% url 'checklist_update' c.id %}" class="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
-                                    <i class="far fa-edit text-base"></i>
+                                {% if user.is_patrao %}
+                                <a href="{% url 'checklist_update' c.id %}"
+                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                                   title="Editar">
+                                    <i class="fas fa-pen text-sm"></i>
                                 </a>
-                                <form action="{% url 'checklist_delete' c.id %}" method="POST" class="inline" onsubmit="return confirm('Excluir?')">
-                                    {% csrf_token %}
-                                    <button type="submit" class="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
-                                        <i class="far fa-trash-alt text-base"></i>
-                                    </button>
-                                </form>
+                                <a href="{% url 'checklist_delete' c.id %}"
+                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                   title="Excluir">
+                                    <i class="fas fa-trash text-sm"></i>
+                                </a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="py-24 text-center">
-                            <div class="flex flex-col items-center gap-3 text-slate-300">
-                                <i class="fas fa-folder-open text-5xl"></i>
-                                <p class="text-sm font-bold">Nenhuma inspeção encontrada.</p>
+                        <td colspan="6">
+                            <div class="py-16 text-center">
+                                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <i class="fas fa-clipboard-list text-2xl text-slate-300"></i>
+                                </div>
+                                <p class="text-sm font-semibold text-slate-700 mb-1">Nenhuma inspeção encontrada</p>
+                                <p class="text-xs text-slate-400 mb-5">
+                                    {% if request.GET.veiculo or request.GET.status %}
+                                        Tente remover os filtros aplicados.
+                                    {% else %}
+                                        Inicie registrando a primeira inspeção do dia.
+                                    {% endif %}
+                                </p>
+                                {% if not request.GET.veiculo and not request.GET.status %}
+                                <a href="{% url 'checklist_add' %}" class="btn-primary text-xs">
+                                    <i class="fas fa-plus"></i> Nova Inspeção
+                                </a>
+                                {% else %}
+                                <a href="?" class="btn-secondary text-xs">
+                                    <i class="fas fa-xmark"></i> Limpar filtros
+                                </a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>
@@ -209,45 +401,185 @@
                 </tbody>
             </table>
         </div>
-        
-        <!-- Mobile -->
-        <div class="md:hidden divide-y divide-slate-100">
+
+        <!-- Mobile cards -->
+        <div class="md:hidden divide-y divide-slate-50">
             {% for c in checklists %}
-            <div class="p-6 bg-white">
-                <div class="flex justify-between items-start mb-4">
+            <a href="{% url 'checklist_detail' c.id %}" class="block p-4 hover:bg-slate-50 transition-colors active:bg-slate-100">
+                <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-500">
-                            <span class="text-[8px] font-black leading-none">{{ c.data_realizada|date:"M"|upper }}</span>
-                            <span class="text-sm font-black leading-none">{{ c.data_realizada|date:"d" }}</span>
+                        <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center flex-shrink-0">
+                            <span class="text-[8px] font-semibold text-slate-400 uppercase">{{ c.data_realizada|date:"M" }}</span>
+                            <span class="text-base font-bold text-slate-700 leading-tight">{{ c.data_realizada|date:"d" }}</span>
                         </div>
                         <div>
-                            <h4 class="font-black text-slate-800 text-sm uppercase">{{ c.veiculo.modelo }}</h4>
-                            <p class="text-blue-600 text-[10px] font-bold tracking-widest">{{ c.veiculo.placa }}</p>
+                            <p class="text-sm font-semibold text-slate-900">{{ c.veiculo.modelo }}</p>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[10px] font-semibold text-blue-600 tracking-wider">{{ c.veiculo.placa }}</span>
+                                <span class="text-slate-300">·</span>
+                                <span class="text-xs text-slate-400">{{ c.motorista.nome_completo|default:"Admin"|truncatechars:16 }}</span>
+                            </div>
                         </div>
                     </div>
-                    {% if c.tem_avaria %}
-                        <span class="text-rose-600 text-[10px] font-black uppercase tracking-widest italic">Avaria</span>
-                    {% else %}
-                        <span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest italic">OK</span>
-                    {% endif %}
-                </div>
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-2 text-slate-500">
-                        <i class="fas fa-user text-[10px]"></i>
-                        <span class="text-xs font-bold">{{ c.motorista.nome_completo|default:"Admin" }}</span>
-                    </div>
-                    <div class="flex gap-4 text-slate-400">
-                        <a href="{% url 'checklist_detail' c.id %}"><i class="far fa-eye"></i></a>
-                        <a href="{% url 'checklist_update' c.id %}"><i class="far fa-edit"></i></a>
-                        <form action="{% url 'checklist_delete' c.id %}" method="POST" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" onclick="return confirm('Excluir?')"><i class="far fa-trash-alt"></i></button>
-                        </form>
+                    <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                        {% if c.tem_avaria %}
+                            <span class="badge badge-danger" style="font-size:10px">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Avaria
+                            </span>
+                        {% else %}
+                            <span class="badge badge-success" style="font-size:10px">
+                                <i class="fas fa-check text-[9px]"></i> OK
+                            </span>
+                        {% endif %}
+                        <span class="text-[10px] text-slate-400">{{ c.data_realizada|date:"H:i" }}</span>
                     </div>
                 </div>
+                <div class="mt-3 flex items-center gap-4 text-xs text-slate-400">
+                    <span><i class="fas fa-tachometer-alt mr-1"></i>{{ c.km_atual }} km</span>
+                    <span><i class="fas fa-gas-pump mr-1"></i>{{ c.nivel_combustivel }}</span>
+                </div>
+            </a>
+            {% empty %}
+            <div class="py-14 text-center">
+                <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-clipboard-list text-xl text-slate-300"></i>
+                </div>
+                <p class="text-sm font-semibold text-slate-600">Nenhuma inspeção encontrada</p>
+                <a href="{% url 'checklist_add' %}" class="inline-block mt-3 text-xs text-blue-600 font-semibold hover:underline">
+                    Criar inspeção →
+                </a>
             </div>
             {% endfor %}
         </div>
+
     </div>
+
+    <!-- ── Paginação ── -->
+    {% if is_paginated %}
+    <div class="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+        <p class="text-sm text-slate-500">
+            Mostrando <span class="font-semibold text-slate-700">{{ page_obj.start_index }}–{{ page_obj.end_index }}</span>
+            de <span class="font-semibold text-slate-700">{{ paginator.count }}</span> inspeções
+        </p>
+        <nav class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+               class="page-btn"><i class="fas fa-chevron-left text-xs"></i></a>
+            {% endif %}
+            {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="page-btn active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+                       class="page-btn">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+               class="page-btn"><i class="fas fa-chevron-right text-xs"></i></a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+
 </div>
+
+{% if user.is_patrao %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const chartLabels  = {{ chart_labels|safe }};
+    const chartOk      = {{ chart_ok|safe }};
+    const chartAvarias = {{ chart_avarias|safe }};
+
+    Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+
+    const gridColor = '#f1f5f9';
+
+    // Gráfico semanal
+    const ctxWeekly = document.getElementById('weeklyChart');
+    if (ctxWeekly) {
+        new Chart(ctxWeekly.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [
+                    {
+                        label: 'Conformes',
+                        data: chartOk,
+                        backgroundColor: 'rgba(34,197,94,0.75)',
+                        borderRadius: 5,
+                        borderWidth: 0,
+                    },
+                    {
+                        label: 'Avarias',
+                        data: chartAvarias,
+                        backgroundColor: 'rgba(239,68,68,0.75)',
+                        borderRadius: 5,
+                        borderWidth: 0,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { weight: '600', size: 11 }, color: '#94a3b8' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0, font: { size: 11 }, color: '#94a3b8' },
+                        grid: { color: gridColor }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfico top veículos
+    const ctxTop = document.getElementById('topVehiclesChart');
+    if (ctxTop) {
+        const topLabels = {{ top_veiculos_labels|safe }};
+        const topData   = {{ top_veiculos_data|safe }};
+        if (topData.length > 0) {
+            new Chart(ctxTop.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: topLabels,
+                    datasets: [{
+                        data: topData,
+                        backgroundColor: [
+                            'rgba(239,68,68,0.8)',
+                            'rgba(249,115,22,0.8)',
+                            'rgba(234,179,8,0.8)',
+                            'rgba(99,102,241,0.8)',
+                            'rgba(14,165,233,0.8)',
+                        ],
+                        borderRadius: 5,
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, font: { size: 11 }, color: '#94a3b8' },
+                            grid: { color: gridColor }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { weight: '600', size: 10 }, color: '#64748b' }
+                        }
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

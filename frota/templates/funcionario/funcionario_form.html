@@ -2,220 +2,140 @@
 {% load humanize %}
 
 {% block title %}Novo Colaborador | Frota Check{% endblock %}
+{% block header_title %}Novo Colaborador{% endblock %}
 
 {% block content %}
-
 <div class="max-w-4xl mx-auto py-10 px-4">
 
-```
-<div class="mb-10 flex items-center justify-between">
-    <div>
-        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Novo Colaborador</h1>
-        <p class="text-sm text-slate-500 font-medium mt-1">Gerencie os acessos e credenciais dos motoristas.</p>
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <nav class="flex mb-2" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    <li><a href="{% url 'funcionario_list' %}" class="hover:text-blue-600 transition-colors">Colaboradores</a></li>
+                    <li><i class="fas fa-chevron-right text-[9px] opacity-40 mx-1"></i></li>
+                    <li class="text-blue-600">Novo</li>
+                </ol>
+            </nav>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Novo Colaborador</h1>
+            <p class="text-sm text-slate-500 font-medium mt-1">Gerencie os acessos e credenciais dos motoristas.</p>
+        </div>
+        <a href="javascript:history.back()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all">
+            <i class="fas fa-arrow-left"></i>
+        </a>
     </div>
-    <a href="javascript:history.back()" class="text-slate-400 hover:text-slate-900 transition">
-        <i class="fas fa-arrow-left"></i>
-    </a>
-</div>
 
-<form method="post" enctype="multipart/form-data" class="space-y-8">
-    {% csrf_token %}
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
 
-    {% if form.errors %}
-    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p class="text-red-700 text-sm font-bold">
-            Corrija os erros abaixo antes de continuar.
-        </p>
-    </div>
-    {% endif %}
-
-    {% if form.non_field_errors %}
-    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
-        {% for error in form.non_field_errors %}
-            <p class="text-red-600 text-sm">{{ error }}</p>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- INFORMAÇÕES DE ACESSO -->
-
-    <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
-            Informações de Acesso
+        {% if form.errors %}
+        <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3">
+            <i class="fas fa-circle-exclamation text-rose-500 flex-shrink-0"></i>
+            <p class="text-rose-700 text-sm font-bold">Corrija os erros abaixo antes de continuar.</p>
         </div>
+        {% endif %}
 
-        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Login <label class="text-red-500">*</label>
-                </label>
-
-                <input type="text" name="username"
-                value="{{ request.POST.username }}"
-                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    E-mail 
-                </label>
-
-                <input type="email" name="email"
-                value="{{ request.POST.email }}"
-                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Senha 
-                </label>
-
-                <input type="password" name="password"
-                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-
+        {% if form.non_field_errors %}
+        <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl">
+            {% for error in form.non_field_errors %}
+            <p class="text-rose-600 text-sm font-bold">{{ error }}</p>
+            {% endfor %}
         </div>
-    </section>
+        {% endif %}
 
-
-    <!-- DADOS DO MOTORISTA -->
-
-    <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-
-        <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
-            Dados do Motorista
-        </div>
-
-        <div class="p-6 space-y-6">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                        Nome Completo <label class="text-red-500">*</label>
-                    </label>
-
-                    {{ form.nome_completo }}
-
-                    {% if form.nome_completo.errors %}
-                    <p class="text-red-500 text-xs mt-1">
-                        {{ form.nome_completo.errors.0 }}
-                    </p>
-                    {% endif %}
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                        CPF <label class="text-red-500">*</label>
-                    </label>
-
-                    {{ form.cpf }}
-
-                    {% if form.cpf.errors %}
-                    <p class="text-red-500 text-xs mt-1">
-                        {{ form.cpf.errors.0 }}
-                    </p>
-                    {% endif %}
-                </div>
-
+        <!-- Informações de Acesso -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+                <i class="fas fa-key text-slate-400 text-sm"></i>
+                <span class="text-xs font-black text-slate-700 uppercase tracking-widest">Informações de Acesso</span>
             </div>
-
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100">
-
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                        CNH <label class="text-red-500">*</label>
-                    </label>
-
-                    {{ form.numero_cnh }}
-
-                    {% if form.numero_cnh.errors %}
-                    <p class="text-red-500 text-xs mt-1">
-                        {{ form.numero_cnh.errors.0 }}
-                    </p>
-                    {% endif %}
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Login <span class="text-rose-500">*</span></label>
+                    <input type="text" name="username" value="{{ request.POST.username }}"
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    {% if form.username.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.username.errors.0 }}</p>{% endif %}
                 </div>
-
-
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                        Validade <label class="text-red-500">*</label>
-                    </label>
-
-                    {{ form.validade_cnh }}
-
-                    {% if form.validade_cnh.errors %}
-                    <p class="text-red-500 text-xs mt-1">
-                        {{ form.validade_cnh.errors.0 }}
-                    </p>
-                    {% endif %}
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">E-mail</label>
+                    <input type="email" name="email" value="{{ request.POST.email }}"
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
                 </div>
-
-
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                        Cargo
-                    </label>
-
-                    {{ form.cargo }}
-
-                    {% if form.cargo.errors %}
-                    <p class="text-red-500 text-xs mt-1">
-                        {{ form.cargo.errors.0 }}
-                    </p>
-                    {% endif %}
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Senha <span class="text-rose-500">*</span></label>
+                    <input type="password" name="password"
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
                 </div>
-
             </div>
+        </section>
 
-
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                    Upload de Habilitação
-                </label>
-
-                {{ form.cnh_impressa }}
-
-                {% if form.cnh_impressa.errors %}
-                <p class="text-red-500 text-xs mt-1">
-                    {{ form.cnh_impressa.errors.0 }}
-                </p>
-                {% endif %}
+        <!-- Dados do Motorista -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+                <i class="fas fa-id-card text-slate-400 text-sm"></i>
+                <span class="text-xs font-black text-slate-700 uppercase tracking-widest">Dados do Colaborador</span>
             </div>
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Nome Completo <span class="text-rose-500">*</span></label>
+                        {{ form.nome_completo }}
+                        {% if form.nome_completo.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.nome_completo.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">CPF <span class="text-rose-500">*</span></label>
+                        {{ form.cpf }}
+                        {% if form.cpf.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.cpf.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
 
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-5 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Nº CNH <span class="text-rose-500">*</span></label>
+                        {{ form.numero_cnh }}
+                        {% if form.numero_cnh.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.numero_cnh.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Validade CNH <span class="text-rose-500">*</span></label>
+                        {{ form.validade_cnh }}
+                        {% if form.validade_cnh.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.validade_cnh.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Cargo</label>
+                        {{ form.cargo }}
+                        {% if form.cargo.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.cargo.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
 
-    </section>
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Upload de Habilitação (PDF/Imagem)</label>
+                    {{ form.cnh_impressa }}
+                    {% if form.cnh_impressa.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.cnh_impressa.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+        </section>
 
-
-    <button type="submit"
-    class="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition shadow-lg">
-        Registrar Colaborador
-    </button>
-
-</form>
-```
-
+        <button type="submit"
+                class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+            <i class="fas fa-check mr-2"></i>Registrar Colaborador
+        </button>
+    </form>
 </div>
 
 <style>
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="date"],
-select {
-
-width:100%!important;
-background-color:#f8fafc!important;
-border:1px solid #e2e8f0!important;
-border-radius:.5rem!important;
-padding:.65rem .8rem!important;
-font-size:.875rem!important;
-font-weight:600!important;
-
+input[type="text"], input[type="email"], input[type="password"], input[type="date"], select {
+    width: 100% !important;
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 0.75rem !important;
+    padding: 0.625rem 0.875rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    outline: none !important;
+    transition: all 0.15s !important;
+}
+input:focus, select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important;
 }
 </style>
-
 {% endblock %}

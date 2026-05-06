@@ -2,6 +2,7 @@
 {% load humanize %}
 
 {% block title %}{% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %} | Frota Check{% endblock %}
+{% block header_title %}{% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %}{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto py-10 px-4 pb-24">
@@ -125,8 +126,31 @@
             </div>
         </section>
 
-        <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition shadow-lg">
-            Salvar Dados do Veículo
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-xs font-black text-slate-700 uppercase tracking-widest">
+                Documentos e Revisão
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Vencimento CRLV</label>
+                    {{ form.vencimento_crlv }}
+                    {% if form.vencimento_crlv.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.vencimento_crlv.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Vencimento Seguro</label>
+                    {{ form.vencimento_seguro }}
+                    {% if form.vencimento_seguro.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.vencimento_seguro.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">KM Próxima Revisão</label>
+                    {{ form.km_proxima_revisao }}
+                    {% if form.km_proxima_revisao.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.km_proxima_revisao.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+        </section>
+
+        <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+            <i class="fas fa-check mr-2"></i>Salvar Dados do Veículo
         </button>
 
     </form>

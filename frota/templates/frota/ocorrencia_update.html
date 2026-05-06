@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Atualizar Ocorrência | Frota Check{% endblock %}
+{% block header_title %}Atualizar Ocorrência{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-10 px-4">
+
+    <div class="mb-8 flex items-start justify-between">
+        <div>
+            <nav class="flex mb-2">
+                <ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    <li><a href="{% url 'ocorrencias_list' %}" class="hover:text-blue-600 transition-colors">Ocorrências</a></li>
+                    <li><i class="fas fa-chevron-right text-[9px] opacity-40 mx-1"></i></li>
+                    <li class="text-blue-600">Atualizar</li>
+                </ol>
+            </nav>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Atualizar Ocorrência</h1>
+        </div>
+        <a href="{% url 'ocorrencias_list' %}" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- Resumo da ocorrência -->
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-sm font-black text-slate-900">{{ object.veiculo.modelo }}</span>
+            <span class="text-xs font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">{{ object.veiculo.placa }}</span>
+        </div>
+        <div class="text-sm font-medium text-slate-600 mb-3">
+            <span class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-1">Itens com Avaria</span>
+            {{ object.descricao }}
+        </div>
+        <div class="flex items-center gap-4 text-xs text-slate-400">
+            <span><i class="far fa-calendar mr-1"></i>{{ object.criada_em|date:"d/m/Y H:i" }}</span>
+            <a href="{% url 'checklist_detail' object.checklist.pk %}" class="text-blue-600 hover:underline font-bold">
+                <i class="fas fa-clipboard-list mr-1"></i> Ver inspeção original
+            </a>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-5">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3">
+            <i class="fas fa-circle-exclamation text-rose-500"></i>
+            <p class="text-sm text-rose-700 font-bold">Corrija os erros antes de continuar.</p>
+        </div>
+        {% endif %}
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
+                <span class="text-xs font-black text-slate-700 uppercase tracking-widest">Atualizar Status</span>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Novo Status</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.status.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Nota de Resolução</label>
+                    {{ form.nota_resolucao }}
+                    {% if form.nota_resolucao.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.nota_resolucao.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+            <i class="fas fa-check mr-2"></i>Salvar Atualização
+        </button>
+    </form>
+</div>
+
+<style>
+select, textarea { width:100%!important; background-color:#f8fafc!important; border:1px solid #e2e8f0!important; border-radius:.75rem!important; padding:.75rem!important; font-size:.875rem!important; font-weight:600!important; outline:none!important; }
+</style>
+{% endblock %}

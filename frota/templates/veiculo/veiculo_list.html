@@ -1,149 +1,192 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Gestão de Frota{% endblock %}
+{% block title %}Frota de Veículos | FrotaCheck{% endblock %}
+{% block header_title %}Gestão de Veículos{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-    
-    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 pb-6 border-b border-slate-200">
+<div class="max-w-7xl mx-auto">
+
+    <!-- ── Page header ── -->
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div>
-            <nav class="flex mb-2" aria-label="Breadcrumb">
-                <ol class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <li>Ativos</li>
-                    <li><i class="fas fa-chevron-right text-[8px] opacity-50"></i></li>
-                    <li class="text-blue-600">Frota de Veículos</li>
-                </ol>
-            </nav>
-          
+            <div class="flex items-center gap-2 mb-1">
+                <a href="{% url 'checklist_list' %}" class="text-xs text-slate-400 font-medium hover:text-blue-600 transition-colors">Início</a>
+                <i class="fas fa-chevron-right text-slate-300 text-[9px]"></i>
+                <span class="text-xs text-blue-600 font-semibold">Frota de Veículos</span>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Frota de Veículos</h2>
+            <p class="text-sm text-slate-500 mt-0.5">{{ paginator.count|default:"0" }} veículo{{ paginator.count|pluralize }} cadastrado{{ paginator.count|pluralize }}</p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-            <form method="GET" class="relative flex-grow sm:flex-grow-0">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input 
-                    type="text"
-                    name="busca"
-                    placeholder="Filtrar placa ou modelo..."
-                    value="{{ request.GET.busca }}"
-                    class="pl-9 pr-10 py-2.5 bg-slate-100 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 w-full sm:w-72 transition-all">
-                
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <form method="GET" class="relative">
+                <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" name="busca" placeholder="Buscar placa ou modelo..."
+                       value="{{ request.GET.busca }}"
+                       class="form-input pl-9 pr-9 text-sm w-56"
+                       style="border-radius:8px">
                 {% if request.GET.busca %}
-                <a href="{% url 'veiculos_list' %}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors">
-                    <i class="fas fa-times"></i>
+                <a href="{% url 'veiculos_list' %}"
+                   class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors">
+                    <i class="fas fa-xmark text-xs"></i>
                 </a>
                 {% endif %}
             </form>
-
-            <a href="{% url 'veiculo_add' %}" class="flex-shrink-0 inline-flex items-center justify-center px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg gap-2">
-                <i class="fas fa-plus text-[10px]"></i> Novo Veículo
+            <a href="{% url 'veiculo_add' %}" class="btn-primary text-xs flex-shrink-0">
+                <i class="fas fa-plus"></i>
+                Novo Veículo
             </a>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- ── Grid de veículos ── -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for veiculo in veiculos %}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col">
-            
-            <div class="p-5 flex gap-4">
-                <div class="w-20 h-20 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
-                    {% if veiculo.foto %}
-                        <img src="{{ veiculo.foto.url }}" class="w-full h-full object-cover">
-                    {% else %}
-                        <div class="w-full h-full flex flex-col items-center justify-center space-y-1">
-                            <i class="fas fa-car text-xs text-slate-400 opacity-50"></i> 
-                            <span class="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none">
-                                Sem imagem
-                            </span>
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <div class="flex-grow min-w-0">
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">{{ veiculo.placa }}</span>
-                        
-                        <div class="flex gap-2">
-                            <a href="{% url 'veiculo_update' veiculo.pk %}" class="text-slate-400 hover:text-amber-600 transition-colors"><i class="fas fa-pen text-xs"></i></a>
-                            <a href="{% url 'veiculo_delete' veiculo.pk %}" class="text-slate-400 hover:text-rose-600 transition-colors"><i class="fas fa-trash text-xs"></i></a>
-                        </div>
+        <div class="group card overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
+
+            <!-- Foto 16:9 -->
+            <div class="relative aspect-video bg-slate-100 overflow-hidden flex-shrink-0">
+                {% if veiculo.foto %}
+                    <img src="{{ veiculo.foto.url }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                         alt="{{ veiculo.modelo }}">
+                {% else %}
+                    <div class="w-full h-full flex flex-col items-center justify-center gap-2"
+                         style="background:linear-gradient(135deg,#f1f5f9,#e2e8f0)">
+                        <i class="fas fa-truck text-4xl text-slate-300"></i>
+                        <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Sem foto</span>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-800 mt-2 truncate">{{ veiculo.modelo }}</h3>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ veiculo.ano }}</p>
-                </div>
-            </div>
+                {% endif %}
 
-            <div class="px-5 py-4 bg-slate-50 border-y border-slate-100 grid grid-cols-2 gap-4">
-                <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Valor FIPE</p>
-                    <p class="text-sm font-bold text-slate-700">R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Status</p>
-                    
+                <!-- Status badge -->
+                <div class="absolute top-3 right-3">
                     {% if veiculo.ativo %}
-                        <span class="inline-flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ativo
-                        </span>
+                    <span class="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full"
+                          style="background:rgba(22,163,74,0.9); color:white; backdrop-filter:blur(8px)">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Ativo
+                    </span>
                     {% else %}
-                        <span class="inline-flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Inativo
-                        </span>
+                    <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full"
+                          style="background:rgba(71,85,105,0.85); color:#cbd5e1; backdrop-filter:blur(8px)">
+                        Inativo
+                    </span>
                     {% endif %}
                 </div>
+
+                <!-- Placa badge -->
+                <div class="absolute bottom-3 left-3">
+                    <span class="text-xs font-bold px-2.5 py-1 rounded-lg tracking-widest uppercase"
+                          style="background:rgba(15,23,42,0.85); color:white; backdrop-filter:blur(8px)">
+                        {{ veiculo.placa }}
+                    </span>
+                </div>
+
+                <!-- Ações hover -->
+                {% if user.is_patrao %}
+                <div class="absolute top-3 left-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <a href="{% url 'veiculo_update' veiculo.pk %}"
+                       class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-md"
+                       style="background:rgba(255,255,255,0.92); color:#475569"
+                       onmouseover="this.style.color='#d97706'"
+                       onmouseout="this.style.color='#475569'"
+                       title="Editar">
+                        <i class="fas fa-pen text-xs"></i>
+                    </a>
+                    <a href="{% url 'veiculo_delete' veiculo.pk %}"
+                       class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-md"
+                       style="background:rgba(255,255,255,0.92); color:#475569"
+                       onmouseover="this.style.color='#dc2626'"
+                       onmouseout="this.style.color='#475569'"
+                       title="Excluir">
+                        <i class="fas fa-trash text-xs"></i>
+                    </a>
+                </div>
+                {% endif %}
             </div>
 
-            <div class="p-4 mt-auto">
-                <a href="{% url 'veiculo_detail' veiculo.pk %}" class="flex items-center justify-center w-full py-2.5 rounded-xl border border-slate-200 text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-900 hover:text-white transition-all gap-2">
-                    Visualizar Detalhes <i class="fas fa-arrow-right text-[10px]"></i>
-                </a>
+            <!-- Info -->
+            <div class="p-5 flex-1 flex flex-col">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 leading-tight">{{ veiculo.modelo }}</h3>
+                        <p class="text-xs text-slate-400 font-medium mt-0.5">{{ veiculo.marca }} &nbsp;·&nbsp; {{ veiculo.ano }}</p>
+                    </div>
+                    {% if veiculo.bloqueado %}
+                    <span class="badge badge-danger flex-shrink-0" style="font-size:10px">
+                        <i class="fas fa-lock text-[9px]"></i> Bloqueado
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Valor FIPE</p>
+                        <p class="text-sm font-semibold {% if veiculo.fipe %}text-emerald-600{% else %}text-slate-300{% endif %} mt-0.5">
+                            {% if veiculo.fipe %}R$ {{ veiculo.fipe|floatformat:2|intcomma }}{% else %}—{% endif %}
+                        </p>
+                    </div>
+                    <a href="{% url 'veiculo_detail' veiculo.pk %}"
+                       class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
+                        Detalhes <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-span-full py-24 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
-            <i class="fas fa-folder-open text-slate-300 text-4xl mb-4"></i>
-            <h3 class="text-slate-900 font-bold">Nenhum veículo encontrado</h3>
-            <p class="text-slate-500 text-sm mt-1">Sua frota está vazia no momento.</p>
+        <div class="col-span-full py-20">
+            <div class="max-w-xs mx-auto text-center">
+                <div class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-truck text-3xl text-slate-300"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900 mb-2">
+                    {% if request.GET.busca %}Nenhum resultado{% else %}Frota vazia{% endif %}
+                </h3>
+                <p class="text-sm text-slate-400 mb-5 leading-relaxed">
+                    {% if request.GET.busca %}
+                        Nenhum veículo encontrado para "{{ request.GET.busca }}".
+                        <a href="{% url 'veiculos_list' %}" class="text-blue-600 hover:underline font-semibold">Limpar busca</a>
+                    {% else %}
+                        Adicione o primeiro veículo da sua frota para começar.
+                    {% endif %}
+                </p>
+                {% if not request.GET.busca %}
+                <a href="{% url 'veiculo_add' %}" class="btn-primary text-xs">
+                    <i class="fas fa-plus"></i> Cadastrar veículo
+                </a>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
+
+    <!-- ── Paginação ── -->
     {% if is_paginated %}
-<div class="flex flex-col sm:flex-row items-center justify-between mt-10 pb-10 gap-4 border-t border-slate-100 pt-8">
-    <div class="text-sm text-slate-500 font-medium">
-        Mostrando <span class="text-slate-900 font-bold">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> de <span class="text-slate-900 font-bold">{{ paginator.count }}</span> veículos
-    </div>
-
-    <nav class="flex items-center gap-1 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
-        
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-           class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
-            <i class="fas fa-chevron-left text-xs"></i>
-        </a>
-        {% endif %}
-
-        {% for num in paginator.page_range %}
-            {% if page_obj.number == num %}
-                <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white text-sm font-black shadow-lg shadow-slate-200">
-                    {{ num }}
-                </span>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-                   class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 text-sm font-bold hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
-                    {{ num }}
-                </a>
+    <div class="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4">
+        <p class="text-sm text-slate-500">
+            Mostrando <span class="font-semibold text-slate-700">{{ page_obj.start_index }}–{{ page_obj.end_index }}</span>
+            de <span class="font-semibold text-slate-700">{{ paginator.count }}</span> veículos
+        </p>
+        <nav class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+               class="page-btn"><i class="fas fa-chevron-left text-xs"></i></a>
             {% endif %}
-        {% endfor %}
+            {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="page-btn active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+                       class="page-btn">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+               class="page-btn"><i class="fas fa-chevron-right text-xs"></i></a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
 
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-           class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all">
-            <i class="fas fa-chevron-right text-xs"></i>
-        </a>
-        {% endif %}
-
-    </nav>
-</div>
-{% endif %}
 </div>
 {% endblock %}

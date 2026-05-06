@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = 'django-insecure-cfehpe=s%2ub(q7lx5m&h&1t7^-j&)u(#=p&4(+pdmn)b$o4e0'
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['192.168.27.100', '127.0.0.1', '172.20.10.3']
 AUTH_USER_MODEL = 'frota.Usuario'
 
@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'frota',
     'django.contrib.humanize',
     'widget_tweaks',
+    
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'frota.context_processors.alertas_globais',
             ],
         },
     },
@@ -90,3 +92,17 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# ── Email ──────────────────────────────────────────────────────────────────────
+# Em desenvolvimento, e-mails são exibidos no console (não enviados).
+# Em produção, configure EMAIL_HOST_USER e EMAIL_HOST_PASSWORD via variáveis de ambiente.
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend'
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'FrotaCheck <noreply@frotacheck.com.br>')
