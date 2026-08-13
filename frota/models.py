@@ -38,7 +38,7 @@ class Funcionario(models.Model):
     )
     cpf = models.CharField(max_length=14, unique=True, db_index=True)
     numero_cnh = models.CharField(max_length=20, verbose_name="Número CNH")
-    validade_cnh = models.DateField(verbose_name="Validade da CNH")
+    validade_cnh = models.DateField(verbose_name="Validade da CNH", db_index=True)
     cnh_impressa = models.FileField(
         upload_to='funcionarios/cnh/', null=True, blank=True,
         verbose_name="CNH Digital/Scanner",
@@ -66,14 +66,14 @@ class Veiculo(models.Model):
         max_digits=12, decimal_places=2, verbose_name="Valor FIPE",
         blank=True, null=True, default=0,
     )
-    ativo = models.BooleanField(default=True, verbose_name="Ativo")
+    ativo = models.BooleanField(default=True, verbose_name="Ativo", db_index=True)
     foto = models.ImageField(upload_to='veiculos/fotos/%Y/%m/', null=True, blank=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
     # Controle de documentos
-    vencimento_crlv = models.DateField(null=True, blank=True, verbose_name="Vencimento CRLV")
-    vencimento_seguro = models.DateField(null=True, blank=True, verbose_name="Vencimento Seguro")
+    vencimento_crlv = models.DateField(null=True, blank=True, verbose_name="Vencimento CRLV", db_index=True)
+    vencimento_seguro = models.DateField(null=True, blank=True, verbose_name="Vencimento Seguro", db_index=True)
 
     # Revisão por KM
     km_proxima_revisao = models.PositiveIntegerField(
@@ -243,6 +243,9 @@ class OcorrenciaAvaria(models.Model):
         ordering = ['-criada_em']
         verbose_name = "Ocorrência de Avaria"
         verbose_name_plural = "Ocorrências de Avarias"
+        indexes = [
+            models.Index(fields=['veiculo', 'status']),
+        ]
 
     def __str__(self):
         return f"{self.veiculo.placa} — {self.get_status_display()} ({self.criada_em.strftime('%d/%m/%Y')})"
