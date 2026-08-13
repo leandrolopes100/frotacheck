@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .forms import ChecklistForm
-from .models import Checklist, Funcionario, Veiculo
+from .models import Abastecimento, Checklist, Funcionario, Veiculo
 
 Usuario = get_user_model()
 
@@ -224,3 +224,29 @@ class DocumentoDownloadViewTests(TestCase):
         )
         response = self.client.get(reverse('veiculo_documento_download', args=[veiculo.pk]))
         self.assertEqual(response.status_code, 302)
+
+
+class AbastecimentoIDORTests(TestCase):
+    """Regressão: um motorista não pode registrar abastecimento em nome
+    de outro motorista adulterando o campo 'motorista' do formulário
+    (AbastecimentoCreateView não forçava o motorista logado)."""
+
+    def setUp(self):
+        self.veiculo = Veiculo.objects.create(
+            placa='FUE1L23', marca='Ford', modelo='Cargo',
+            ano=2020, renavam='55667788990',
+        )
+        self.motorista_a = _criar_motorista('motoristaE')
+        self.motorista_b = _criar_motorista('motoristaF')
+
+    def test_motorista_nao_atribui_abastecimento_a_outro(self):
+        self.client.login(username='motoristaE', password='senha-teste-123')
+        funcionario_b = Funcionario.objects.get(usuario=self.motorista_b)
+        response = self.client.post(reverse('abastecimento_add'), {
+            'veiculo': self.veiculo.pk, 'motorista': funcionario_b.pk,
+            'data': '2026-01-10T10:00', 'km_atual': 1000,
+            'litros': '50.00', 'valor_total': '300.00', 'tipo_combustivel': 'diesel',
+        })
+        self.assertEqual(response.status_code, 302)
+        abastecimento = Abastecimento.objects.get()
+        self.assertEqual(abastecimento.motorista, Funcionario.objects.get(usuario=self.motorista_a))

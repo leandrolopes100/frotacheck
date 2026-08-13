@@ -700,7 +700,13 @@ class AbastecimentoCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('abastecimento_list')
 
     def form_valid(self, form):
-        form.instance.registrado_por = self.request.user
+        user = self.request.user
+        if not (user.is_superuser or user.is_patrao):
+            if not hasattr(user, 'perfil_funcionario'):
+                form.add_error(None, "Seu usuário não possui um perfil de Funcionário vinculado.")
+                return self.form_invalid(form)
+            form.instance.motorista = user.perfil_funcionario
+        form.instance.registrado_por = user
         messages.success(self.request, "Abastecimento registrado com sucesso.")
         return super().form_valid(form)
 
