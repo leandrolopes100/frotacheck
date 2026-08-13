@@ -1,79 +1,87 @@
 {% extends 'base.html' %}
-{% block title %}Registrar Abastecimento | Frota Check{% endblock %}
+{% block title %}Registrar Abastecimento | FrotaCheck{% endblock %}
 {% block header_title %}Novo Abastecimento{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto py-10 px-4">
+<div class="max-w-2xl mx-auto">
 
-    <div class="mb-8 flex items-start justify-between">
+    <div class="mb-6 flex items-start justify-between">
         <div>
-            <nav class="flex mb-2"><ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400">
-                <li><a href="{% url 'abastecimento_list' %}" class="hover:text-blue-600 transition-colors">Abastecimentos</a></li>
-                <li><i class="fas fa-chevron-right text-[9px] opacity-40 mx-1"></i></li>
-                <li class="text-blue-600">Novo</li>
-            </ol></nav>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Registrar Abastecimento</h1>
+            <div class="flex items-center gap-2 mb-1">
+                <a href="{% url 'abastecimento_list' %}" class="text-xs font-medium transition-colors"
+                   style="color:#484f58"
+                   onmouseover="this.style.color='#3fb950'"
+                   onmouseout="this.style.color='#484f58'">Abastecimentos</a>
+                <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
+                <span class="text-xs font-semibold" style="color:#3fb950">Novo</span>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight" style="color:#e6edf3">Registrar Abastecimento</h1>
         </div>
-        <a href="{% url 'abastecimento_list' %}" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all">
+        <a href="{% url 'abastecimento_list' %}"
+           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
+           style="color:#484f58"
+           onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='#e6edf3'"
+           onmouseout="this.style.background='transparent';this.style.color='#484f58'">
             <i class="fas fa-arrow-left"></i>
         </a>
     </div>
 
-    <form method="post" class="space-y-6">
+    <form method="post" class="space-y-5">
         {% csrf_token %}
 
         {% if form.errors %}
-        <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3">
-            <i class="fas fa-circle-exclamation text-rose-500"></i>
-            <p class="text-sm text-rose-700 font-bold">Corrija os erros antes de continuar.
+        <div class="alert-item alert-danger">
+            <i class="fas fa-circle-exclamation flex-shrink-0" style="color:#f85149"></i>
+            <p class="text-sm font-bold" style="color:#f85149">
+                Corrija os erros antes de continuar.
                 {% for field, errs in form.errors.items %}{{ field }}: {{ errs.0 }}. {% endfor %}
             </p>
         </div>
         {% endif %}
 
-        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
-                <i class="fas fa-gas-pump text-slate-400 text-sm"></i>
-                <span class="text-xs font-black text-slate-700 uppercase tracking-widest">Dados do Abastecimento</span>
+        <div class="card overflow-hidden">
+            <div class="px-6 py-4 flex items-center gap-2" style="background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06)">
+                <i class="fas fa-gas-pump text-sm" style="color:#2dd4bf"></i>
+                <span class="text-xs font-bold uppercase tracking-widest" style="color:#484f58">Dados do Abastecimento</span>
             </div>
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Veículo *</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Veículo <span style="color:#f85149">*</span></label>
                     {{ form.veiculo }}
-                    {% if form.veiculo.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.veiculo.errors.0 }}</p>{% endif %}
+                    {% if form.veiculo.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.veiculo.errors.0 }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Motorista</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Motorista</label>
                     {{ form.motorista }}
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Data / Hora *</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Data / Hora <span style="color:#f85149">*</span></label>
                     {{ form.data }}
-                    {% if form.data.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.data.errors.0 }}</p>{% endif %}
+                    {% if form.data.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.data.errors.0 }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">KM no Momento *</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">KM no Momento <span style="color:#f85149">*</span></label>
                     {{ form.km_atual }}
-                    {% if form.km_atual.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.km_atual.errors.0 }}</p>{% endif %}
+                    {% if form.km_atual.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.km_atual.errors.0 }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Litros Abastecidos *</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Litros Abastecidos <span style="color:#f85149">*</span></label>
                     {{ form.litros }}
-                    {% if form.litros.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.litros.errors.0 }}</p>{% endif %}
+                    {% if form.litros.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.litros.errors.0 }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Valor Total R$ *</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Valor Total R$ <span style="color:#f85149">*</span></label>
                     {{ form.valor_total }}
-                    {% if form.valor_total.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.valor_total.errors.0 }}</p>{% endif %}
+                    {% if form.valor_total.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.valor_total.errors.0 }}</p>{% endif %}
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Tipo de Combustível *</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Tipo de Combustível <span style="color:#f85149">*</span></label>
                     {{ form.tipo_combustivel }}
                 </div>
             </div>
-        </section>
+        </div>
 
-        <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+        <button type="submit" class="btn-primary w-full py-4 justify-center text-xs uppercase tracking-widest">
             <i class="fas fa-check mr-2"></i>Registrar Abastecimento
         </button>
     </form>
@@ -81,9 +89,19 @@
 
 <style>
 input[type="text"], input[type="number"], input[type="datetime-local"], select {
-    width:100%!important; background-color:#f8fafc!important; border:1px solid #e2e8f0!important;
-    border-radius:.75rem!important; padding:.625rem .875rem!important; font-size:.875rem!important;
-    font-weight:600!important; outline:none!important;
+    width: 100% !important;
+    background-color: #0d1117 !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    border-radius: .75rem !important;
+    padding: .625rem .875rem !important;
+    font-size: .875rem !important;
+    font-weight: 500 !important;
+    color: #e6edf3 !important;
+    outline: none !important;
+}
+input:focus, select:focus {
+    border-color: #3fb950 !important;
+    box-shadow: 0 0 0 3px rgba(63,185,80,0.12) !important;
 }
 </style>
 {% endblock %}

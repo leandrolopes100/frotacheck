@@ -1,45 +1,53 @@
 {% extends 'base.html' %}
 
-{% block title %}Excluir Colaborador | Frota Check{% endblock %}
+{% block title %}Excluir Colaborador | FrotaCheck{% endblock %}
 
 {% block content %}
 <div class="max-w-xl mx-auto py-20 px-4">
-    
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        
-        <div class="bg-rose-50 border-b border-rose-100 p-8 text-center">
-            <div class="w-16 h-16 bg-white text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+
+    <div class="rounded-2xl overflow-hidden" style="background:#161b22; border:1px solid rgba(255,255,255,0.08)">
+
+        <div class="p-8 text-center" style="background:rgba(248,81,73,0.08); border-bottom:1px solid rgba(248,81,73,0.15)">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                 style="background:rgba(248,81,73,0.12); color:#f85149">
                 <i class="fas fa-user-times text-2xl"></i>
             </div>
-            <h2 class="text-xl font-black text-rose-900 uppercase tracking-tighter">Confirmar Exclusão</h2>
+            <h2 class="text-xl font-black uppercase tracking-tighter" style="color:#f85149">Confirmar Exclusão</h2>
         </div>
 
         <div class="p-8 text-center">
-            <p class="text-slate-600 mb-2 font-medium">
+            <p class="mb-2 font-medium" style="color:#8b949e">
                 Você está prestes a remover o acesso de:
             </p>
-            <h3 class="text-lg font-black text-slate-900 mb-1">{{ funcionario.nome_completo }}</h3>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">
+            <h3 class="text-lg font-black mb-1" style="color:#e6edf3">{{ funcionario.nome_completo }}</h3>
+            <p class="text-[10px] font-black uppercase tracking-widest mb-8" style="color:#484f58">
                 CPF: {{ funcionario.cpf }} | Cargo: {{ funcionario.cargo }}
             </p>
 
-            <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-8 text-left flex gap-3">
-                <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                <p class="text-[11px] text-slate-500 leading-relaxed font-semibold">
+            <div class="rounded-xl p-4 mb-8 text-left flex gap-3"
+                 style="background:rgba(56,139,253,0.08); border:1px solid rgba(56,139,253,0.2)">
+                <i class="fas fa-info-circle mt-1" style="color:#388bfd"></i>
+                <p class="text-[11px] leading-relaxed font-semibold" style="color:#8b949e">
                     Esta ação removerá o colaborador do sistema. Os registros de checklists anteriores vinculados a este CPF permanecerão no histórico, mas o acesso do usuário será revogado imediatamente.
                 </p>
             </div>
 
             <form method="post" class="flex flex-col sm:flex-row gap-3">
                 {% csrf_token %}
-                
-                <a href="{% url 'funcionario_list' %}" 
-                   class="flex-1 px-6 py-3 bg-slate-100 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all text-center">
+
+                <a href="{% url 'funcionario_list' %}"
+                   class="flex-1 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all text-center"
+                   style="background:rgba(255,255,255,0.05); color:#8b949e; border:1px solid rgba(255,255,255,0.08)"
+                   onmouseover="this.style.background='rgba(255,255,255,0.09)'"
+                   onmouseout="this.style.background='rgba(255,255,255,0.05)'">
                     Cancelar e Voltar
                 </a>
-                
-                <button type="submit" 
-                        class="flex-1 px-6 py-3 bg-rose-600 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-200">
+
+                <button type="submit"
+                        class="flex-1 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+                        style="background:#da3633; color:white"
+                        onmouseover="this.style.background='#b91c1c'"
+                        onmouseout="this.style.background='#da3633'">
                     Confirmar Exclusão
                 </button>
             </form>
@@ -47,8 +55,8 @@
     </div>
 
     <div class="mt-8 text-center">
-        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            Precisa de ajuda? <a href="#" class="text-blue-500 hover:underline">Contate o Administrador</a>
+        <p class="text-[10px] font-black uppercase tracking-widest" style="color:#484f58">
+            Precisa de ajuda? <a href="#" class="hover:underline" style="color:#388bfd">Contate o Administrador</a>
         </p>
     </div>
 

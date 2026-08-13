@@ -1,137 +1,189 @@
 {% extends 'base.html' %}
 {% load humanize %}
-{% block title %}Conformidade da Frota | Frota Check{% endblock %}
+{% block title %}Conformidade da Frota | FrotaCheck{% endblock %}
 {% block header_title %}Conformidade da Frota{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+<div class="max-w-7xl mx-auto">
 
-    <div class="mb-8">
-        <nav class="flex mb-2">
-            <ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400">
-                <li><a href="{% url 'checklist_list' %}" class="hover:text-blue-600 transition-colors">Início</a></li>
-                <li><i class="fas fa-chevron-right text-[9px] opacity-40 mx-1"></i></li>
-                <li class="text-blue-600">Conformidade</li>
-            </ol>
-        </nav>
-        <div class="flex items-end justify-between">
-            <div>
-                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Conformidade da Frota</h1>
-                <p class="text-sm text-slate-500 font-medium mt-1">Situação de inspeções do dia — {{ hoje|date:"d/m/Y" }}</p>
+    <!-- ── Page header ── -->
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors"
+                   style="color:#484f58"
+                   onmouseover="this.style.color='#3fb950'"
+                   onmouseout="this.style.color='#484f58'">Início</a>
+                <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
+                <span class="text-xs font-semibold" style="color:#3fb950">Conformidade</span>
             </div>
-            <a href="{% url 'checklist_add' %}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
-                <i class="fas fa-plus text-xs"></i> Nova Inspeção
-            </a>
+            <h1 class="text-2xl font-bold tracking-tight" style="color:#e6edf3">Conformidade da Frota</h1>
+            <p class="text-sm mt-0.5" style="color:#8b949e">Situação de inspeções do dia — {{ hoje|date:"d/m/Y" }}</p>
         </div>
+        <a href="{% url 'checklist_add' %}" class="btn-primary text-xs flex-shrink-0">
+            <i class="fas fa-plus text-xs"></i> Nova Inspeção
+        </a>
     </div>
 
-    <!-- KPIs do dia -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Total Ativos</p>
-            <p class="text-3xl font-black text-slate-900">{{ total_veiculos }}</p>
+    <!-- ── KPIs do dia ── -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+        <div class="kpi-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:rgba(56,139,253,0.12); color:#388bfd">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:#484f58">Ativos</span>
+            </div>
+            <p class="text-3xl font-bold tracking-tight" style="color:#e6edf3">{{ total_veiculos }}</p>
+            <p class="text-xs mt-1" style="color:#484f58">veículos na frota</p>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Inspecionados Hoje</p>
-            <p class="text-3xl font-black text-emerald-600">{{ inspecionados_hoje }}</p>
+
+        <div class="kpi-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:rgba(63,185,80,0.12); color:#3fb950">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:#484f58">Inspecionados</span>
+            </div>
+            <p class="text-3xl font-bold tracking-tight" style="color:#3fb950">{{ inspecionados_hoje }}</p>
+            <p class="text-xs mt-1" style="color:#484f58">inspecionados hoje</p>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Pendentes</p>
-            <p class="text-3xl font-black {% if pendentes_hoje > 0 %}text-rose-600{% else %}text-slate-900{% endif %}">{{ pendentes_hoje }}</p>
+
+        <div class="kpi-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:{% if pendentes_hoje > 0 %}rgba(248,81,73,0.12){% else %}rgba(63,185,80,0.12){% endif %}; color:{% if pendentes_hoje > 0 %}#f85149{% else %}#3fb950{% endif %}">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:#484f58">Pendentes</span>
+            </div>
+            <p class="text-3xl font-bold tracking-tight" style="color:{% if pendentes_hoje > 0 %}#f85149{% else %}#3fb950{% endif %}">{{ pendentes_hoje }}</p>
+            <p class="text-xs mt-1" style="color:#484f58">sem inspeção hoje</p>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
-            <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Conformidade</p>
-            <p class="text-3xl font-black {% if conformidade_pct >= 80 %}text-emerald-600{% else %}text-amber-600{% endif %}">{{ conformidade_pct }}%</p>
-            <div class="absolute bottom-0 left-0 w-full h-1 bg-slate-100">
-                <div class="h-full {% if conformidade_pct >= 80 %}bg-emerald-500{% else %}bg-amber-500{% endif %}" style="width: {{ conformidade_pct }}%"></div>
+
+        <div class="kpi-card" style="border-color:{% if conformidade_pct >= 80 %}rgba(63,185,80,0.3){% else %}rgba(210,153,34,0.3){% endif %}">
+            <div class="flex items-start justify-between mb-4">
+                <div class="kpi-icon" style="background:{% if conformidade_pct >= 80 %}rgba(63,185,80,0.12){% else %}rgba(210,153,34,0.12){% endif %}; color:{% if conformidade_pct >= 80 %}#3fb950{% else %}#d29922{% endif %}">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:#484f58">Conformidade</span>
+            </div>
+            <p class="text-3xl font-bold tracking-tight" style="color:{% if conformidade_pct >= 80 %}#3fb950{% else %}#d29922{% endif %}">{{ conformidade_pct }}%</p>
+            <div class="mt-3 h-1.5 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.06)">
+                <div class="h-full rounded-full" style="width:{{ conformidade_pct }}%; background:{% if conformidade_pct >= 80 %}#3fb950{% else %}#d29922{% endif %}"></div>
             </div>
         </div>
+
     </div>
 
-    <!-- Tabela -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <!-- ── Tabela ── -->
+    <div class="card overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="data-table">
                 <thead>
-                    <tr class="bg-slate-50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Veículo</th>
-                        <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Última Inspeção</th>
-                        <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Hoje</th>
-                        <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Ocorrências</th>
-                        <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Bloqueado</th>
-                        <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Ações</th>
+                    <tr>
+                        <th>Veículo</th>
+                        <th>Última Inspeção</th>
+                        <th class="text-center">Hoje</th>
+                        <th class="text-center">Ocorrências</th>
+                        <th class="text-center">Bloqueado</th>
+                        <th class="text-right">Ações</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
+                <tbody>
                     {% for s in situacao %}
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="px-6 py-4">
+                    <tr>
+                        <td>
                             <div>
-                                <p class="text-sm font-black text-slate-900">{{ s.veiculo.modelo }}</p>
-                                <p class="text-xs text-blue-600 font-black tracking-widest">{{ s.veiculo.placa }}</p>
+                                <p class="text-sm font-bold" style="color:#e6edf3">{{ s.veiculo.modelo }}</p>
+                                <p class="text-xs font-bold tracking-widest" style="color:#388bfd">{{ s.veiculo.placa }}</p>
                             </div>
                         </td>
-                        <td class="px-6 py-4">
+                        <td>
                             {% if s.ultima_inspecao %}
                             <div>
-                                <p class="text-sm font-bold text-slate-700">{{ s.ultima_inspecao.data_realizada|date:"d/m/Y H:i" }}</p>
-                                <p class="text-xs text-slate-400">{{ s.ultima_inspecao.get_tipo_display }} · {{ s.ultima_inspecao.motorista.nome_completo|default:"—" }}</p>
+                                <p class="text-sm font-bold" style="color:#c9d1d9">{{ s.ultima_inspecao.data_realizada|date:"d/m/Y H:i" }}</p>
+                                <p class="text-xs" style="color:#484f58">{{ s.ultima_inspecao.get_tipo_display }} · {{ s.ultima_inspecao.motorista.nome_completo|default:"—" }}</p>
                             </div>
                             {% else %}
-                            <span class="text-xs text-slate-400 italic">Nenhuma inspeção registrada</span>
+                            <span class="text-xs italic" style="color:#484f58">Nenhuma inspeção registrada</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="text-center">
                             {% if s.inspecionado_hoje %}
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">
-                                <i class="fas fa-check text-[10px]"></i> Sim
+                            <span class="badge badge-success" style="font-size:10px">
+                                <i class="fas fa-check text-[9px]"></i> Sim
                             </span>
                             {% else %}
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-black border border-rose-200">
-                                <i class="fas fa-times text-[10px]"></i> Não
+                            <span class="badge badge-danger" style="font-size:10px">
+                                <i class="fas fa-times text-[9px]"></i> Não
                             </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="text-center">
                             {% if s.ocorrencias_abertas > 0 %}
-                            <a href="{% url 'ocorrencias_list' %}?veiculo={{ s.veiculo.placa }}" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-black border border-amber-200 hover:bg-amber-100 transition-colors">
-                                <i class="fas fa-triangle-exclamation text-[10px]"></i> {{ s.ocorrencias_abertas }}
+                            <a href="{% url 'ocorrencias_list' %}?veiculo={{ s.veiculo.placa }}"
+                               class="badge badge-warning transition-colors"
+                               style="font-size:10px"
+                               onmouseover="this.style.opacity='0.8'"
+                               onmouseout="this.style.opacity='1'">
+                                <i class="fas fa-triangle-exclamation text-[9px]"></i> {{ s.ocorrencias_abertas }}
                             </a>
                             {% else %}
-                            <span class="text-xs text-slate-300 font-bold">—</span>
+                            <span style="color:#30363d; font-weight:700; font-size:12px">—</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="text-center">
                             {% if s.veiculo.bloqueado %}
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-black border border-rose-200">
-                                <i class="fas fa-lock text-[10px]"></i> Sim
+                            <span class="badge badge-danger" style="font-size:10px">
+                                <i class="fas fa-lock text-[9px]"></i> Sim
                             </span>
                             {% else %}
-                            <span class="text-xs text-slate-300 font-bold">—</span>
+                            <span style="color:#30363d; font-weight:700; font-size:12px">—</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-right">
+                        <td class="text-right">
                             <div class="flex justify-end gap-1">
-                                <a href="{% url 'veiculo_detail' s.veiculo.pk %}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Detalhes do veículo">
+                                <a href="{% url 'veiculo_detail' s.veiculo.pk %}"
+                                   class="p-2 rounded-lg transition-all"
+                                   style="color:#484f58"
+                                   onmouseover="this.style.background='rgba(56,139,253,0.1)';this.style.color='#388bfd'"
+                                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                                   title="Detalhes do veículo">
                                     <i class="fas fa-truck text-sm"></i>
                                 </a>
                                 {% if s.ultima_inspecao %}
-                                <a href="{% url 'checklist_detail' s.ultima_inspecao.pk %}" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Ver última inspeção">
+                                <a href="{% url 'checklist_detail' s.ultima_inspecao.pk %}"
+                                   class="p-2 rounded-lg transition-all"
+                                   style="color:#484f58"
+                                   onmouseover="this.style.background='rgba(63,185,80,0.1)';this.style.color='#3fb950'"
+                                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                                   title="Ver última inspeção">
                                     <i class="far fa-eye text-sm"></i>
                                 </a>
                                 {% endif %}
-                                <a href="{% url 'checklist_add' %}?veiculo_id={{ s.veiculo.pk }}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Nova inspeção">
+                                <a href="{% url 'checklist_add' %}?veiculo_id={{ s.veiculo.pk }}"
+                                   class="p-2 rounded-lg transition-all"
+                                   style="color:#484f58"
+                                   onmouseover="this.style.background='rgba(63,185,80,0.1)';this.style.color='#3fb950'"
+                                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                                   title="Nova inspeção">
                                     <i class="fas fa-plus text-sm"></i>
                                 </a>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="6" class="py-16 text-center text-slate-400 text-sm font-bold">Nenhum veículo ativo cadastrado.</td></tr>
+                    <tr>
+                        <td colspan="6" class="py-16 text-center text-sm font-bold" style="color:#484f58">
+                            Nenhum veículo ativo cadastrado.
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
 {% endblock %}

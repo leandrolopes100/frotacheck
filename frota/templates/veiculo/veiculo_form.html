@@ -1,155 +1,131 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}{% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %} | Frota Check{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %} | FrotaCheck{% endblock %}
 {% block header_title %}{% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-10 px-4 pb-24">
-    
-    <div class="mb-10 flex items-center justify-between">
+<div class="max-w-4xl mx-auto pb-24">
+
+    <div class="mb-8 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">
+            <h1 class="text-2xl font-bold tracking-tight" style="color:#e6edf3">
                 {% if form.instance.pk %}Editar Veículo{% else %}Novo Veículo{% endif %}
             </h1>
-            <p class="text-sm text-slate-500 font-medium mt-1">Cadastre e gerencie as informações técnicas da sua frota.</p>
+            <p class="text-sm mt-1" style="color:#8b949e">Cadastre e gerencie as informações técnicas da sua frota.</p>
         </div>
-        <a href="javascript:history.back()" class="text-slate-400 hover:text-slate-900 transition text-xl">
+        <a href="javascript:history.back()"
+           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors text-lg"
+           style="color:#484f58"
+           onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='#e6edf3'"
+           onmouseout="this.style.background='transparent';this.style.color='#484f58'">
             <i class="fas fa-arrow-left"></i>
         </a>
     </div>
 
-    <form method="post" enctype="multipart/form-data" class="space-y-8">
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
 
         {% if form.errors %}
-        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-red-700 text-sm font-bold">
-                Corrija os erros abaixo antes de continuar.
-            </p>
+        <div class="alert-item alert-danger">
+            <i class="fas fa-circle-exclamation flex-shrink-0" style="color:#f85149"></i>
+            <p class="text-sm font-bold" style="color:#f85149">Corrija os erros abaixo antes de continuar.</p>
         </div>
         {% endif %}
 
-        {% if form.non_field_errors %}
-        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
-            {% for error in form.non_field_errors %}
-                <p class="text-red-600 text-sm font-bold">{{ error }}</p>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
-                Identificação do Veículo 
+        <!-- Identificação -->
+        <div class="card overflow-hidden">
+            <div class="px-6 py-4" style="background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06)">
+                <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#484f58">Identificação do Veículo</span>
             </div>
-
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for fname in "placa,renavam,marca,modelo" %}{% endfor %}
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Placa <label class="font-bold text-red-500">*</label></label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Placa <span style="color:#f85149">*</span></label>
                     {{ form.placa }}
-                    {% if form.placa.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.placa.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.placa.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.placa.errors.0 }}</p>{% endif %}
                 </div>
-
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Renavam <label class="font-bold text-red-500">*</label></label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Renavam <span style="color:#f85149">*</span></label>
                     {{ form.renavam }}
-                    {% if form.renavam.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.renavam.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.renavam.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.renavam.errors.0 }}</p>{% endif %}
                 </div>
-
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Marca <label class="font-bold text-red-500">*</label></label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Marca <span style="color:#f85149">*</span></label>
                     {{ form.marca }}
-                    {% if form.marca.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.marca.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.marca.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.marca.errors.0 }}</p>{% endif %}
                 </div>
-
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Modelo <label class="font-bold text-red-500">*</label></label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Modelo <span style="color:#f85149">*</span></label>
                     {{ form.modelo }}
-                    {% if form.modelo.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.modelo.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.modelo.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.modelo.errors.0 }}</p>{% endif %}
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
-                Dados Técnicos e Avaliação
+        <!-- Dados Técnicos -->
+        <div class="card overflow-hidden">
+            <div class="px-6 py-4" style="background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06)">
+                <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#484f58">Dados Técnicos e Avaliação</span>
             </div>
-            
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Ano <label class="font-bold text-red-500">*</label></label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Ano <span style="color:#f85149">*</span></label>
                     {{ form.ano }}
-                    {% if form.ano.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.ano.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.ano.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.ano.errors.0 }}</p>{% endif %}
                 </div>
-
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Valor FIPE (Opcional)</label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">Valor FIPE (Opcional)</label>
                     {{ form.fipe }}
-                    {% if form.fipe.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.fipe.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.fipe.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.fipe.errors.0 }}</p>{% endif %}
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-800 uppercase tracking-widest">
-                Mídia e Documentos
+        <!-- Mídia -->
+        <div class="card overflow-hidden">
+            <div class="px-6 py-4" style="background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06)">
+                <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#484f58">Mídia e Documentos</span>
             </div>
-            
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Foto Principal</label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#484f58">Foto Principal</label>
                     {{ form.foto }}
-                    {% if form.foto.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.foto.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.foto.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.foto.errors.0 }}</p>{% endif %}
                 </div>
-
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Documento Digital (CRLV)</label>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#484f58">Documento Digital (CRLV)</label>
                     {{ form.documento_impresso }}
-                    {% if form.documento_impresso.errors %}
-                        <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wide">{{ form.documento_impresso.errors.0 }}</p>
-                    {% endif %}
+                    {% if form.documento_impresso.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.documento_impresso.errors.0 }}</p>{% endif %}
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 text-xs font-black text-slate-700 uppercase tracking-widest">
-                Documentos e Revisão
+        <!-- Documentos e Revisão -->
+        <div class="card overflow-hidden">
+            <div class="px-6 py-4" style="background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06)">
+                <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#484f58">Documentos e Revisão</span>
             </div>
             <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Vencimento CRLV</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1" style="color:#484f58">Vencimento CRLV</label>
                     {{ form.vencimento_crlv }}
-                    {% if form.vencimento_crlv.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.vencimento_crlv.errors.0 }}</p>{% endif %}
+                    {% if form.vencimento_crlv.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.vencimento_crlv.errors.0 }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Vencimento Seguro</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1" style="color:#484f58">Vencimento Seguro</label>
                     {{ form.vencimento_seguro }}
-                    {% if form.vencimento_seguro.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.vencimento_seguro.errors.0 }}</p>{% endif %}
+                    {% if form.vencimento_seguro.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.vencimento_seguro.errors.0 }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">KM Próxima Revisão</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest mb-1" style="color:#484f58">KM Próxima Revisão</label>
                     {{ form.km_proxima_revisao }}
-                    {% if form.km_proxima_revisao.errors %}<p class="text-rose-500 text-xs mt-1 font-bold">{{ form.km_proxima_revisao.errors.0 }}</p>{% endif %}
+                    {% if form.km_proxima_revisao.errors %}<p class="text-xs mt-1 font-bold" style="color:#f85149">{{ form.km_proxima_revisao.errors.0 }}</p>{% endif %}
                 </div>
             </div>
-        </section>
+        </div>
 
-        <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+        <button type="submit" class="btn-primary w-full py-4 justify-center text-xs uppercase tracking-widest">
             <i class="fas fa-check mr-2"></i>Salvar Dados do Veículo
         </button>
 
@@ -157,24 +133,20 @@
 </div>
 
 <style>
-/* Força o estilo consistente para todos os campos injetados pelo Django */
-input[type="text"],
-input[type="number"],
-input[type="date"],
-select {
+input[type="text"], input[type="number"], input[type="date"], select {
     width: 100% !important;
-    background-color: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
+    background-color: #0d1117 !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
     border-radius: .5rem !important;
     padding: .65rem .8rem !important;
     font-size: .875rem !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
+    color: #e6edf3 !important;
     outline: none !important;
 }
-
-input:focus {
-    border-color: #3b82f6 !important;
-    ring: 2px #3b82f6 !important;
+input:focus, select:focus {
+    border-color: #3fb950 !important;
+    box-shadow: 0 0 0 3px rgba(63,185,80,0.12) !important;
 }
 </style>
 {% endblock %}

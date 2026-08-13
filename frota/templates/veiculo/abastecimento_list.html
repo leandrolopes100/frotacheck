@@ -1,90 +1,126 @@
 {% extends 'base.html' %}
 {% load humanize %}
-{% block title %}Abastecimentos | Frota Check{% endblock %}
+{% block title %}Abastecimentos | FrotaCheck{% endblock %}
 {% block header_title %}Abastecimentos{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+<div class="max-w-7xl mx-auto">
 
-    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-8">
+    <!-- ── Page header ── -->
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div>
-            <nav class="flex mb-2"><ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400">
-                <li><a href="{% url 'checklist_list' %}" class="hover:text-blue-600 transition-colors">Início</a></li>
-                <li><i class="fas fa-chevron-right text-[9px] opacity-40 mx-1"></i></li>
-                <li class="text-blue-600">Abastecimentos</li>
-            </ol></nav>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Abastecimentos</h1>
+            <div class="flex items-center gap-2 mb-1">
+                <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors"
+                   style="color:#484f58"
+                   onmouseover="this.style.color='#3fb950'"
+                   onmouseout="this.style.color='#484f58'">Início</a>
+                <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
+                <span class="text-xs font-semibold" style="color:#3fb950">Abastecimentos</span>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight" style="color:#e6edf3">Abastecimentos</h1>
         </div>
-        <a href="{% url 'abastecimento_add' %}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-100">
+        <a href="{% url 'abastecimento_add' %}" class="btn-primary text-xs flex-shrink-0">
             <i class="fas fa-plus text-xs"></i> Registrar Abastecimento
         </a>
     </div>
 
-    <!-- KPIs -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500"><i class="fas fa-gas-pump text-lg"></i></div>
-            <div><p class="text-xs font-black text-slate-400 uppercase tracking-wider">Total Abastecido</p><p class="text-2xl font-black text-slate-900">{{ total_litros|floatformat:1 }} L</p></div>
+    <!-- ── KPIs ── -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="kpi-card">
+            <div class="flex items-center gap-4">
+                <div class="kpi-icon" style="background:rgba(45,212,191,0.12); color:#2dd4bf">
+                    <i class="fas fa-gas-pump"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider" style="color:#484f58">Total Abastecido</p>
+                    <p class="text-2xl font-bold" style="color:#e6edf3">{{ total_litros|floatformat:1 }} L</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500"><i class="fas fa-coins text-lg"></i></div>
-            <div><p class="text-xs font-black text-slate-400 uppercase tracking-wider">Valor Total</p><p class="text-2xl font-black text-emerald-600">R$ {{ total_valor|floatformat:2|intcomma }}</p></div>
+        <div class="kpi-card">
+            <div class="flex items-center gap-4">
+                <div class="kpi-icon" style="background:rgba(63,185,80,0.12); color:#3fb950">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider" style="color:#484f58">Valor Total</p>
+                    <p class="text-2xl font-bold" style="color:#3fb950">R$ {{ total_valor|floatformat:2|intcomma }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Filtro -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-3 mb-6">
+    <!-- ── Filtro ── -->
+    <div class="card p-3 mb-4">
         <form method="GET" class="flex flex-wrap gap-3 items-center">
             <div class="relative flex-1 min-w-[200px]">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs" style="color:#484f58"></i>
                 <input type="text" name="veiculo" value="{{ request.GET.veiculo }}" placeholder="Placa ou modelo..."
-                       class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium focus:ring-4 focus:ring-blue-500/10 outline-none">
+                       class="form-input pl-10 text-sm">
             </div>
-            <button type="submit" class="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all">Filtrar</button>
-            {% if request.GET.veiculo %}<a href="?" class="w-10 h-10 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all"><i class="fas fa-times"></i></a>{% endif %}
+            <button type="submit" class="btn-primary text-xs">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            {% if request.GET.veiculo %}
+            <a href="?" class="btn-secondary text-xs" style="color:#f85149">
+                <i class="fas fa-times"></i>
+            </a>
+            {% endif %}
         </form>
     </div>
 
-    <!-- Tabela -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <!-- ── Tabela ── -->
+    <div class="card overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="data-table">
                 <thead>
-                    <tr class="bg-slate-50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Data</th>
-                        <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Veículo</th>
-                        <th class="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Motorista</th>
-                        <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Combustível</th>
-                        <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Litros</th>
-                        <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Valor</th>
-                        <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">R$/L</th>
-                        <th class="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">KM</th>
+                    <tr>
+                        <th>Data</th>
+                        <th>Veículo</th>
+                        <th>Motorista</th>
+                        <th class="text-center">Combustível</th>
+                        <th class="text-right">Litros</th>
+                        <th class="text-right">Valor</th>
+                        <th class="text-right">R$/L</th>
+                        <th class="text-right">KM</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
+                <tbody>
                     {% for a in abastecimentos %}
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <p class="text-sm font-bold text-slate-700">{{ a.data|date:"d/m/Y" }}</p>
-                            <p class="text-xs text-slate-400">{{ a.data|date:"H:i" }}</p>
+                    <tr>
+                        <td>
+                            <p class="text-sm font-bold" style="color:#c9d1d9">{{ a.data|date:"d/m/Y" }}</p>
+                            <p class="text-xs" style="color:#484f58">{{ a.data|date:"H:i" }}</p>
                         </td>
-                        <td class="px-6 py-4">
-                            <p class="text-sm font-black text-slate-900">{{ a.veiculo.modelo }}</p>
-                            <p class="text-xs text-blue-600 font-black tracking-widest">{{ a.veiculo.placa }}</p>
+                        <td>
+                            <p class="text-sm font-bold" style="color:#e6edf3">{{ a.veiculo.modelo }}</p>
+                            <p class="text-xs font-bold tracking-widest" style="color:#388bfd">{{ a.veiculo.placa }}</p>
                         </td>
-                        <td class="px-6 py-4"><p class="text-sm font-medium text-slate-600">{{ a.motorista.nome_completo|default:"—" }}</p></td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black uppercase">{{ a.get_tipo_combustivel_display }}</span>
+                        <td>
+                            <p class="text-sm font-medium" style="color:#8b949e">{{ a.motorista.nome_completo|default:"—" }}</p>
                         </td>
-                        <td class="px-6 py-4 text-right"><p class="text-sm font-bold text-slate-700">{{ a.litros|floatformat:1 }} L</p></td>
-                        <td class="px-6 py-4 text-right"><p class="text-sm font-bold text-emerald-600">R$ {{ a.valor_total|floatformat:2|intcomma }}</p></td>
-                        <td class="px-6 py-4 text-right">
-                            <p class="text-sm font-medium text-slate-500">{% if a.valor_por_litro %}R$ {{ a.valor_por_litro }}{% else %}—{% endif %}</p>
+                        <td class="text-center">
+                            <span class="badge badge-neutral" style="font-size:10px">{{ a.get_tipo_combustivel_display }}</span>
                         </td>
-                        <td class="px-6 py-4 text-right"><p class="text-sm font-medium text-slate-600">{{ a.km_atual|intcomma }} km</p></td>
+                        <td class="text-right">
+                            <p class="text-sm font-bold" style="color:#c9d1d9">{{ a.litros|floatformat:1 }} L</p>
+                        </td>
+                        <td class="text-right">
+                            <p class="text-sm font-bold" style="color:#3fb950">R$ {{ a.valor_total|floatformat:2|intcomma }}</p>
+                        </td>
+                        <td class="text-right">
+                            <p class="text-sm font-medium" style="color:#8b949e">{% if a.valor_por_litro %}R$ {{ a.valor_por_litro }}{% else %}—{% endif %}</p>
+                        </td>
+                        <td class="text-right">
+                            <p class="text-sm font-medium" style="color:#8b949e">{{ a.km_atual|intcomma }} km</p>
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="8" class="py-16 text-center text-slate-400 text-sm font-bold">Nenhum abastecimento registrado.</td></tr>
+                    <tr>
+                        <td colspan="8" class="py-16 text-center text-sm font-bold" style="color:#484f58">
+                            Nenhum abastecimento registrado.
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -92,13 +128,21 @@
     </div>
 
     {% if is_paginated %}
-    <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
-        <p class="text-sm text-slate-500">Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ paginator.count }}</p>
-        <nav class="flex items-center gap-1 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
-            {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 transition-all"><i class="fas fa-chevron-left text-xs"></i></a>{% endif %}
-            {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:bg-white hover:text-blue-600 transition-all"><i class="fas fa-chevron-right text-xs"></i></a>{% endif %}
+    <div class="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+        <p class="text-sm" style="color:#484f58">
+            Mostrando <span class="font-semibold" style="color:#8b949e">{{ page_obj.start_index }}–{{ page_obj.end_index }}</span>
+            de <span class="font-semibold" style="color:#8b949e">{{ paginator.count }}</span>
+        </p>
+        <nav class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="fas fa-chevron-left text-xs"></i></a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="fas fa-chevron-right text-xs"></i></a>
+            {% endif %}
         </nav>
     </div>
     {% endif %}
+
 </div>
 {% endblock %}

@@ -10,7 +10,10 @@
     <!-- ── Nav ── -->
     <div class="flex items-center justify-between mb-6">
         <a href="{% url 'checklist_list' %}"
-           class="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-blue-600 transition-colors group">
+           class="flex items-center gap-2 text-xs font-semibold transition-colors group"
+           style="color:#484f58"
+           onmouseover="this.style.color='#3fb950'"
+           onmouseout="this.style.color='#484f58'">
             <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
             Voltar ao Dashboard
         </a>
@@ -50,28 +53,28 @@
                         {% else %}Geral{% endif %}
                     </span>
                 </div>
-                <h1 class="text-xl font-bold text-slate-900 tracking-tight">{{ checklist.nome_checklist }}</h1>
-                <p class="text-sm text-slate-500 mt-1">
+                <h1 class="text-xl font-bold tracking-tight" style="color:#e6edf3">{{ checklist.nome_checklist }}</h1>
+                <p class="text-sm mt-1" style="color:#8b949e">
                     {{ checklist.veiculo.marca }} {{ checklist.veiculo.modelo }}
-                    <span class="mx-2 text-slate-300">·</span>
-                    <span class="text-blue-600 font-semibold">{{ checklist.veiculo.placa }}</span>
+                    <span class="mx-2" style="color:#30363d">·</span>
+                    <span class="font-semibold" style="color:#388bfd">{{ checklist.veiculo.placa }}</span>
                 </p>
             </div>
 
-            <div class="flex items-center gap-4 md:border-l md:border-slate-100 md:pl-6 flex-shrink-0">
+            <div class="flex items-center gap-4 flex-shrink-0" style="border-left:1px solid rgba(255,255,255,0.08); padding-left:24px">
                 <div class="text-center">
-                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Data</p>
-                    <p class="text-sm font-semibold text-slate-800">{{ checklist.data_realizada|date:"d/m/Y" }}</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-wider mb-1" style="color:#484f58">Data</p>
+                    <p class="text-sm font-semibold" style="color:#c9d1d9">{{ checklist.data_realizada|date:"d/m/Y" }}</p>
                 </div>
-                <div class="w-px h-10 bg-slate-100"></div>
+                <div class="w-px h-10" style="background:rgba(255,255,255,0.08)"></div>
                 <div class="text-center">
-                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Horário</p>
-                    <p class="text-sm font-semibold text-slate-800">{{ checklist.data_realizada|date:"H:i" }}</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-wider mb-1" style="color:#484f58">Horário</p>
+                    <p class="text-sm font-semibold" style="color:#c9d1d9">{{ checklist.data_realizada|date:"H:i" }}</p>
                 </div>
-                <div class="w-px h-10 bg-slate-100"></div>
+                <div class="w-px h-10" style="background:rgba(255,255,255,0.08)"></div>
                 <div class="text-center">
-                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">ID</p>
-                    <p class="text-sm font-semibold text-slate-800">#{{ checklist.id }}</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-wider mb-1" style="color:#484f58">ID</p>
+                    <p class="text-sm font-semibold" style="color:#c9d1d9">#{{ checklist.id }}</p>
                 </div>
             </div>
 
@@ -82,35 +85,38 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
 
         <div class="card p-4">
-            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <p class="text-[10px] font-semibold uppercase tracking-wider mb-2" style="color:#484f58">
                 <i class="fas fa-user mr-1 opacity-60"></i>Motorista
             </p>
-            <p class="text-sm font-semibold text-slate-800 truncate">{{ checklist.motorista.nome_completo|default:"Administrador" }}</p>
+            <p class="text-sm font-semibold truncate" style="color:#e6edf3">{{ checklist.motorista.nome_completo|default:"Administrador" }}</p>
         </div>
 
         <div class="card p-4">
-            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <p class="text-[10px] font-semibold uppercase tracking-wider mb-2" style="color:#484f58">
                 <i class="fas fa-tachometer-alt mr-1 opacity-60"></i>Odômetro
             </p>
-            <p class="text-sm font-semibold text-slate-800">{{ checklist.km_atual|intcomma }} km</p>
+            <p class="text-sm font-semibold" style="color:#e6edf3">{{ checklist.km_atual|intcomma }} km</p>
         </div>
 
         <div class="card p-4">
-            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <p class="text-[10px] font-semibold uppercase tracking-wider mb-2" style="color:#484f58">
                 <i class="fas fa-gas-pump mr-1 opacity-60"></i>Combustível
             </p>
-            <p class="text-sm font-semibold text-slate-800">{{ checklist.nivel_combustivel }}</p>
+            <p class="text-sm font-semibold" style="color:#e6edf3">{{ checklist.nivel_combustivel }}</p>
         </div>
 
         <div class="card p-4 flex items-center justify-center">
             {% if checklist.latitude %}
                 <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}"
                    target="_blank"
-                   class="flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                   class="flex items-center gap-2 text-xs font-semibold transition-colors"
+                   style="color:#388bfd"
+                   onmouseover="this.style.color='#3fb950'"
+                   onmouseout="this.style.color='#388bfd'">
                     <i class="fas fa-location-dot"></i> Ver GPS
                 </a>
             {% else %}
-                <span class="text-xs text-slate-400">Sem GPS</span>
+                <span class="text-xs" style="color:#484f58">Sem GPS</span>
             {% endif %}
         </div>
 
@@ -119,22 +125,25 @@
     <!-- ── Mapa ── -->
     {% if checklist.latitude and checklist.longitude %}
     <div class="card mb-5 overflow-hidden print:hidden">
-        <div class="px-5 py-3 border-b border-slate-50 flex items-center justify-between">
+        <div class="px-5 py-3 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,0.05)">
             <div class="flex items-center gap-2">
                 <div class="w-5 h-5 rounded flex items-center justify-center"
-                     style="background:#eff6ff; color:#2563eb; font-size:10px">
+                     style="background:rgba(56,139,253,0.12); color:#388bfd; font-size:10px">
                     <i class="fas fa-map-pin"></i>
                 </div>
-                <span class="text-xs font-semibold text-slate-700">Local da Inspeção</span>
+                <span class="text-xs font-semibold" style="color:#e6edf3">Local da Inspeção</span>
             </div>
             <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}"
                target="_blank"
-               class="text-xs text-blue-600 font-semibold hover:text-blue-800 transition-colors flex items-center gap-1">
+               class="text-xs font-semibold transition-colors flex items-center gap-1"
+               style="color:#388bfd"
+               onmouseover="this.style.color='#3fb950'"
+               onmouseout="this.style.color='#388bfd'">
                 <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
                 Abrir no Google Maps
             </a>
         </div>
-        <div class="h-56 bg-slate-100">
+        <div class="h-56" style="background:#1c2128">
             <iframe id="mapa-osm" width="100%" height="100%" frameborder="0" scrolling="no" src=""></iframe>
         </div>
     </div>
@@ -144,23 +153,24 @@
     <div class="grid md:grid-cols-2 gap-4 mb-5">
         {% for cat, itens in checklist.get_campos_agrupados.items %}
         <div class="card overflow-hidden break-inside-avoid">
-            <div class="px-5 py-3 border-b border-slate-50 bg-slate-50/50">
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ cat }}</span>
+            <div class="px-5 py-3" style="border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(255,255,255,0.015)">
+                <span class="text-[10px] font-bold uppercase tracking-wider" style="color:#484f58">{{ cat }}</span>
             </div>
             <div class="p-5 space-y-2.5">
                 {% for nome, valor in itens %}
                 <div class="flex items-center justify-between gap-3">
-                    <span class="text-sm font-medium {% if not valor %}text-red-600{% else %}text-slate-700{% endif %} leading-tight">
+                    <span class="text-sm font-medium leading-tight"
+                          style="color:{% if not valor %}#f85149{% else %}#c9d1d9{% endif %}">
                         {{ nome }}
                     </span>
                     {% if valor %}
                         <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                             style="background:#f0fdf4; color:#16a34a; font-size:10px">
+                             style="background:rgba(63,185,80,0.12); color:#3fb950; font-size:10px">
                             <i class="fas fa-check"></i>
                         </div>
                     {% else %}
                         <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse"
-                             style="background:#fff1f2; color:#dc2626; font-size:10px">
+                             style="background:rgba(248,81,73,0.12); color:#f85149; font-size:10px">
                             <i class="fas fa-xmark"></i>
                         </div>
                     {% endif %}
@@ -174,22 +184,23 @@
     <!-- ── Fotos ── -->
     {% if checklist.fotos_avarias.all %}
     <div class="card mb-5 overflow-hidden print:break-inside-avoid">
-        <div class="px-5 py-3 border-b border-slate-50">
+        <div class="px-5 py-3" style="border-bottom:1px solid rgba(255,255,255,0.05)">
             <div class="flex items-center gap-2">
                 <div class="w-5 h-5 rounded flex items-center justify-center"
-                     style="background:#fef2f2; color:#dc2626; font-size:10px">
+                     style="background:rgba(248,81,73,0.12); color:#f85149; font-size:10px">
                     <i class="fas fa-camera"></i>
                 </div>
-                <span class="text-xs font-semibold text-slate-700">
+                <span class="text-xs font-semibold" style="color:#e6edf3">
                     Registro Fotográfico
-                    <span class="ml-1.5 text-slate-400 font-normal">({{ checklist.fotos_avarias.all|length }} foto{{ checklist.fotos_avarias.all|length|pluralize }})</span>
+                    <span class="ml-1.5 font-normal" style="color:#484f58">({{ checklist.fotos_avarias.all|length }} foto{{ checklist.fotos_avarias.all|length|pluralize }})</span>
                 </span>
             </div>
         </div>
         <div class="p-5 grid grid-cols-2 md:grid-cols-4 gap-3">
             {% for foto in checklist.fotos_avarias.all %}
             <div class="group">
-                <div class="aspect-video rounded-xl overflow-hidden border border-slate-100 cursor-zoom-in relative"
+                <div class="aspect-video rounded-xl overflow-hidden cursor-zoom-in relative"
+                     style="border:1px solid rgba(255,255,255,0.08)"
                      onclick="openModal('{{ foto.imagem.url }}')">
                     <img src="{{ foto.imagem.url }}"
                          class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
@@ -199,7 +210,7 @@
                     </div>
                 </div>
                 {% if foto.descricao %}
-                <p class="mt-1.5 text-[10px] font-medium text-slate-500 leading-tight px-0.5">{{ foto.descricao }}</p>
+                <p class="mt-1.5 text-[10px] font-medium leading-tight px-0.5" style="color:#484f58">{{ foto.descricao }}</p>
                 {% endif %}
             </div>
             {% endfor %}
@@ -211,17 +222,19 @@
     <div class="card p-5">
         <div class="flex items-center gap-2 mb-3">
             <div class="w-5 h-5 rounded flex items-center justify-center"
-                 style="background:#f8fafc; color:#64748b; font-size:10px">
+                 style="background:rgba(255,255,255,0.05); color:#484f58; font-size:10px">
                 <i class="fas fa-message"></i>
             </div>
-            <span class="text-xs font-semibold text-slate-700">Observações do Condutor</span>
+            <span class="text-xs font-semibold" style="color:#e6edf3">Observações do Condutor</span>
         </div>
         {% if checklist.observacoes %}
-        <p class="text-sm font-medium text-slate-700 leading-relaxed bg-slate-50 border border-slate-100 rounded-xl px-5 py-4">
+        <p class="text-sm font-medium leading-relaxed rounded-xl px-5 py-4"
+           style="color:#c9d1d9; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07)">
             {{ checklist.observacoes }}
         </p>
         {% else %}
-        <p class="text-sm text-slate-400 italic bg-slate-50 border border-slate-100 rounded-xl px-5 py-4">
+        <p class="text-sm italic rounded-xl px-5 py-4"
+           style="color:#484f58; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05)">
             Nenhuma observação registrada pelo condutor neste protocolo.
         </p>
         {% endif %}
