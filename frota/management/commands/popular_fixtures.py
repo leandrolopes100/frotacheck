@@ -1,7 +1,8 @@
 import random
 from datetime import timedelta
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from frota.models import (
@@ -15,6 +16,12 @@ class Command(BaseCommand):
     help = "Popula o banco com dados de demonstração (usuários, veículos, checklists, ocorrências, manutenções e abastecimentos)."
 
     def handle(self, *args, **options):
+        if not settings.DEBUG:
+            raise CommandError(
+                "Este comando cria usuários de demonstração com senha conhecida "
+                "(demo1234) e não deve ser executado com DEBUG=False."
+            )
+
         hoje = timezone.now()
 
         self.stdout.write("Criando usuários...")
