@@ -714,7 +714,7 @@ class FuncionarioListView(LoginRequiredMixin, GestorRequiredMixin, FuncionarioBa
         return context
 
 
-class FuncionarioCreateView(LoginRequiredMixin, CreateView):
+class FuncionarioCreateView(LoginRequiredMixin, GestorRequiredMixin, CreateView):
     model = Funcionario
     form_class = NovoFuncionarioForm
     template_name = 'funcionario/funcionario_form.html'

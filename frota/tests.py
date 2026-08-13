@@ -1,3 +1,52 @@
-from django.test import TestCase
+from datetime import date
 
-# Create your tests here.
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import reverse
+
+from .models import Funcionario
+
+Usuario = get_user_model()
+
+
+def _criar_motorista(username, is_patrao=False):
+    usuario = Usuario.objects.create_user(
+        username=username, password='senha-teste-123',
+        is_motorista=not is_patrao, is_patrao=is_patrao,
+    )
+    Funcionario.objects.create(
+        usuario=usuario, nome_completo=f'Funcionario {username}',
+        cpf='52998224725' if not is_patrao else '11144477735',
+        numero_cnh='12345678900', validade_cnh=date(2030, 1, 1),
+        cargo='Gestor' if is_patrao else 'Motorista',
+    )
+    return usuario
+
+
+class FuncionarioCreateViewPermissionTests(TestCase):
+    """Regressão: motorista comum não pode se autopromover a gestor
+    criando um novo Usuario com cargo='Gestor' (era possível pois a view
+    só exigia login, sem checar is_patrao)."""
+
+    def setUp(self):
+        self.motorista = _criar_motorista('motorista1')
+        self.gestor = _criar_motorista('gestor1', is_patrao=True)
+        self.dados_novo_funcionario = {
+            'username': 'novo.usuario', 'password': 'outra-senha-123',
+            'email': 'novo@exemplo.com', 'nome_completo': 'Fulano de Tal',
+            'cpf': '39053344705', 'numero_cnh': '98765432100',
+            'validade_cnh': '2030-01-01', 'cargo': 'Gestor',
+        }
+
+    def test_motorista_nao_pode_criar_funcionario(self):
+        self.client.login(username='motorista1', password='senha-teste-123')
+        response = self.client.post(reverse('funcionario_add'), self.dados_novo_funcionario)
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Usuario.objects.filter(username='novo.usuario').exists())
+
+    def test_gestor_pode_criar_funcionario(self):
+        self.client.login(username='gestor1', password='senha-teste-123')
+        response = self.client.post(reverse('funcionario_add'), self.dados_novo_funcionario)
+        self.assertRedirects(response, reverse('funcionario_list'))
+        novo_usuario = Usuario.objects.get(username='novo.usuario')
+        self.assertTrue(novo_usuario.is_patrao)
