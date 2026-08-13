@@ -1,11 +1,23 @@
 from pathlib import Path
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-key-insecure-change-me-in-production')
 DEBUG = False
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'dev-key-insecure-change-me-in-production'
+    else:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY não está definida. Configure essa variável de "
+            "ambiente antes de subir a aplicação com DEBUG=False."
+        )
+
 ALLOWED_HOSTS = ['192.168.27.100', '127.0.0.1', '172.20.10.3']
 AUTH_USER_MODEL = 'frota.Usuario'
 
