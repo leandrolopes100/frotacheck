@@ -33,11 +33,17 @@ SESSION_SAVE_EVERY_REQUEST = False  # não grava sessão em toda requisição
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-# Ativar quando houver HTTPS:
-# SECURE_SSL_REDIRECT = True
-# SECURE_HSTS_SECONDS = 31536000
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+
+# Ligar via DJANGO_HTTPS_ENABLED=True assim que houver HTTPS na frente da
+# aplicação (proxy/Nginx com certificado). Desligado por padrão porque hoje
+# o app roda em rede local sem TLS — ligado sem HTTPS de verdade, o
+# SECURE_SSL_REDIRECT deixaria a aplicação inacessível.
+_HTTPS_ENABLED = os.environ.get('DJANGO_HTTPS_ENABLED', 'False') == 'True'
+if _HTTPS_ENABLED:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
