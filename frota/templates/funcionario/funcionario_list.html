@@ -11,22 +11,28 @@
     <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <a href="{% url 'checklist_list' %}" class="text-xs text-slate-400 font-medium hover:text-blue-600 transition-colors">Início</a>
-                <i class="fas fa-chevron-right text-slate-300 text-[9px]"></i>
-                <span class="text-xs text-blue-600 font-semibold">Colaboradores</span>
+                <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors"
+                   style="color:#484f58"
+                   onmouseover="this.style.color='#3fb950'"
+                   onmouseout="this.style.color='#484f58'">Início</a>
+                <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
+                <span class="text-xs font-semibold" style="color:#3fb950">Colaboradores</span>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Colaboradores</h2>
-            <p class="text-sm text-slate-500 mt-0.5">{{ funcionarios|length }} colaborador{{ funcionarios|length|pluralize:"es" }} cadastrado{{ funcionarios|length|pluralize:"s" }}</p>
+            <h2 class="text-2xl font-bold tracking-tight" style="color:#e6edf3">Colaboradores</h2>
+            <p class="text-sm mt-0.5" style="color:#8b949e">{{ funcionarios|length }} colaborador{{ funcionarios|length|pluralize:"es" }} cadastrado{{ funcionarios|length|pluralize:"s" }}</p>
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
             <form method="GET" class="relative">
-                <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs" style="color:#484f58"></i>
                 <input type="text" name="busca" value="{{ request.GET.busca }}" placeholder="Nome ou CPF..."
                        class="form-input pl-9 pr-9 text-sm w-52"
                        style="border-radius:8px">
                 {% if request.GET.busca %}
-                <a href="?" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors">
+                <a href="?" class="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                   style="color:#484f58"
+                   onmouseover="this.style.color='#f85149'"
+                   onmouseout="this.style.color='#484f58'">
                     <i class="fas fa-xmark text-xs"></i>
                 </a>
                 {% endif %}
@@ -41,62 +47,62 @@
     <!-- ── Grid de colaboradores ── -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for f in funcionarios %}
-        <div class="card p-5 flex flex-col hover:shadow-md transition-shadow">
+        <div class="card p-5 flex flex-col transition-all"
+             onmouseover="this.style.borderColor='rgba(255,255,255,0.14)'"
+             onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
 
             <!-- Header do card -->
             <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0"
-                         style="background:linear-gradient(135deg,#eff6ff,#dbeafe); color:#2563eb; border:1px solid #bfdbfe">
+                         style="background:rgba(163,113,247,0.12); color:#a371f7; border:1px solid rgba(163,113,247,0.2)">
                         {{ f.nome_completo|slice:":2"|upper }}
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-slate-900 leading-tight">{{ f.nome_completo }}</h3>
-                        <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">{{ f.cargo }}</p>
+                        <h3 class="text-sm font-bold leading-tight" style="color:#e6edf3">{{ f.nome_completo }}</h3>
+                        <p class="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style="color:#484f58">{{ f.cargo }}</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-1">
                     {% if request.user.is_patrao %}
                         <a href="{% url 'funcionario_update' f.pk %}"
-                           class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                           class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
+                           style="color:#484f58"
+                           onmouseover="this.style.background='rgba(210,153,34,0.1)';this.style.color='#d29922'"
+                           onmouseout="this.style.background='transparent';this.style.color='#484f58'"
                            title="Editar">
                             <i class="fas fa-pen text-xs"></i>
                         </a>
                         <a href="{% url 'funcionario_delete' f.pk %}"
-                           class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                           class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
+                           style="color:#484f58"
+                           onmouseover="this.style.background='rgba(248,81,73,0.1)';this.style.color='#f85149'"
+                           onmouseout="this.style.background='transparent';this.style.color='#484f58'"
                            title="Excluir">
                             <i class="fas fa-trash text-xs"></i>
                         </a>
                     {% else %}
-                        <i class="fas fa-lock text-slate-300 text-xs" title="Acesso restrito"></i>
+                        <i class="fas fa-lock text-xs" style="color:#30363d" title="Acesso restrito"></i>
                     {% endif %}
                 </div>
             </div>
 
             <!-- CNH Status -->
-            <div class="rounded-lg p-3 mb-4
-                {% if f.validade_cnh < hoje %}bg-red-50 border border-red-100
-                {% elif f.validade_cnh <= limite_alerta_cnh %}bg-amber-50 border border-amber-100
-                {% else %}bg-emerald-50 border border-emerald-100{% endif %}">
+            <div class="rounded-lg p-3 mb-4 border"
+                 style="{% if f.validade_cnh < hoje %}background:rgba(248,81,73,0.08); border-color:rgba(248,81,73,0.2){% elif f.validade_cnh <= limite_alerta_cnh %}background:rgba(210,153,34,0.08); border-color:rgba(210,153,34,0.2){% else %}background:rgba(63,185,80,0.08); border-color:rgba(63,185,80,0.2){% endif %}">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <i class="fas fa-id-card text-sm
-                            {% if f.validade_cnh < hoje %}text-red-500
-                            {% elif f.validade_cnh <= limite_alerta_cnh %}text-amber-500
-                            {% else %}text-emerald-500{% endif %}"></i>
-                        <span class="text-xs font-semibold
-                            {% if f.validade_cnh < hoje %}text-red-700
-                            {% elif f.validade_cnh <= limite_alerta_cnh %}text-amber-700
-                            {% else %}text-emerald-700{% endif %}">
+                        <i class="fas fa-id-card text-sm"
+                           style="color:{% if f.validade_cnh < hoje %}#f85149{% elif f.validade_cnh <= limite_alerta_cnh %}#d29922{% else %}#3fb950{% endif %}"></i>
+                        <span class="text-xs font-semibold"
+                              style="color:{% if f.validade_cnh < hoje %}#f85149{% elif f.validade_cnh <= limite_alerta_cnh %}#d29922{% else %}#3fb950{% endif %}">
                             {% if f.validade_cnh < hoje %}CNH Vencida
                             {% elif f.validade_cnh <= limite_alerta_cnh %}Vence em Breve
                             {% else %}CNH Válida{% endif %}
                         </span>
                     </div>
-                    <span class="text-[10px] font-semibold
-                        {% if f.validade_cnh < hoje %}text-red-500
-                        {% elif f.validade_cnh <= limite_alerta_cnh %}text-amber-500
-                        {% else %}text-emerald-500{% endif %}">
+                    <span class="text-[10px] font-semibold"
+                          style="color:{% if f.validade_cnh < hoje %}#f85149{% elif f.validade_cnh <= limite_alerta_cnh %}#d29922{% else %}#3fb950{% endif %}">
                         {{ f.validade_cnh|date:"d/m/Y" }}
                     </span>
                 </div>
@@ -105,21 +111,21 @@
             <!-- Dados -->
             <div class="grid grid-cols-2 gap-3 flex-1">
                 <div>
-                    <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-1">CNH Nº</p>
-                    <p class="text-xs font-semibold text-slate-700">{{ f.numero_cnh }}</p>
+                    <p class="text-[9px] font-semibold uppercase tracking-wider mb-1" style="color:#484f58">CNH Nº</p>
+                    <p class="text-xs font-semibold" style="color:#c9d1d9">{{ f.numero_cnh }}</p>
                 </div>
                 <div>
-                    <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-1">CPF</p>
-                    <p class="text-xs font-semibold text-slate-700">{{ f.cpf }}</p>
+                    <p class="text-[9px] font-semibold uppercase tracking-wider mb-1" style="color:#484f58">CPF</p>
+                    <p class="text-xs font-semibold" style="color:#c9d1d9">{{ f.cpf }}</p>
                 </div>
                 <div class="col-span-2">
-                    <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Cadastrado por</p>
-                    <p class="text-xs font-medium text-slate-500">{{ f.cadastrado_por|default:"Admin" }}</p>
+                    <p class="text-[9px] font-semibold uppercase tracking-wider mb-1" style="color:#484f58">Cadastrado por</p>
+                    <p class="text-xs font-medium" style="color:#8b949e">{{ f.cadastrado_por|default:"Admin" }}</p>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="mt-4 pt-4 border-t border-slate-50">
+            <div class="mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.05)">
                 {% if f.cnh_impressa %}
                     <a href="{{ f.cnh_impressa.url }}" target="_blank"
                        class="btn-secondary w-full justify-center text-xs">
@@ -128,7 +134,8 @@
                     </a>
                 {% else %}
                     <button disabled
-                            class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 text-xs font-medium cursor-not-allowed">
+                            class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium cursor-not-allowed"
+                            style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color:#30363d">
                         <i class="fas fa-ban text-xs"></i>
                         Sem documento
                     </button>
@@ -139,16 +146,17 @@
         {% empty %}
         <div class="col-span-full py-20">
             <div class="max-w-xs mx-auto text-center">
-                <div class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-users text-3xl text-slate-300"></i>
+                <div class="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4"
+                     style="background:#1c2128; border:1px solid rgba(255,255,255,0.08)">
+                    <i class="fas fa-users text-3xl" style="color:#30363d"></i>
                 </div>
-                <h3 class="text-base font-bold text-slate-900 mb-2">
+                <h3 class="text-base font-bold mb-2" style="color:#e6edf3">
                     {% if request.GET.busca %}Nenhum resultado{% else %}Nenhum colaborador{% endif %}
                 </h3>
-                <p class="text-sm text-slate-400 mb-5 leading-relaxed">
+                <p class="text-sm mb-5 leading-relaxed" style="color:#484f58">
                     {% if request.GET.busca %}
                         Nenhum resultado para "{{ request.GET.busca }}".
-                        <a href="?" class="text-blue-600 hover:underline font-semibold">Limpar</a>
+                        <a href="?" class="font-semibold hover:underline" style="color:#388bfd">Limpar</a>
                     {% else %}
                         Cadastre motoristas e gestores para registrar inspeções.
                     {% endif %}
@@ -166,9 +174,9 @@
     <!-- ── Paginação ── -->
     {% if is_paginated %}
     <div class="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4">
-        <p class="text-sm text-slate-500">
-            Mostrando <span class="font-semibold text-slate-700">{{ page_obj.start_index }}–{{ page_obj.end_index }}</span>
-            de <span class="font-semibold text-slate-700">{{ paginator.count }}</span> colaboradores
+        <p class="text-sm" style="color:#484f58">
+            Mostrando <span class="font-semibold" style="color:#8b949e">{{ page_obj.start_index }}–{{ page_obj.end_index }}</span>
+            de <span class="font-semibold" style="color:#8b949e">{{ paginator.count }}</span> colaboradores
         </p>
         <nav class="pagination">
             {% if page_obj.has_previous %}
