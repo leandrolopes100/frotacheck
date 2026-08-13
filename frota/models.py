@@ -106,7 +106,7 @@ class Checklist(models.Model):
     )
 
     nome_checklist = models.CharField(
-        max_length=100, null=True, blank=False, verbose_name="Título do Checklist",
+        max_length=100, blank=False, verbose_name="Título do Checklist",
     )
     veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE)
     motorista = models.ForeignKey(Funcionario, on_delete=models.CASCADE, null=True, blank=True)
