@@ -82,7 +82,7 @@
                     </div>
 
                     {% if funcionario.cnh_impressa %}
-                    <a href="{{ funcionario.cnh_impressa.url }}" target="_blank"
+                    <a href="{% url 'funcionario_cnh_download' funcionario.pk %}" target="_blank"
                        class="btn-secondary w-full justify-center text-xs">
                         <i class="fas fa-file-pdf"></i> Visualizar CNH
                     </a>

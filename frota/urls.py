@@ -10,13 +10,14 @@ from .views import (
     VeiculoAlternarStatusView, VeiculoListView, VeiculoDetailView,
     VeiculoUpdateView, VeiculoCreateView, VeiculoDeleteView,
     VeiculoEtiquetaListView, QRCodeGeneratorView, VeiculoBloqueioView,
+    VeiculoDocumentoDownloadView,
     # Manutenção
     OrdemManutencaoListView, OrdemManutencaoCreateView, OrdemManutencaoUpdateView,
     # Abastecimento
     AbastecimentoListView, AbastecimentoCreateView,
     # Funcionário
     FuncionarioListView, FuncionarioCreateView, FuncionarioUpdateView,
-    FuncionarioDeleteView,
+    FuncionarioDeleteView, FuncionarioCnhDownloadView,
 )
 
 urlpatterns = [
@@ -42,6 +43,7 @@ urlpatterns = [
     path('veiculos/<int:pk>/status/', VeiculoAlternarStatusView.as_view(), name='alternar_status'),
     path('veiculos/<int:pk>/bloqueio/', VeiculoBloqueioView.as_view(), name='veiculo_bloqueio'),
     path('veiculo/<int:pk>/qrcode/', QRCodeGeneratorView.as_view(), name='veiculo_qrcode'),
+    path('veiculos/<int:pk>/documento/', VeiculoDocumentoDownloadView.as_view(), name='veiculo_documento_download'),
     path('gestao/etiquetas/', VeiculoEtiquetaListView.as_view(), name='etiquetas_list'),
 
     # ── Manutenção ─────────────────────────────────────────────────────────────
@@ -58,4 +60,5 @@ urlpatterns = [
     path('funcionarios/', FuncionarioListView.as_view(), name='funcionario_list'),
     path('funcionarios/editar/<int:pk>/', FuncionarioUpdateView.as_view(), name='funcionario_update'),
     path('funcionarios/delete/<int:pk>/', FuncionarioDeleteView.as_view(), name='funcionario_delete'),
+    path('funcionarios/<int:pk>/cnh/', FuncionarioCnhDownloadView.as_view(), name='funcionario_cnh_download'),
 ]

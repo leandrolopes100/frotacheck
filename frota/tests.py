@@ -1,9 +1,11 @@
 import itertools
+import shutil
+import tempfile
 from datetime import date
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .forms import ChecklistForm
@@ -170,3 +172,55 @@ class ChecklistDetailIDORTests(TestCase):
         self.client.login(username='gestor2', password='senha-teste-123')
         response = self.client.get(reverse('checklist_detail', args=[self.checklist_a.pk]))
         self.assertEqual(response.status_code, 200)
+
+
+_MEDIA_ROOT_TESTE = tempfile.mkdtemp(prefix='frotacheck_test_media_')
+
+
+@override_settings(MEDIA_ROOT=_MEDIA_ROOT_TESTE)
+class DocumentoDownloadViewTests(TestCase):
+    """Regressão: CNH/documento do veículo não devem mais ser acessíveis
+    via link direto de mídia sem autenticação/permissão — agora passam
+    por uma view que checa login e, no caso da CNH, propriedade do
+    registro."""
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(_MEDIA_ROOT_TESTE, ignore_errors=True)
+
+    def setUp(self):
+        self.motorista_a = _criar_motorista('motoristaC')
+        self.motorista_b = _criar_motorista('motoristaD')
+        self.gestor = _criar_motorista('gestor3', is_patrao=True)
+        self.funcionario_a = Funcionario.objects.get(usuario=self.motorista_a)
+        self.funcionario_a.cnh_impressa = SimpleUploadedFile(
+            'cnh.pdf', b'%PDF-1.4 conteudo de teste', content_type='application/pdf',
+        )
+        self.funcionario_a.save()
+
+    def test_download_cnh_exige_login(self):
+        response = self.client.get(reverse('funcionario_cnh_download', args=[self.funcionario_a.pk]))
+        self.assertEqual(response.status_code, 302)
+
+    def test_motorista_nao_baixa_cnh_de_outro(self):
+        self.client.login(username='motoristaD', password='senha-teste-123')
+        response = self.client.get(reverse('funcionario_cnh_download', args=[self.funcionario_a.pk]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_motorista_baixa_propria_cnh(self):
+        self.client.login(username='motoristaC', password='senha-teste-123')
+        response = self.client.get(reverse('funcionario_cnh_download', args=[self.funcionario_a.pk]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_gestor_baixa_cnh_de_qualquer_funcionario(self):
+        self.client.login(username='gestor3', password='senha-teste-123')
+        response = self.client.get(reverse('funcionario_cnh_download', args=[self.funcionario_a.pk]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_download_documento_veiculo_exige_login(self):
+        veiculo = Veiculo.objects.create(
+            placa='DOC1A23', marca='Ford', modelo='Cargo', ano=2021, renavam='11223344556',
+        )
+        response = self.client.get(reverse('veiculo_documento_download', args=[veiculo.pk]))
+        self.assertEqual(response.status_code, 302)

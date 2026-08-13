@@ -127,7 +127,7 @@
             <!-- Footer -->
             <div class="mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.05)">
                 {% if f.cnh_impressa %}
-                    <a href="{{ f.cnh_impressa.url }}" target="_blank"
+                    <a href="{% url 'funcionario_cnh_download' f.pk %}" target="_blank"
                        class="btn-secondary w-full justify-center text-xs">
                         <i class="fas fa-arrow-up-right-from-square"></i>
                         Visualizar CNH

@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 from datetime import timedelta
 from io import BytesIO
 
@@ -12,7 +13,7 @@ from django.db import transaction
 from django.core.cache import cache
 from django.db.models import Count, OuterRef, Q, Subquery, Sum
 from django.forms import inlineformset_factory
-from django.http import HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -563,6 +564,17 @@ class VeiculoDetailView(LoginRequiredMixin, VeiculoBaseView, DetailView):
         return context
 
 
+class VeiculoDocumentoDownloadView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        veiculo = get_object_or_404(Veiculo, pk=pk)
+        if not veiculo.documento_impresso:
+            raise Http404("Este veículo não possui documento anexado.")
+        return FileResponse(
+            veiculo.documento_impresso.open('rb'),
+            filename=os.path.basename(veiculo.documento_impresso.name),
+        )
+
+
 class VeiculoUpdateView(LoginRequiredMixin, GestorRequiredMixin, UpdateView):
     model = Veiculo
     form_class = VeiculoForm
@@ -756,3 +768,18 @@ class FuncionarioUpdateView(LoginRequiredMixin, GestorRequiredMixin, Funcionario
 
 class FuncionarioDeleteView(LoginRequiredMixin, GestorRequiredMixin, FuncionarioBaseView, DeleteView):
     template_name = 'funcionario/funcionario_delete.html'
+
+
+class FuncionarioCnhDownloadView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        funcionario = get_object_or_404(Funcionario, pk=pk)
+        user = request.user
+        pode_acessar = user.is_superuser or user.is_patrao or funcionario.usuario_id == user.pk
+        if not pode_acessar:
+            raise Http404()
+        if not funcionario.cnh_impressa:
+            raise Http404("Este funcionário não possui CNH anexada.")
+        return FileResponse(
+            funcionario.cnh_impressa.open('rb'),
+            filename=os.path.basename(funcionario.cnh_impressa.name),
+        )
