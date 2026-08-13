@@ -9,7 +9,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import send_mail
 from django.db import transaction
-from django.db.models import Count, Q, Sum
+from django.core.cache import cache
+from django.db.models import Count, OuterRef, Q, Subquery, Sum
 from django.forms import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -58,6 +59,11 @@ def _enviar_email_avaria_critica(checklist):
 
     if not tem_avaria_critica(checklist):
         return
+
+    chave_cache = f'email_avaria_critica_{checklist.pk}'
+    if cache.get(chave_cache):
+        return  # e-mail já enviado para este checklist nas últimas 2h
+    cache.set(chave_cache, True, 60 * 60 * 2)
 
     gestores_emails = list(
         Usuario.objects.filter(is_patrao=True)
@@ -198,18 +204,18 @@ class ChecklistListView(LoginRequiredMixin, CheckListBaseView, ListView):
                 Q(vencimento_seguro__gte=hoje, vencimento_seguro__lte=limite)
             ).count()
 
-            # Alerta de combustível crítico (última inspeção de cada veículo ativo)
-            critico = 0
-            for v in Veiculo.objects.filter(ativo=True):
-                ultima = (
-                    Checklist.objects.filter(veiculo=v)
-                    .order_by('-data_realizada')
-                    .values('nivel_combustivel')
-                    .first()
-                )
-                if ultima and ultima['nivel_combustivel'] == 'Reserva':
-                    critico += 1
-            context['combustivel_critico'] = critico
+            # Alerta de combustível crítico — 1 query via Subquery (sem N+1)
+            ultimo_nivel_sq = Subquery(
+                Checklist.objects.filter(veiculo=OuterRef('pk'))
+                .order_by('-data_realizada')
+                .values('nivel_combustivel')[:1]
+            )
+            context['combustivel_critico'] = (
+                Veiculo.objects.filter(ativo=True)
+                .annotate(ultimo_nivel=ultimo_nivel_sq)
+                .filter(ultimo_nivel='Reserva')
+                .count()
+            )
 
             # Veículos sem inspeção hoje
             inspecionados_hoje_ids = set(
@@ -308,9 +314,6 @@ class CheckListUpdateView(LoginRequiredMixin, GestorRequiredMixin, UpdateView):
     template_name = 'frota/checklist_update.html'
     success_url = reverse_lazy('checklist_list')
 
-    def test_func(self):
-        return self.request.user.is_patrao
-
 
 class CheckListDeleteView(LoginRequiredMixin, GestorRequiredMixin, DeleteView):
     model = Checklist
@@ -351,17 +354,42 @@ class ConformidadeFrotaView(LoginRequiredMixin, GestorRequiredMixin, View):
     def get(self, request):
         from django.shortcuts import render
         hoje = timezone.now().date()
-        veiculos_ativos = Veiculo.objects.filter(ativo=True).order_by('modelo')
 
+        # 1ª query: veículos anotados com ID do último checklist e qtd de ocorrências abertas
+        ultima_id_sq = Subquery(
+            Checklist.objects.filter(veiculo=OuterRef('pk'))
+            .order_by('-data_realizada')
+            .values('id')[:1]
+        )
+        veiculos_ativos = (
+            Veiculo.objects.filter(ativo=True)
+            .annotate(
+                ultima_checklist_id=ultima_id_sq,
+                n_ocorrencias_abertas=Count(
+                    'ocorrencias',
+                    filter=~Q(ocorrencias__status='resolvida'),
+                    distinct=True,
+                ),
+            )
+            .order_by('modelo')
+        )
+
+        # 2ª query: busca todos os últimos checklists de uma vez
+        ids_ultima = [v.ultima_checklist_id for v in veiculos_ativos if v.ultima_checklist_id]
+        checklists_map = {
+            c.id: c for c in
+            Checklist.objects.filter(id__in=ids_ultima).select_related('motorista')
+        }
+
+        # Montagem sem queries adicionais
         situacao = []
         for v in veiculos_ativos:
-            ultima = Checklist.objects.filter(veiculo=v).select_related('motorista').order_by('-data_realizada').first()
-            ocorrencias_abertas = OcorrenciaAvaria.objects.filter(veiculo=v).exclude(status='resolvida').count()
+            ultima = checklists_map.get(v.ultima_checklist_id)
             situacao.append({
                 'veiculo': v,
                 'ultima_inspecao': ultima,
-                'inspecionado_hoje': ultima and ultima.data_realizada.date() == hoje,
-                'ocorrencias_abertas': ocorrencias_abertas,
+                'inspecionado_hoje': ultima is not None and ultima.data_realizada.date() == hoje,
+                'ocorrencias_abertas': v.n_ocorrencias_abertas,
             })
 
         total = len(situacao)
@@ -397,9 +425,14 @@ class OcorrenciaListView(LoginRequiredMixin, GestorRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_aguardando'] = OcorrenciaAvaria.objects.filter(status='aguardando').count()
-        context['total_em_reparo'] = OcorrenciaAvaria.objects.filter(status='em_reparo').count()
-        context['total_resolvidas'] = OcorrenciaAvaria.objects.filter(status='resolvida').count()
+        contagens = OcorrenciaAvaria.objects.aggregate(
+            aguardando=Count('id', filter=Q(status='aguardando')),
+            em_reparo=Count('id', filter=Q(status='em_reparo')),
+            resolvidas=Count('id', filter=Q(status='resolvida')),
+        )
+        context['total_aguardando'] = contagens['aguardando']
+        context['total_em_reparo'] = contagens['em_reparo']
+        context['total_resolvidas'] = contagens['resolvidas']
         return context
 
 
@@ -503,16 +536,10 @@ class VeiculoDetailView(LoginRequiredMixin, VeiculoBaseView, DetailView):
         context['seguro_vencido'] = v.vencimento_seguro and v.vencimento_seguro < hoje
         context['seguro_vencendo'] = v.vencimento_seguro and hoje <= v.vencimento_seguro <= limite_doc and not context['seguro_vencido']
 
-        # Ocorrências abertas
-        context['ocorrencias_abertas'] = (
-            OcorrenciaAvaria.objects.filter(veiculo=self.object)
-            .exclude(status='resolvida')
-            .order_by('-criada_em')[:5]
-        )
-        context['total_ocorrencias_abertas'] = (
-            OcorrenciaAvaria.objects.filter(veiculo=self.object)
-            .exclude(status='resolvida').count()
-        )
+        # Ocorrências abertas — queryset reutilizado (evita query duplicada)
+        oc_qs = OcorrenciaAvaria.objects.filter(veiculo=self.object).exclude(status='resolvida')
+        context['ocorrencias_abertas'] = oc_qs.order_by('-criada_em')[:5]
+        context['total_ocorrencias_abertas'] = oc_qs.count()
 
         # Últimas 5 inspeções
         context['ultimas_inspecoes'] = (
@@ -667,7 +694,7 @@ class FuncionarioBaseView:
     success_url = reverse_lazy('funcionario_list')
 
 
-class FuncionarioListView(LoginRequiredMixin, FuncionarioBaseView, ListView):
+class FuncionarioListView(LoginRequiredMixin, GestorRequiredMixin, FuncionarioBaseView, ListView):
     template_name = 'funcionario/funcionario_list.html'
     context_object_name = 'funcionarios'
     paginate_by = 9

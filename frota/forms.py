@@ -5,6 +5,33 @@ from .models import (
     OcorrenciaAvaria, OrdemManutencao, Abastecimento,
 )
 
+
+# ── Validadores de documentos brasileiros ─────────────────────────────────────
+
+def _validar_cpf(cpf: str) -> bool:
+    if len(cpf) != 11 or cpf == cpf[0] * 11:
+        return False
+    for i, peso_base in enumerate([10, 11]):
+        soma = sum(int(cpf[j]) * (peso_base - j) for j in range(peso_base - 1))
+        if int(cpf[peso_base - 1]) != (soma * 10 % 11) % 10:
+            return False
+    return True
+
+
+def _validar_renavam(renavam: str) -> bool:
+    renavam = renavam.strip()
+    if not renavam.isdigit():
+        return False
+    if len(renavam) == 9:
+        renavam = '00' + renavam
+    if len(renavam) != 11:
+        return False
+    pesos = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    soma = sum(int(renavam[i]) * pesos[i] for i in range(10))
+    resto = soma % 11
+    digito = 0 if resto < 2 else 11 - resto
+    return digito == int(renavam[10])
+
 _INPUT = 'mt-1 block w-full rounded-xl border-slate-300 p-3 border bg-slate-50/50 text-sm font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition'
 _SELECT = _INPUT
 _FILE = 'mt-1 block w-full text-sm text-slate-500 file:rounded-xl file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-blue-700 file:font-semibold'
@@ -72,6 +99,8 @@ class NovoFuncionarioForm(forms.ModelForm):
                 raise forms.ValidationError("CPF deve conter apenas números.")
             if len(cpf) != 11:
                 raise forms.ValidationError("CPF deve conter 11 dígitos.")
+            if not _validar_cpf(cpf):
+                raise forms.ValidationError("CPF inválido. Verifique os dígitos verificadores.")
         return cpf
 
     def clean_numero_cnh(self):
@@ -124,8 +153,12 @@ class VeiculoForm(forms.ModelForm):
         renavam = self.cleaned_data.get("renavam")
         if renavam:
             renavam = renavam.strip()
+            if not renavam.isdigit():
+                raise forms.ValidationError("RENAVAM deve conter apenas números.")
             if len(renavam) not in [9, 11]:
-                raise forms.ValidationError("Renavam deve conter 9 ou 11 dígitos.")
+                raise forms.ValidationError("RENAVAM deve conter 9 ou 11 dígitos.")
+            if not _validar_renavam(renavam):
+                raise forms.ValidationError("RENAVAM inválido. Verifique o dígito verificador.")
         return renavam
 
     def clean_placa(self):
@@ -151,6 +184,12 @@ class OcorrenciaUpdateForm(forms.ModelForm):
                 'placeholder': 'Descreva o que foi feito para resolver...',
             }),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get('status') == 'resolvida' and not cleaned.get('nota_resolucao', '').strip():
+            self.add_error('nota_resolucao', 'Informe o que foi feito para resolver a ocorrência.')
+        return cleaned
 
 
 # ── ORDEM DE MANUTENÇÃO ───────────────────────────────────────────────────────

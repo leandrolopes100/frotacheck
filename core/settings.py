@@ -4,17 +4,27 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = 'django-insecure-cfehpe=s%2ub(q7lx5m&h&1t7^-j&)u(#=p&4(+pdmn)b$o4e0'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-key-insecure-change-me-in-production')
 DEBUG = False
 ALLOWED_HOSTS = ['192.168.27.100', '127.0.0.1', '172.20.10.3']
 AUTH_USER_MODEL = 'frota.Usuario'
 
-LOGIN_REDIRECT_URL = 'checklist_list' 
+LOGIN_REDIRECT_URL = 'checklist_list'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1700
-SESSION_SAVE_EVERY_REQUEST = True
+SESSION_SAVE_EVERY_REQUEST = False  # não grava sessão em toda requisição
+
+# ── Segurança HTTP ─────────────────────────────────────────────────────────────
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+# Ativar quando houver HTTPS:
+# SECURE_SSL_REDIRECT = True
+# SECURE_HSTS_SECONDS = 31536000
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -92,6 +102,48 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# ── Cache em memória (sem dependências externas) ───────────────────────────────
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'frotacheck-cache',
+    }
+}
+
+# ── Logging de auditoria ───────────────────────────────────────────────────────
+_LOG_DIR = BASE_DIR / 'logs'
+_LOG_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'auditoria': {
+            'format': '[{asctime}] {levelname} | {message}',
+            'style': '{',
+            'datefmt': '%d/%m/%Y %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'arquivo': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'auditoria.log',
+            'maxBytes': 10 * 1024 * 1024,
+            'backupCount': 5,
+            'formatter': 'auditoria',
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+        'frota.auditoria': {
+            'handlers': ['arquivo'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
 
 # ── Email ──────────────────────────────────────────────────────────────────────
 # Em desenvolvimento, e-mails são exibidos no console (não enviados).

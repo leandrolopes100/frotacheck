@@ -103,9 +103,9 @@ class Checklist(models.Model):
     )
     veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE)
     motorista = models.ForeignKey(Funcionario, on_delete=models.CASCADE, null=True, blank=True)
-    data_realizada = models.DateTimeField(default=timezone.now)
+    data_realizada = models.DateTimeField(default=timezone.now, db_index=True)
     km_atual = models.PositiveIntegerField(verbose_name="KM Atual")
-    nivel_combustivel = models.CharField(max_length=10, choices=COMBUSTIVEL_CHOICES, default='Cheio')
+    nivel_combustivel = models.CharField(max_length=10, choices=COMBUSTIVEL_CHOICES, default='Cheio', db_index=True)
     tipo = models.CharField(
         max_length=20, choices=TIPO_CHOICES, default='geral', verbose_name="Tipo de Inspeção",
     )
@@ -223,7 +223,7 @@ class OcorrenciaAvaria(models.Model):
         Veiculo, on_delete=models.CASCADE, related_name='ocorrencias',
     )
     descricao = models.TextField(verbose_name="Itens com Falha")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='aguardando')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='aguardando', db_index=True)
     criada_em = models.DateTimeField(auto_now_add=True)
     atualizada_em = models.DateTimeField(auto_now=True)
     resolvida_por = models.ForeignKey(
