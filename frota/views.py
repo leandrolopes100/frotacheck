@@ -8,7 +8,7 @@ from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import send_mail
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.core.cache import cache
 from django.db.models import Count, OuterRef, Q, Subquery, Sum
 from django.http import FileResponse, Http404, HttpResponse
@@ -754,7 +754,7 @@ class FuncionarioCreateView(LoginRequiredMixin, GestorRequiredMixin, CreateView)
                 funcionario.save()
             messages.success(self.request, "Funcionário cadastrado com sucesso.")
             return redirect(self.success_url)
-        except Exception:
+        except IntegrityError:
             form.add_error(None, "Erro ao cadastrar. Verifique se o login já existe.")
             return self.form_invalid(form)
 
