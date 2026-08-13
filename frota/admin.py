@@ -9,7 +9,8 @@ from .models import (
 # --- INLINES ---
 class FotoAvariaInline(admin.TabularInline):
     model = FotoAvaria
-    extra = 1
+    extra = 0
+    can_delete = False  # evidências fotográficas são imutáveis
     readonly_fields = ('miniatura',)
 
     def miniatura(self, obj):
