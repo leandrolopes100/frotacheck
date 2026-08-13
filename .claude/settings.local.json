@@ -11,7 +11,15 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8000/login/)",
       "Bash(python manage.py makemigrations --name=\"add_ocorrencia_manutencao_abastecimento_veiculo_docs\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Computador\\\\Desktop\\\\MEUS PROJETOS\\\\DJANGO\\\\FROTACHECK\" -Recurse -Force)",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "Bash(Get-ChildItem -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "PowerShell(cd \"C:\\\\Users\\\\Computador\\\\Desktop\\\\MEUS PROJETOS\\\\DJANGO\\\\FROTACHECK\"; Get-ChildItem -Path \".\" -Name -Directory | Where-Object {$_ -ne \"venv\"})",
+      "PowerShell(cd \"C:\\\\Users\\\\Computador\\\\Desktop\\\\MEUS PROJETOS\\\\DJANGO\\\\FROTACHECK\"; Get-Item -Path \".\\\\\" | Get-ChildItem -Directory -Exclude \"venv\" | ForEach-Object {Write-Host \"$\\($_.Name\\)/\"}; Write-Host \"`n\"; tree /L /F frota\\\\templates 2>/dev/null | Select-Object -First 40)",
+      "Bash(venv\\\\Scripts\\\\python.exe manage.py check)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Computador\\\\Desktop\\\\MEUS PROJETOS\\\\DJANGO\\\\FROTACHECK\" -Recurse -File -Filter \"*.py\")",
+      "Bash(Sort-Object)",
+      "Bash(python manage.py makemigrations frota --name=\"add_db_indexes\")"
     ]
   }
 }
