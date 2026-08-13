@@ -519,11 +519,16 @@
 </div>
 
 {% if user.is_patrao %}
+{{ chart_labels|json_script:"chart-labels-data" }}
+{{ chart_ok|json_script:"chart-ok-data" }}
+{{ chart_avarias|json_script:"chart-avarias-data" }}
+{{ top_veiculos_labels|json_script:"top-veiculos-labels-data" }}
+{{ top_veiculos_data|json_script:"top-veiculos-data-data" }}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const chartLabels  = {{ chart_labels|safe }};
-    const chartOk      = {{ chart_ok|safe }};
-    const chartAvarias = {{ chart_avarias|safe }};
+    const chartLabels  = JSON.parse(document.getElementById('chart-labels-data').textContent);
+    const chartOk      = JSON.parse(document.getElementById('chart-ok-data').textContent);
+    const chartAvarias = JSON.parse(document.getElementById('chart-avarias-data').textContent);
 
     Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
 
@@ -575,8 +580,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Gráfico top veículos
     const ctxTop = document.getElementById('topVehiclesChart');
     if (ctxTop) {
-        const topLabels = {{ top_veiculos_labels|safe }};
-        const topData   = {{ top_veiculos_data|safe }};
+        const topLabels = JSON.parse(document.getElementById('top-veiculos-labels-data').textContent);
+        const topData   = JSON.parse(document.getElementById('top-veiculos-data-data').textContent);
         if (topData.length > 0) {
             new Chart(ctxTop.getContext('2d'), {
                 type: 'bar',

@@ -1,5 +1,4 @@
 import csv
-import json
 import os
 from datetime import timedelta
 from io import BytesIO
@@ -173,9 +172,9 @@ class ChecklistListView(LoginRequiredMixin, CheckListBaseView, ListView):
             data_avarias.append(qtd_avarias)
             data_ok.append(dia_qs.count() - qtd_avarias)
 
-        context['chart_labels'] = json.dumps(labels)
-        context['chart_ok'] = json.dumps(data_ok)
-        context['chart_avarias'] = json.dumps(data_avarias)
+        context['chart_labels'] = labels
+        context['chart_ok'] = data_ok
+        context['chart_avarias'] = data_avarias
 
         top_veiculos = (
             qs_chart.filter(get_filtro_avaria())
@@ -183,10 +182,10 @@ class ChecklistListView(LoginRequiredMixin, CheckListBaseView, ListView):
             .annotate(total=Count('id'))
             .order_by('-total')[:5]
         )
-        context['top_veiculos_labels'] = json.dumps([
+        context['top_veiculos_labels'] = [
             f"{v['veiculo__modelo']} ({v['veiculo__placa']})" for v in top_veiculos
-        ])
-        context['top_veiculos_data'] = json.dumps([v['total'] for v in top_veiculos])
+        ]
+        context['top_veiculos_data'] = [v['total'] for v in top_veiculos]
 
         # Alertas de CNH (gestores)
         if self.request.user.is_patrao or self.request.user.is_superuser:
@@ -525,8 +524,8 @@ class VeiculoDetailView(LoginRequiredMixin, VeiculoBaseView, DetailView):
             Checklist.objects.filter(veiculo=self.object)
             .order_by('data_realizada').values('data_realizada', 'km_atual')[:20]
         )
-        context['km_labels'] = json.dumps([c['data_realizada'].strftime('%d/%m') for c in km_hist])
-        context['km_data'] = json.dumps([c['km_atual'] for c in km_hist])
+        context['km_labels'] = [c['data_realizada'].strftime('%d/%m') for c in km_hist]
+        context['km_data'] = [c['km_atual'] for c in km_hist]
         context['tem_km_historico'] = len(km_hist) >= 2
 
         # Alerta de revisão por KM

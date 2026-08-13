@@ -250,3 +250,29 @@ class AbastecimentoIDORTests(TestCase):
         self.assertEqual(response.status_code, 302)
         abastecimento = Abastecimento.objects.get()
         self.assertEqual(abastecimento.motorista, Funcionario.objects.get(usuario=self.motorista_a))
+
+
+class ChartJSONScriptXSSTests(TestCase):
+    """Regressão: dados injetados em <script> do dashboard usavam |safe
+    sobre json.dumps simples — uma string de veículo contendo
+    '</script>' quebrava o contexto do script. Agora usam o filtro
+    json_script, que escapa corretamente."""
+
+    def test_nome_malicioso_de_veiculo_nao_quebra_script(self):
+        veiculo = Veiculo.objects.create(
+            placa='XSS1A23', marca='Ford',
+            modelo='Cargo</script><script>alert(1)</script>',
+            ano=2020, renavam='99887766554',
+        )
+        motorista = _criar_motorista('motoristaG')
+        gestor = _criar_motorista('gestorX', is_patrao=True)
+        Checklist.objects.create(
+            veiculo=veiculo, motorista=Funcionario.objects.get(usuario=motorista),
+            km_atual=1000, latitude=-23.55, longitude=-46.63, farol=False,
+        )
+        self.client.login(username='gestorX', password='senha-teste-123')
+        response = self.client.get(reverse('checklist_list'))
+        self.assertEqual(response.status_code, 200)
+        conteudo = response.content.decode()
+        self.assertNotIn('</script><script>alert(1)</script>', conteudo)
+        self.assertIn('id="top-veiculos-labels-data"', conteudo)

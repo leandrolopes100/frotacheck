@@ -262,6 +262,8 @@
         </div>
         <canvas id="kmChart" height="80"></canvas>
     </div>
+    {{ km_labels|json_script:"km-labels-data" }}
+    {{ km_data|json_script:"km-data-data" }}
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('kmChart');
@@ -269,10 +271,10 @@
         new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: {
-                labels: {{ km_labels|safe }},
+                labels: JSON.parse(document.getElementById('km-labels-data').textContent),
                 datasets: [{
                     label: 'KM',
-                    data: {{ km_data|safe }},
+                    data: JSON.parse(document.getElementById('km-data-data').textContent),
                     borderColor: '#388bfd',
                     backgroundColor: 'rgba(56,139,253,0.08)',
                     fill: true,
