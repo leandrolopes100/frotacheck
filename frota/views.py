@@ -307,6 +307,13 @@ class ChecklistCreateView(LoginRequiredMixin, QrCodeMixin, CheckListBaseView, Cr
 class CheckListDetailView(LoginRequiredMixin, CheckListBaseView, DetailView):
     template_name = 'frota/checklist_detail.html'
 
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+        if user.is_superuser or user.is_patrao:
+            return queryset
+        return queryset.filter(motorista__usuario=user)
+
 
 class CheckListUpdateView(LoginRequiredMixin, GestorRequiredMixin, UpdateView):
     model = Checklist

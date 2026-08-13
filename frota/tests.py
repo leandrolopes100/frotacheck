@@ -1,3 +1,4 @@
+import itertools
 from datetime import date
 
 from django.contrib.auth import get_user_model
@@ -6,9 +7,27 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .forms import ChecklistForm
-from .models import Funcionario, Veiculo
+from .models import Checklist, Funcionario, Veiculo
 
 Usuario = get_user_model()
+
+_cpf_counter = itertools.count(100000001)
+
+
+def _gerar_cpf_valido():
+    """Gera um CPF com dígitos verificadores válidos (mesmo algoritmo de
+    frota.forms._validar_cpf), único a cada chamada — evita colisão com a
+    constraint unique=True de Funcionario.cpf nos testes."""
+    base = str(next(_cpf_counter)).zfill(9)[-9:]
+
+    def dv(digitos, peso_inicial):
+        soma = sum(int(d) * p for d, p in zip(digitos, range(peso_inicial, 1, -1)))
+        resto = soma % 11
+        return '0' if resto < 2 else str(11 - resto)
+
+    d1 = dv(base, 10)
+    d2 = dv(base + d1, 11)
+    return base + d1 + d2
 
 
 def _criar_motorista(username, is_patrao=False):
@@ -18,7 +37,7 @@ def _criar_motorista(username, is_patrao=False):
     )
     Funcionario.objects.create(
         usuario=usuario, nome_completo=f'Funcionario {username}',
-        cpf='52998224725' if not is_patrao else '11144477735',
+        cpf=_gerar_cpf_valido(),
         numero_cnh='12345678900', validade_cnh=date(2030, 1, 1),
         cargo='Gestor' if is_patrao else 'Motorista',
     )
@@ -116,3 +135,38 @@ class DocumentoUploadValidationTests(TestCase):
             cnh_impressa=arquivo_valido,
         )
         funcionario.full_clean()
+
+
+class ChecklistDetailIDORTests(TestCase):
+    """Regressão: um motorista não pode ver o detalhe de checklist de
+    outro motorista trocando o pk na URL (CheckListDetailView não
+    filtrava por usuário)."""
+
+    def setUp(self):
+        self.veiculo = Veiculo.objects.create(
+            placa='XYZ9A87', marca='Ford', modelo='Cargo',
+            ano=2021, renavam='98765432100',
+        )
+        self.motorista_a = _criar_motorista('motoristaA')
+        self.motorista_b = _criar_motorista('motoristaB')
+        self.gestor = _criar_motorista('gestor2', is_patrao=True)
+        self.checklist_a = Checklist.objects.create(
+            veiculo=self.veiculo,
+            motorista=Funcionario.objects.get(usuario=self.motorista_a),
+            km_atual=1000, latitude=-23.55, longitude=-46.63,
+        )
+
+    def test_motorista_nao_acessa_checklist_de_outro(self):
+        self.client.login(username='motoristaB', password='senha-teste-123')
+        response = self.client.get(reverse('checklist_detail', args=[self.checklist_a.pk]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_motorista_acessa_proprio_checklist(self):
+        self.client.login(username='motoristaA', password='senha-teste-123')
+        response = self.client.get(reverse('checklist_detail', args=[self.checklist_a.pk]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_gestor_acessa_qualquer_checklist(self):
+        self.client.login(username='gestor2', password='senha-teste-123')
+        response = self.client.get(reverse('checklist_detail', args=[self.checklist_a.pk]))
+        self.assertEqual(response.status_code, 200)
