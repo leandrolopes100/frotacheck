@@ -62,11 +62,7 @@ class ChecklistAdmin(admin.ModelAdmin):
         return qs.filter(motorista__usuario=request.user)
 
     def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser or getattr(request.user, 'is_patrao', False):
-            return True
-        if obj and obj.motorista and obj.motorista.usuario == request.user:
-            return False # Bloqueia edição após salvar (segurança de dados)
-        return False
+        return request.user.is_superuser or getattr(request.user, 'is_patrao', False)
 
 @admin.register(Veiculo)
 class VeiculoAdmin(admin.ModelAdmin):
