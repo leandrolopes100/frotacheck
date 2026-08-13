@@ -11,7 +11,7 @@ from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.core.cache import cache
 from django.db.models import Count, OuterRef, Q, Subquery, Sum
-from django.http import FileResponse, Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -320,6 +320,15 @@ class CheckListDeleteView(LoginRequiredMixin, GestorRequiredMixin, DeleteView):
     success_url = reverse_lazy('checklist_list')
 
 
+class _EchoBuffer:
+    """Pseudo-arquivo: csv.writer espera um objeto com .write(), mas aqui
+    só repassamos a linha já formatada para o gerador do StreamingHttpResponse
+    — nada é acumulado em memória."""
+
+    def write(self, value):
+        return value
+
+
 class ChecklistExportCSVView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
@@ -327,21 +336,26 @@ class ChecklistExportCSVView(LoginRequiredMixin, View):
         if not (user.is_superuser or user.is_patrao):
             queryset = queryset.filter(motorista__usuario=user)
 
+        writer = csv.writer(_EchoBuffer())
+
+        def linhas_csv():
+            yield writer.writerow(
+                ['Data', 'Tipo', 'Motorista', 'Veículo', 'Placa', 'KM', 'Combustível', 'Status', 'Observações']
+            )
+            for c in queryset.iterator():
+                yield writer.writerow([
+                    c.data_realizada.strftime('%d/%m/%Y %H:%M'),
+                    c.get_tipo_display(),
+                    c.motorista.nome_completo if c.motorista else '-',
+                    c.veiculo.modelo, c.veiculo.placa, c.km_atual,
+                    c.nivel_combustivel,
+                    'Avaria' if c.tem_avaria else 'Conforme',
+                    c.observacoes or '',
+                ])
+
         nome = f"checklists_{timezone.now().strftime('%Y%m%d_%H%M')}.csv"
-        response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+        response = StreamingHttpResponse(linhas_csv(), content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = f'attachment; filename="{nome}"'
-        writer = csv.writer(response)
-        writer.writerow(['Data', 'Tipo', 'Motorista', 'Veículo', 'Placa', 'KM', 'Combustível', 'Status', 'Observações'])
-        for c in queryset:
-            writer.writerow([
-                c.data_realizada.strftime('%d/%m/%Y %H:%M'),
-                c.get_tipo_display(),
-                c.motorista.nome_completo if c.motorista else '-',
-                c.veiculo.modelo, c.veiculo.placa, c.km_atual,
-                c.nivel_combustivel,
-                'Avaria' if c.tem_avaria else 'Conforme',
-                c.observacoes or '',
-            ])
         return response
 
 

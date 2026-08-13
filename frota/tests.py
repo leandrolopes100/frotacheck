@@ -296,3 +296,30 @@ class LoginBruteForceProtectionTests(TestCase):
         response = self.client.post(login_url, {'username': 'motoristaH', 'password': 'senha-teste-123'})
         self.assertEqual(response.status_code, 429)
         self.assertNotIn('_auth_user_id', self.client.session)
+
+
+class ChecklistExportCSVStreamingTests(TestCase):
+    """Regressão: a exportação de CSV carregava a queryset inteira em
+    memória via HttpResponse. Agora usa StreamingHttpResponse, gerando
+    linha por linha."""
+
+    def setUp(self):
+        self.veiculo = Veiculo.objects.create(
+            placa='CSV1A23', marca='Ford', modelo='Cargo',
+            ano=2021, renavam='11122233344',
+        )
+        self.gestor = _criar_motorista('gestor4', is_patrao=True)
+        Checklist.objects.create(
+            veiculo=self.veiculo, km_atual=1000,
+            latitude=-23.55, longitude=-46.63,
+        )
+
+    def test_export_e_streaming_e_contem_cabecalho_e_linha(self):
+        from django.http import StreamingHttpResponse
+
+        self.client.login(username='gestor4', password='senha-teste-123')
+        response = self.client.get(reverse('checklist_export_csv'))
+        self.assertIsInstance(response, StreamingHttpResponse)
+        conteudo = b''.join(response.streaming_content).decode('utf-8-sig')
+        self.assertIn('Data,Tipo,Motorista,Veículo,Placa,KM', conteudo)
+        self.assertIn('CSV1A23', conteudo)
