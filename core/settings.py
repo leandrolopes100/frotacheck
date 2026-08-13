@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import sys
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -48,7 +49,7 @@ INSTALLED_APPS = [
     'frota',
     'django.contrib.humanize',
     'widget_tweaks',
-    
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -57,9 +58,22 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# ── Proteção contra força bruta no login ────────────────────────────────────────
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1  # horas até desbloqueio automático
+# AxesStandaloneBackend exige um `request` real em authenticate(), o que o
+# atalho Client.login() dos testes não fornece. Desativado só durante testes.
+AXES_ENABLED = 'test' not in sys.argv
 
 ROOT_URLCONF = 'core.urls'
 

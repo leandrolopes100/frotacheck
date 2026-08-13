@@ -276,3 +276,23 @@ class ChartJSONScriptXSSTests(TestCase):
         conteudo = response.content.decode()
         self.assertNotIn('</script><script>alert(1)</script>', conteudo)
         self.assertIn('id="top-veiculos-labels-data"', conteudo)
+
+
+@override_settings(AXES_ENABLED=True, AXES_FAILURE_LIMIT=3, AXES_COOLOFF_TIME=1)
+class LoginBruteForceProtectionTests(TestCase):
+    """Regressão: o login não tinha nenhuma proteção contra força bruta
+    de senha. django-axes agora bloqueia após AXES_FAILURE_LIMIT
+    tentativas com senha errada, mesmo que a senha correta seja
+    enviada depois."""
+
+    def setUp(self):
+        self.motorista = _criar_motorista('motoristaH')
+
+    def test_bloqueia_apos_tentativas_repetidas_de_senha_errada(self):
+        login_url = reverse('login')
+        for _ in range(3):
+            self.client.post(login_url, {'username': 'motoristaH', 'password': 'senha-errada'})
+
+        response = self.client.post(login_url, {'username': 'motoristaH', 'password': 'senha-teste-123'})
+        self.assertEqual(response.status_code, 429)
+        self.assertNotIn('_auth_user_id', self.client.session)
