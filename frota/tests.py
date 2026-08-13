@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -85,3 +86,33 @@ class ChecklistFormGPSTests(TestCase):
         dados['longitude'] = -46.63
         form = ChecklistForm(data=dados)
         self.assertTrue(form.is_valid(), form.errors)
+
+
+class DocumentoUploadValidationTests(TestCase):
+    """Regressão: uploads de CNH/documento do veículo devem aceitar
+    apenas pdf/jpg/jpeg/png — antes qualquer extensão era aceita."""
+
+    def test_cnh_com_extensao_invalida_e_rejeitada(self):
+        usuario = Usuario.objects.create_user(username='motorista2', password='x', is_motorista=True)
+        arquivo_malicioso = SimpleUploadedFile(
+            'cnh.html', b'<script>alert(1)</script>', content_type='text/html',
+        )
+        funcionario = Funcionario(
+            usuario=usuario, nome_completo='Fulano de Tal', cpf='39053344705',
+            numero_cnh='12345678900', validade_cnh=date(2030, 1, 1),
+            cnh_impressa=arquivo_malicioso,
+        )
+        with self.assertRaises(Exception):
+            funcionario.full_clean()
+
+    def test_cnh_com_extensao_valida_e_aceita(self):
+        usuario = Usuario.objects.create_user(username='motorista3', password='x', is_motorista=True)
+        arquivo_valido = SimpleUploadedFile(
+            'cnh.pdf', b'%PDF-1.4 conteudo de teste', content_type='application/pdf',
+        )
+        funcionario = Funcionario(
+            usuario=usuario, nome_completo='Fulano de Tal', cpf='39053344705',
+            numero_cnh='12345678900', validade_cnh=date(2030, 1, 1),
+            cnh_impressa=arquivo_valido,
+        )
+        funcionario.full_clean()

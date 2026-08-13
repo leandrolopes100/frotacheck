@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -6,6 +7,8 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
 import os
+
+DOCUMENTO_EXTENSOES_PERMITIDAS = ['pdf', 'jpg', 'jpeg', 'png']
 
 
 # ── USUÁRIOS ──────────────────────────────────────────────────────────────────
@@ -39,6 +42,7 @@ class Funcionario(models.Model):
     cnh_impressa = models.FileField(
         upload_to='funcionarios/cnh/', null=True, blank=True,
         verbose_name="CNH Digital/Scanner",
+        validators=[FileExtensionValidator(DOCUMENTO_EXTENSOES_PERMITIDAS)],
     )
     cargo = models.CharField(max_length=100, choices=CARGO_CHOICES, default="Motorista")
 
@@ -54,7 +58,10 @@ class Veiculo(models.Model):
     modelo = models.CharField(max_length=100, db_index=True)
     ano = models.IntegerField()
     renavam = models.CharField(max_length=11, unique=True)
-    documento_impresso = models.FileField(upload_to='veiculos/docs/%Y/%m/', null=True, blank=True)
+    documento_impresso = models.FileField(
+        upload_to='veiculos/docs/%Y/%m/', null=True, blank=True,
+        validators=[FileExtensionValidator(DOCUMENTO_EXTENSOES_PERMITIDAS)],
+    )
     fipe = models.DecimalField(
         max_digits=12, decimal_places=2, verbose_name="Valor FIPE",
         blank=True, null=True, default=0,
