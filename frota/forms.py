@@ -62,6 +62,15 @@ class ChecklistForm(forms.ModelForm):
             if not isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs.update({'class': _INPUT})
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('latitude') is None or cleaned_data.get('longitude') is None:
+            raise forms.ValidationError(
+                "Não foi possível confirmar sua localização. Permita o acesso ao "
+                "GPS e tente novamente — o envio do checklist exige localização confirmada."
+            )
+        return cleaned_data
+
 
 # ── FOTO AVARIA ───────────────────────────────────────────────────────────────
 

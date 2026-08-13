@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Funcionario
+from .forms import ChecklistForm
+from .models import Funcionario, Veiculo
 
 Usuario = get_user_model()
 
@@ -50,3 +51,37 @@ class FuncionarioCreateViewPermissionTests(TestCase):
         self.assertRedirects(response, reverse('funcionario_list'))
         novo_usuario = Usuario.objects.get(username='novo.usuario')
         self.assertTrue(novo_usuario.is_patrao)
+
+
+class ChecklistFormGPSTests(TestCase):
+    """Regressão: o formulário de checklist deve exigir latitude/longitude
+    no servidor — antes a checagem era só via JavaScript no navegador."""
+
+    def setUp(self):
+        self.veiculo = Veiculo.objects.create(
+            placa='ABC1D23', marca='Ford', modelo='Cargo',
+            ano=2020, renavam='12345678901',
+        )
+
+    def _dados_base(self):
+        return {
+            'veiculo': self.veiculo.pk, 'nome_checklist': 'Checklist Teste',
+            'km_atual': 1000, 'nivel_combustivel': 'Cheio', 'tipo': 'geral',
+        }
+
+    def test_form_invalido_sem_gps(self):
+        form = ChecklistForm(data=self._dados_base())
+        self.assertFalse(form.is_valid())
+
+    def test_form_invalido_com_gps_parcial(self):
+        dados = self._dados_base()
+        dados['latitude'] = -23.55
+        form = ChecklistForm(data=dados)
+        self.assertFalse(form.is_valid())
+
+    def test_form_valido_com_gps_completo(self):
+        dados = self._dados_base()
+        dados['latitude'] = -23.55
+        dados['longitude'] = -46.63
+        form = ChecklistForm(data=dados)
+        self.assertTrue(form.is_valid(), form.errors)
