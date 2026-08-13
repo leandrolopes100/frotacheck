@@ -19,26 +19,49 @@
     </script>
     <style>
         /* ============================================
-           FROTACHECK — DESIGN SYSTEM
+           FROTACHECK — SLATE LIGHT DESIGN SYSTEM
         ============================================ */
+
+        :root {
+            --bg-base:      #f1f5f9;
+            --bg-sidebar:   #ffffff;
+            --bg-card:      #ffffff;
+            --bg-elevated:  #f8fafc;
+            --bg-input:     #ffffff;
+            --border:       #e2e8f0;
+            --border-soft:  #f1f5f9;
+            --text-primary:   #0f172a;
+            --text-secondary: #475569;
+            --text-muted:     #94a3b8;
+            --green:      #16a34a;
+            --green-glow: rgba(22,163,74,0.12);
+            --red:        #dc2626;
+            --red-dim:    rgba(220,38,38,0.10);
+            --yellow:     #d97706;
+            --yellow-dim: rgba(217,119,6,0.10);
+            --blue:       #2563eb;
+            --blue-dim:   rgba(37,99,235,0.10);
+        }
 
         *, *::before, *::after { box-sizing: border-box; }
 
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: #f1f5f9;
-            color: #0f172a;
+            background: var(--bg-base);
+            color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
         }
 
         /* ── Sidebar ── */
         #sidebar {
-            background: #0b1628;
+            background: var(--bg-sidebar);
             width: 256px;
+            border-right: 1px solid var(--border);
+            box-shadow: 1px 0 4px rgba(0,0,0,0.04);
         }
 
         .sidebar-scroll::-webkit-scrollbar { width: 3px; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: #1a3050; border-radius: 10px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
         .sidebar-transition { transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
 
         .nav-section {
@@ -49,7 +72,7 @@
             font-weight: 600;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: #2d4a6e;
+            color: var(--text-muted);
         }
 
         .nav-item {
@@ -57,10 +80,10 @@
             align-items: center;
             gap: 9px;
             padding: 7px 10px;
-            border-radius: 8px;
-            font-size: 13.5px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 500;
-            color: #5d7fa8;
+            color: var(--text-secondary);
             transition: background 0.12s, color 0.12s;
             text-decoration: none;
             position: relative;
@@ -68,13 +91,13 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.06);
-            color: #a8c4e0;
+            background: rgba(0,0,0,0.04);
+            color: var(--text-primary);
         }
 
         .nav-item.active {
-            background: rgba(37,99,235,0.14);
-            color: #93c5fd;
+            background: rgba(22,163,74,0.08);
+            color: var(--green);
         }
 
         .nav-item.active::before {
@@ -84,39 +107,36 @@
             top: 6px;
             bottom: 6px;
             width: 2.5px;
-            background: #3b82f6;
+            background: var(--green);
             border-radius: 0 2px 2px 0;
         }
 
         .nav-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 7px;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             flex-shrink: 0;
-            transition: background 0.12s;
-        }
-
-        .nav-item:hover .nav-icon {
-            opacity: 1;
         }
 
         /* ── Header ── */
         .app-header {
-            background: rgba(255,255,255,0.96);
+            background: rgba(255,255,255,0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
         /* ── Cards ── */
         .card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
         /* ── Buttons ── */
@@ -125,8 +145,8 @@
             align-items: center;
             gap: 7px;
             padding: 8px 16px;
-            background: #2563eb;
-            color: white;
+            background: var(--green);
+            color: #ffffff;
             border-radius: 8px;
             font-size: 13.5px;
             font-weight: 600;
@@ -134,11 +154,11 @@
             cursor: pointer;
             text-decoration: none;
             transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-            box-shadow: 0 1px 2px rgba(37,99,235,0.25);
+            box-shadow: 0 1px 4px rgba(22,163,74,0.25);
         }
         .btn-primary:hover {
-            background: #1d4ed8;
-            box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+            background: #15803d;
+            box-shadow: 0 4px 16px rgba(22,163,74,0.3);
         }
         .btn-primary:active { transform: scale(0.98); }
 
@@ -147,19 +167,21 @@
             align-items: center;
             gap: 7px;
             padding: 8px 16px;
-            background: white;
-            color: #374151;
+            background: #ffffff;
+            color: var(--text-secondary);
             border-radius: 8px;
             font-size: 13.5px;
             font-weight: 500;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             cursor: pointer;
             text-decoration: none;
-            transition: background 0.12s, border-color 0.12s;
+            transition: background 0.12s, border-color 0.12s, color 0.12s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .btn-secondary:hover {
-            background: #f8fafc;
+            background: var(--bg-elevated);
             border-color: #cbd5e1;
+            color: var(--text-primary);
         }
 
         /* ── Badges ── */
@@ -173,11 +195,11 @@
             font-weight: 600;
             white-space: nowrap;
         }
-        .badge-success { background: #f0fdf4; color: #16a34a; }
-        .badge-danger  { background: #fff1f2; color: #dc2626; }
-        .badge-warning { background: #fffbeb; color: #d97706; }
-        .badge-info    { background: #eff6ff; color: #2563eb; }
-        .badge-neutral { background: #f8fafc; color: #475569; }
+        .badge-success { background: rgba(22,163,74,0.10);  color: #15803d; }
+        .badge-danger  { background: rgba(220,38,38,0.10);  color: var(--red); }
+        .badge-warning { background: rgba(217,119,6,0.10);  color: #b45309; }
+        .badge-info    { background: rgba(37,99,235,0.10);  color: var(--blue); }
+        .badge-neutral { background: rgba(0,0,0,0.06);      color: var(--text-secondary); }
 
         /* ── Alert banners ── */
         .alert-item {
@@ -188,9 +210,9 @@
             border-radius: 10px;
             border-width: 1px;
         }
-        .alert-danger  { background: #fff1f2; border-color: #fecdd3; }
-        .alert-warning { background: #fffbeb; border-color: #fde68a; }
-        .alert-neutral { background: #f8fafc; border-color: #e2e8f0; }
+        .alert-danger  { background: rgba(220,38,38,0.06);  border-color: rgba(220,38,38,0.18); }
+        .alert-warning { background: rgba(217,119,6,0.06);  border-color: rgba(217,119,6,0.18); }
+        .alert-neutral { background: rgba(0,0,0,0.03);      border-color: var(--border); }
 
         /* ── Toasts ── */
         @keyframes toastIn  { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -206,33 +228,34 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.07em;
-            color: #94a3b8;
-            background: #f8fafc;
+            color: var(--text-muted);
+            background: var(--bg-elevated);
             text-align: left;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border);
         }
         .data-table tbody td {
             padding: 14px 20px;
             font-size: 13.5px;
-            border-bottom: 1px solid #f8fafc;
-            color: #334155;
+            border-bottom: 1px solid var(--border-soft);
+            color: var(--text-secondary);
         }
         .data-table tbody tr:last-child td { border-bottom: none; }
-        .data-table tbody tr:hover td { background: #f8fafc; }
+        .data-table tbody tr:hover td { background: rgba(0,0,0,0.02); }
 
         /* ── KPI Cards ── */
         .kpi-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             padding: 22px 24px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
         .kpi-icon {
             width: 44px;
             height: 44px;
-            border-radius: 11px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -244,31 +267,31 @@
         .form-input {
             width: 100%;
             padding: 9px 14px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-input);
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-            color: #0f172a;
-            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            color: var(--text-primary);
+            transition: border-color 0.15s, box-shadow 0.15s;
             outline: none;
         }
         .form-input:focus {
-            background: white;
-            border-color: #93c5fd;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.10);
         }
-        .form-input::placeholder { color: #94a3b8; }
+        .form-input::placeholder { color: var(--text-muted); }
 
         /* ── Pagination ── */
         .pagination {
             display: flex;
             align-items: center;
             gap: 4px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 10px;
             padding: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
         .page-btn {
             width: 36px;
@@ -276,15 +299,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 7px;
+            border-radius: 6px;
             font-size: 13px;
             font-weight: 500;
-            color: #64748b;
+            color: var(--text-secondary);
             transition: all 0.12s;
             text-decoration: none;
         }
-        .page-btn:hover { background: white; color: #2563eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-        .page-btn.active { background: #0f172a; color: white; font-weight: 700; }
+        .page-btn:hover { background: rgba(0,0,0,0.04); color: var(--green); }
+        .page-btn.active { background: var(--green); color: #ffffff; font-weight: 700; }
 
         /* ── Global form styles (applies to all templates) ── */
         .main-area input[type="text"],
@@ -299,30 +322,30 @@
         .main-area textarea {
             width: 100%;
             padding: 9px 12px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-input);
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-            color: #0f172a;
-            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            color: var(--text-primary);
+            transition: border-color 0.15s, box-shadow 0.15s;
             outline: none;
         }
         .main-area input:focus,
         .main-area select:focus,
         .main-area textarea:focus {
-            background: white;
-            border-color: #93c5fd;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.10);
         }
         .main-area input::placeholder,
-        .main-area textarea::placeholder { color: #94a3b8; }
+        .main-area textarea::placeholder { color: var(--text-muted); }
         .main-area select { cursor: pointer; }
+        .main-area select option { background: #ffffff; color: var(--text-primary); }
         .main-area label {
             display: block;
             font-size: 12px;
             font-weight: 600;
-            color: #475569;
+            color: var(--text-secondary);
             margin-bottom: 6px;
         }
 
@@ -333,7 +356,7 @@
         /* ── Divider ── */
         .sidebar-divider {
             height: 1px;
-            background: rgba(255,255,255,0.04);
+            background: var(--border);
             margin: 10px 12px;
         }
     </style>
@@ -378,7 +401,8 @@
 
     <!-- Mobile overlay -->
     <div id="mobile-overlay"
-         class="fixed inset-0 bg-slate-950/50 backdrop-blur-[2px] z-40 hidden opacity-0 transition-opacity duration-300"
+         class="fixed inset-0 z-40 hidden opacity-0 transition-opacity duration-300"
+         style="background:rgba(0,0,0,0.75); backdrop-filter:blur(2px)"
          onclick="closeSidebar()"></div>
 
     <div class="flex min-h-screen">
@@ -387,26 +411,26 @@
              SIDEBAR
         ══════════════════════════ -->
         <aside id="sidebar"
-               class="fixed inset-y-0 left-0 z-50 flex flex-col sidebar-transition -translate-x-full md:translate-x-0 shadow-2xl"
+               class="fixed inset-y-0 left-0 z-50 flex flex-col sidebar-transition -translate-x-full md:translate-x-0"
                style="width:256px">
 
             <!-- Logo -->
-            <div class="flex items-center justify-between px-4 py-4 border-b" style="border-color:rgba(255,255,255,0.05)">
+            <div class="flex items-center justify-between px-4 py-4 border-b" style="border-color:var(--border)">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                         style="background:linear-gradient(135deg,#3b82f6,#1d4ed8); box-shadow:0 4px 12px rgba(37,99,235,0.4)">
+                         style="background:linear-gradient(135deg,#238636,#196c2e); box-shadow:0 4px 12px rgba(63,185,80,0.25)">
                         <i class="fas fa-truck-fast text-white text-sm"></i>
                     </div>
                     <div>
-                        <span class="text-white font-bold text-sm tracking-tight leading-none">FROTA<span style="color:#60a5fa;font-weight:300">CHECK</span></span>
-                        <p style="font-size:9px;color:#2d4a6e;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-top:1px">Gestão de Frota</p>
+                        <span class="font-bold text-sm tracking-tight leading-none" style="color:var(--text-primary)">FROTA<span style="color:var(--green);font-weight:300">CHECK</span></span>
+                        <p style="font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-top:1px">Gestão de Frota</p>
                     </div>
                 </div>
                 <button onclick="closeSidebar()"
                         class="md:hidden w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-                        style="color:#4a6a8a"
-                        onmouseover="this.style.background='rgba(255,255,255,0.06)'"
-                        onmouseout="this.style.background='transparent'">
+                        style="color:var(--text-muted)"
+                        onmouseover="this.style.background='rgba(0,0,0,0.05)';this.style.color='var(--text-secondary)'"
+                        onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">
                     <i class="fas fa-xmark text-sm"></i>
                 </button>
             </div>
@@ -415,7 +439,9 @@
             <div class="px-3 pt-4 pb-2">
                 <a href="{% url 'checklist_add' %}"
                    class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
-                   style="background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; box-shadow:0 2px 8px rgba(37,99,235,0.3)">
+                   style="background:rgba(63,185,80,0.12); color:#3fb950; border:1px solid rgba(63,185,80,0.2)"
+                   onmouseover="this.style.background='rgba(63,185,80,0.18)';this.style.borderColor='rgba(63,185,80,0.35)'"
+                   onmouseout="this.style.background='rgba(63,185,80,0.12)';this.style.borderColor='rgba(63,185,80,0.2)'">
                     <i class="fas fa-plus text-xs"></i>
                     Nova Inspeção
                 </a>
@@ -428,8 +454,7 @@
 
                 <a href="{% url 'checklist_list' %}"
                    class="nav-item {% if request.resolver_match.url_name == 'checklist_list' %}active{% endif %}">
-                    <span class="nav-icon {% if request.resolver_match.url_name == 'checklist_list' %}{% else %}{% endif %}"
-                          style="background:rgba(59,130,246,0.12); color:#60a5fa">
+                    <span class="nav-icon" style="background:rgba(56,139,253,0.12); color:#388bfd">
                         <i class="fas fa-chart-line"></i>
                     </span>
                     <span>Dashboard</span>
@@ -437,7 +462,7 @@
 
                 <a href="{% url 'abastecimento_list' %}"
                    class="nav-item {% if 'abastecimento' in request.resolver_match.url_name %}active{% endif %}">
-                    <span class="nav-icon" style="background:rgba(20,184,166,0.12); color:#2dd4bf">
+                    <span class="nav-icon" style="background:rgba(45,212,191,0.12); color:#2dd4bf">
                         <i class="fas fa-gas-pump"></i>
                     </span>
                     <span>Abastecimentos</span>
@@ -448,7 +473,7 @@
 
                 <a href="{% url 'veiculos_list' %}"
                    class="nav-item {% if 'veiculo' in request.resolver_match.url_name %}active{% endif %}">
-                    <span class="nav-icon" style="background:rgba(251,146,60,0.12); color:#fb923c">
+                    <span class="nav-icon" style="background:rgba(240,136,62,0.12); color:#f0883e">
                         <i class="fas fa-truck"></i>
                     </span>
                     <span>Frota de Veículos</span>
@@ -456,19 +481,19 @@
 
                 <a href="{% url 'funcionario_list' %}"
                    class="nav-item {% if 'funcionario' in request.resolver_match.url_name %}active{% endif %}">
-                    <span class="nav-icon" style="background:rgba(139,92,246,0.12); color:#a78bfa">
+                    <span class="nav-icon" style="background:rgba(163,113,247,0.12); color:#a371f7">
                         <i class="fas fa-users"></i>
                     </span>
                     <span>Colaboradores</span>
                     {% if alertas_cnh_total > 0 %}
                     <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-                          style="background:rgba(220,38,38,0.15); color:#f87171">{{ alertas_cnh_total }}</span>
+                          style="background:rgba(220,38,38,0.10); color:#dc2626">{{ alertas_cnh_total }}</span>
                     {% endif %}
                 </a>
 
                 <a href="{% url 'conformidade_frota' %}"
                    class="nav-item {% if request.resolver_match.url_name == 'conformidade_frota' %}active{% endif %}">
-                    <span class="nav-icon" style="background:rgba(34,197,94,0.12); color:#4ade80">
+                    <span class="nav-icon" style="background:rgba(63,185,80,0.12); color:#3fb950">
                         <i class="fas fa-calendar-check"></i>
                     </span>
                     <span>Conformidade</span>
@@ -476,19 +501,19 @@
 
                 <a href="{% url 'ocorrencias_list' %}"
                    class="nav-item {% if request.resolver_match.url_name == 'ocorrencias_list' or request.resolver_match.url_name == 'ocorrencia_update' %}active{% endif %}">
-                    <span class="nav-icon" style="background:rgba(239,68,68,0.12); color:#f87171">
+                    <span class="nav-icon" style="background:rgba(248,81,73,0.12); color:#f85149">
                         <i class="fas fa-triangle-exclamation"></i>
                     </span>
                     <span>Ocorrências</span>
                     {% if alertas_ocorrencias > 0 %}
                     <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-                          style="background:rgba(220,38,38,0.15); color:#f87171">{{ alertas_ocorrencias }}</span>
+                          style="background:rgba(220,38,38,0.10); color:#dc2626">{{ alertas_ocorrencias }}</span>
                     {% endif %}
                 </a>
 
                 <a href="{% url 'ordem_manutencao_list' %}"
                    class="nav-item {% if 'ordem_manutencao' in request.resolver_match.url_name %}active{% endif %}">
-                    <span class="nav-icon" style="background:rgba(234,179,8,0.12); color:#facc15">
+                    <span class="nav-icon" style="background:rgba(210,153,34,0.12); color:#d29922">
                         <i class="fas fa-wrench"></i>
                     </span>
                     <span>Manutenção</span>
@@ -496,7 +521,7 @@
 
                 <a href="{% url 'etiquetas_list' %}"
                    class="nav-item {% if request.resolver_match.url_name == 'etiquetas_list' %}active{% endif %}">
-                    <span class="nav-icon" style="background:rgba(99,102,241,0.12); color:#818cf8">
+                    <span class="nav-icon" style="background:rgba(129,140,248,0.12); color:#818cf8">
                         <i class="fas fa-qrcode"></i>
                     </span>
                     <span>Etiquetas QR Code</span>
@@ -506,24 +531,24 @@
             </nav>
 
             <!-- User card -->
-            <div class="px-3 py-3 border-t" style="border-color:rgba(255,255,255,0.05)">
+            <div class="px-3 py-3 border-t" style="border-color:var(--border)">
                 <div class="flex items-center gap-3 px-2 py-2">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0"
-                         style="background:linear-gradient(135deg,#1e3a5f,#0f2440); color:#60a5fa; border:1px solid rgba(96,165,250,0.15)">
+                         style="background:rgba(63,185,80,0.1); color:#3fb950; border:1px solid rgba(63,185,80,0.18)">
                         {{ user.username|slice:":2"|upper }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-white font-medium text-xs truncate leading-tight">{{ user.username }}</p>
-                        <p class="text-[10px] truncate mt-0.5" style="color:#2d4a6e">
+                        <p class="font-medium text-xs truncate leading-tight" style="color:var(--text-primary)">{{ user.username }}</p>
+                        <p class="text-[10px] truncate mt-0.5" style="color:var(--text-muted)">
                             {% if user.is_patrao %}Gestor · Administrador{% else %}Motorista · Operador{% endif %}
                         </p>
                     </div>
                     <button onclick="openLogoutModal()"
                             class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors flex-shrink-0"
-                            style="color:#2d4a6e"
+                            style="color:var(--text-muted)"
                             title="Sair"
-                            onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.color='#f87171'"
-                            onmouseout="this.style.background='transparent';this.style.color='#2d4a6e'">
+                            onmouseover="this.style.background='rgba(220,38,38,0.08)';this.style.color='#dc2626'"
+                            onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">
                         <i class="fas fa-arrow-right-from-bracket text-xs"></i>
                     </button>
                 </div>
@@ -541,24 +566,29 @@
 
                     <!-- Mobile hamburger -->
                     <button onclick="openSidebar()"
-                            class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all flex-shrink-0">
+                            class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl transition-all flex-shrink-0"
+                            style="color:var(--text-secondary)"
+                            onmouseover="this.style.background='rgba(0,0,0,0.05)';this.style.color='var(--text-primary)'"
+                            onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)'">
                         <i class="fas fa-bars-staggered text-sm"></i>
                     </button>
 
                     <!-- Page title -->
-                    <h1 class="flex-1 text-sm font-semibold text-slate-800 truncate">
+                    <h1 class="flex-1 text-sm font-semibold truncate" style="color:var(--text-primary)">
                         {% block header_title %}FrotaCheck{% endblock %}
                     </h1>
 
                     <!-- Right actions -->
                     <div class="flex items-center gap-2 flex-shrink-0">
 
-                        <!-- Alert bell (managers) -->
+                        <!-- Alert bell -->
                         {% if user.is_patrao and alertas_total_geral > 0 %}
-                        <div class="relative w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-default"
+                        <div class="relative w-9 h-9 flex items-center justify-center rounded-xl transition-all cursor-default"
+                             style="color:var(--text-secondary)"
                              title="{{ alertas_total_geral }} alerta(s) pendente(s)">
                             <i class="fas fa-bell text-sm"></i>
-                            <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-white">
+                            <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1"
+                                  style="outline:2px solid var(--bg-base)">
                                 {{ alertas_total_geral }}
                             </span>
                         </div>
@@ -567,25 +597,31 @@
                         <!-- User menu -->
                         <div class="relative" id="user-menu">
                             <button onclick="toggleUserMenu()"
-                                    class="flex items-center gap-2 pl-2 pr-3 h-9 rounded-xl hover:bg-slate-100 transition-all">
-                                <div class="w-6 h-6 rounded-lg bg-slate-900 flex items-center justify-center text-blue-400 text-[10px] font-bold flex-shrink-0">
+                                    class="flex items-center gap-2 pl-2 pr-3 h-9 rounded-xl transition-all"
+                                    onmouseover="this.style.background='rgba(0,0,0,0.05)'"
+                                    onmouseout="this.style.background='transparent'">
+                                <div class="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                                     style="background:rgba(63,185,80,0.15); color:#3fb950">
                                     {{ user.username|slice:":2"|upper }}
                                 </div>
-                                <span class="hidden sm:block text-xs font-semibold text-slate-700 truncate max-w-[100px]">{{ user.username }}</span>
-                                <i class="fas fa-chevron-down text-[9px] text-slate-400"></i>
+                                <span class="hidden sm:block text-xs font-semibold truncate max-w-[100px]" style="color:var(--text-secondary)">{{ user.username }}</span>
+                                <i class="fas fa-chevron-down text-[9px]" style="color:var(--text-muted)"></i>
                             </button>
 
                             <div id="user-dropdown"
-                                 class="hidden absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50"
-                                 style="box-shadow:0 8px 30px rgba(0,0,0,0.12)">
-                                <div class="px-4 py-3 border-b border-slate-50">
-                                    <p class="text-xs font-semibold text-slate-900 truncate">{{ user.username }}</p>
-                                    <p class="text-[11px] text-slate-400 mt-0.5">
+                                 class="hidden absolute right-0 top-full mt-2 w-52 rounded-xl overflow-hidden z-50"
+                                 style="background:var(--bg-card); border:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,0.10)">
+                                <div class="px-4 py-3 border-b" style="border-color:var(--border)">
+                                    <p class="text-xs font-semibold truncate" style="color:var(--text-primary)">{{ user.username }}</p>
+                                    <p class="text-[11px] mt-0.5" style="color:var(--text-muted)">
                                         {% if user.is_patrao %}Gestor / Administrador{% else %}Motorista / Operador{% endif %}
                                     </p>
                                 </div>
                                 <button onclick="openLogoutModal()"
-                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 font-medium hover:bg-red-50 transition-colors">
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors"
+                                        style="color:#dc2626"
+                                        onmouseover="this.style.background='rgba(220,38,38,0.06)'"
+                                        onmouseout="this.style.background='transparent'">
                                     <i class="fas fa-arrow-right-from-bracket text-sm"></i>
                                     Sair do sistema
                                 </button>
@@ -608,24 +644,32 @@
     ══════════════════════════ -->
     <div id="logoutModal"
          class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4"
-         style="background:rgba(15,23,42,0.6); backdrop-filter:blur(4px)">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+         style="background:rgba(0,0,0,0.75); backdrop-filter:blur(6px)">
+        <div class="rounded-2xl max-w-sm w-full p-6 shadow-2xl"
+             style="background:var(--bg-elevated); border:1px solid var(--border)">
             <div class="text-center">
-                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4"
+                     style="background:rgba(248,81,73,0.1); color:#f85149">
                     <i class="fas fa-arrow-right-from-bracket text-lg"></i>
                 </div>
-                <h3 class="text-base font-bold text-slate-900">Sair do Sistema?</h3>
-                <p class="text-sm text-slate-500 mt-1.5">Sua sessão será encerrada com segurança.</p>
+                <h3 class="text-base font-bold" style="color:var(--text-primary)">Sair do Sistema?</h3>
+                <p class="text-sm mt-1.5" style="color:var(--text-secondary)">Sua sessão será encerrada com segurança.</p>
             </div>
             <div class="mt-6 flex gap-3">
                 <button onclick="closeLogoutModal()"
-                        class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                        class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors"
+                        style="background:rgba(0,0,0,0.04); color:var(--text-secondary); border:1px solid var(--border)"
+                        onmouseover="this.style.background='rgba(0,0,0,0.07)'"
+                        onmouseout="this.style.background='rgba(0,0,0,0.04)'">
                     Cancelar
                 </button>
                 <form action="{% url 'logout' %}" method="post" class="flex-1">
                     {% csrf_token %}
                     <button type="submit"
-                            class="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                            class="w-full py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors"
+                            style="background:#da3633; color:white"
+                            onmouseover="this.style.background='#b91c1c'"
+                            onmouseout="this.style.background='#da3633'">
                         Confirmar Saída
                     </button>
                 </form>
