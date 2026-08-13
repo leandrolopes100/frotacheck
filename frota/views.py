@@ -11,7 +11,6 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.core.cache import cache
 from django.db.models import Count, OuterRef, Q, Subquery, Sum
-from django.forms import inlineformset_factory
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -19,11 +18,11 @@ from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, View
 
 from .forms import (
-    AbastecimentoForm, ChecklistForm, NovoFuncionarioForm,
+    AbastecimentoForm, ChecklistForm, FotoAvariaFormSet, NovoFuncionarioForm,
     OcorrenciaUpdateForm, OrdemManutencaoForm, VeiculoForm,
 )
 from .models import (
-    Abastecimento, Checklist, FotoAvaria, Funcionario,
+    Abastecimento, Checklist, Funcionario,
     OcorrenciaAvaria, OrdemManutencao, Usuario, Veiculo,
 )
 from .utils import (
@@ -41,13 +40,6 @@ class GestorRequiredMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         messages.error(self.request, "Acesso Negado: Apenas gestores podem realizar esta operação.")
         return redirect('checklist_list')
-
-
-FotoAvariaFormSet = inlineformset_factory(
-    Checklist, FotoAvaria,
-    fields=('descricao', 'imagem'),
-    extra=1, can_delete=True,
-)
 
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
