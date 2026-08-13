@@ -5,95 +5,121 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 {% endblock %}
 
-{% block title %}{{ veiculo.modelo }} {{ veiculo.placa }} | Frota Check{% endblock %}
+{% block title %}{{ veiculo.modelo }} {{ veiculo.placa }} | FrotaCheck{% endblock %}
 {% block header_title %}{{ veiculo.modelo }} — {{ veiculo.placa }}{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto py-10 px-4">
-    
-    <div class="mb-8">
-        <a href="{% url 'veiculos_list' %}" class="group flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-colors w-fit">
-            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Voltar à frota
+<div class="max-w-5xl mx-auto">
+
+    <!-- ── Nav ── -->
+    <div class="mb-6">
+        <a href="{% url 'veiculos_list' %}"
+           class="group flex items-center gap-2 text-xs font-semibold transition-colors w-fit mb-3"
+           style="color:#484f58"
+           onmouseover="this.style.color='#3fb950'"
+           onmouseout="this.style.color='#484f58'">
+            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+            Voltar à frota
         </a>
-        <div class="flex items-center gap-4 mt-3">
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">{{ veiculo.marca }} {{ veiculo.modelo }}</h1>
-            <span class="px-2.5 py-1 text-[10px] font-black bg-blue-50 text-blue-600 rounded border border-blue-100 uppercase tracking-widest">
+        <div class="flex items-center gap-4">
+            <h1 class="text-3xl font-bold tracking-tight" style="color:#e6edf3">{{ veiculo.marca }} {{ veiculo.modelo }}</h1>
+            <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded"
+                  style="color:#388bfd; background:rgba(56,139,253,0.1); border:1px solid rgba(56,139,253,0.2)">
                 {{ veiculo.placa }}
             </span>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        <div class="md:col-span-2 space-y-8">
-            <div class="bg-slate-100 rounded-xl aspect-video overflow-hidden border border-slate-200 shadow-inner">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- ── Left: Main content ── -->
+        <div class="md:col-span-2 space-y-6">
+
+            <!-- Foto -->
+            <div class="rounded-xl aspect-video overflow-hidden"
+                 style="background:#1c2128; border:1px solid rgba(255,255,255,0.08)">
                 {% if veiculo.foto %}
                     <img src="{{ veiculo.foto.url }}" class="w-full h-full object-cover">
                 {% else %}
-                    <div class="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
+                    <div class="w-full h-full flex flex-col items-center justify-center gap-2" style="color:#484f58">
                         <i class="fas fa-car text-3xl"></i>
                         <span class="text-[10px] uppercase font-bold tracking-widest">Sem imagem</span>
                     </div>
                 {% endif %}
             </div>
 
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-6 flex gap-4 items-start">
-                <i class="fas fa-info-circle text-blue-500 text-lg mt-0.5"></i>
+            <!-- Info box -->
+            <div class="rounded-xl p-5 flex gap-4 items-start"
+                 style="background:rgba(56,139,253,0.08); border:1px solid rgba(56,139,253,0.2)">
+                <i class="fas fa-info-circle text-lg mt-0.5" style="color:#388bfd"></i>
                 <div>
-                    <h3 class="text-blue-900 font-bold text-sm mb-1">Status Patrimonial</h3>
-                    <p class="text-sm text-blue-700/80 leading-relaxed">
-                        Este veículo, fabricado em <strong>{{ veiculo.ano }}</strong>, possui um valor de mercado (FIPE) atual de <strong>R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</strong>. 
+                    <h3 class="font-bold text-sm mb-1" style="color:#388bfd">Status Patrimonial</h3>
+                    <p class="text-sm leading-relaxed" style="color:#8b949e">
+                        Este veículo, fabricado em <strong style="color:#c9d1d9">{{ veiculo.ano }}</strong>, possui um valor de mercado (FIPE) atual de
+                        <strong style="color:#c9d1d9">R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</strong>.
                         Mantenha a documentação e as informações atualizadas para preservar o valor do ativo.
                     </p>
                 </div>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 text-[11px] font-black text-slate-500 uppercase tracking-widest">Especificações Técnicas</div>
-                <div class="divide-y divide-slate-100">
-                    <div class="px-6 py-4 flex justify-between">
-                        <span class="text-sm text-slate-500">Renavam</span>
-                        <span class="text-sm font-bold text-slate-900 font-mono">{{ veiculo.renavam }}</span>
+            <!-- Especificações -->
+            <div class="card overflow-hidden">
+                <div class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest"
+                     style="background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); color:#484f58">
+                    Especificações Técnicas
+                </div>
+                <div style="border-top:none">
+                    <div class="px-6 py-4 flex justify-between" style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <span class="text-sm" style="color:#8b949e">Renavam</span>
+                        <span class="text-sm font-bold font-mono" style="color:#e6edf3">{{ veiculo.renavam }}</span>
+                    </div>
+                    <div class="px-6 py-4 flex justify-between" style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <span class="text-sm" style="color:#8b949e">Valor FIPE</span>
+                        <span class="text-sm font-bold" style="color:#3fb950">R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</span>
                     </div>
                     <div class="px-6 py-4 flex justify-between">
-                        <span class="text-sm text-slate-500">Valor FIPE</span>
-                        <span class="text-sm font-bold text-emerald-600">R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</span>
-                    </div>
-                    <div class="px-6 py-4 flex justify-between">
-                        <span class="text-sm text-slate-500">Criado em</span>
-                        <span class="text-sm font-bold text-emerald-600">{{ veiculo.criado_em }}</span>
+                        <span class="text-sm" style="color:#8b949e">Criado em</span>
+                        <span class="text-sm font-bold" style="color:#c9d1d9">{{ veiculo.criado_em }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="space-y-5">
+        <!-- ── Right: Sidebar ── -->
+        <div class="space-y-4">
 
-            <!-- Status de bloqueio -->
+            <!-- Bloqueio -->
             {% if veiculo.bloqueado %}
-            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4">
+            <div class="rounded-xl p-4" style="background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.2)">
                 <div class="flex items-center gap-2 mb-2">
-                    <i class="fas fa-lock text-rose-500"></i>
-                    <span class="text-xs font-black text-rose-700 uppercase tracking-wider">Bloqueado para Despacho</span>
+                    <i class="fas fa-lock" style="color:#f85149"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider" style="color:#f85149">Bloqueado para Despacho</span>
                 </div>
-                <p class="text-xs text-rose-600 font-medium mb-3">{{ veiculo.motivo_bloqueio|default:"Motivo não informado." }}</p>
+                <p class="text-xs font-medium mb-3" style="color:#8b949e">{{ veiculo.motivo_bloqueio|default:"Motivo não informado." }}</p>
                 <form action="{% url 'veiculo_bloqueio' veiculo.pk %}" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="liberar">
-                    <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all">
+                    <button type="submit"
+                            class="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                            style="background:#da3633; color:white"
+                            onmouseover="this.style.background='#b91c1c'"
+                            onmouseout="this.style.background='#da3633'">
                         <i class="fas fa-lock-open mr-1"></i> Liberar Veículo
                     </button>
                 </form>
             </div>
             {% else %}
-            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                <p class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">Bloquear Despacho</p>
+            <div class="card p-4">
+                <p class="text-xs font-bold uppercase tracking-wider mb-3" style="color:#484f58">Bloquear Despacho</p>
                 <form action="{% url 'veiculo_bloqueio' veiculo.pk %}" method="POST" class="space-y-2">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="bloquear">
-                    <input type="text" name="motivo" placeholder="Motivo do bloqueio..."
-                           class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-rose-400 outline-none">
-                    <button type="submit" class="w-full py-2 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-black uppercase tracking-wider transition-all">
+                    <input type="text" name="motivo" placeholder="Motivo do bloqueio..." class="form-input text-xs">
+                    <button type="submit"
+                            class="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                            style="color:#f85149; border:1px solid rgba(248,81,73,0.2)"
+                            onmouseover="this.style.background='rgba(248,81,73,0.08)'"
+                            onmouseout="this.style.background='transparent'">
                         <i class="fas fa-lock mr-1"></i> Bloquear Veículo
                     </button>
                 </form>
@@ -101,74 +127,98 @@
             {% endif %}
 
             <!-- Gerenciamento -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-2.5">
+            <div class="card p-4 space-y-2">
                 <form action="{% url 'alternar_status' veiculo.pk %}" method="POST">
                     {% csrf_token %}
-                    <button type="submit" class="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all">
+                    <button type="submit"
+                            class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                            style="background:rgba(255,255,255,0.06); color:#c9d1d9; border:1px solid rgba(255,255,255,0.1)"
+                            onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.06)'">
                         <i class="fas fa-power-off"></i>
                         {% if veiculo.ativo %}Desativar{% else %}Ativar{% endif %} Veículo
                     </button>
                 </form>
-                <a href="{% url 'veiculo_update' veiculo.pk %}" class="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all">
+                <a href="{% url 'veiculo_update' veiculo.pk %}"
+                   class="btn-primary flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold uppercase tracking-wider">
                     <i class="fas fa-pen"></i> Editar Cadastro
                 </a>
-                <a href="{% url 'ordem_manutencao_add' %}?veiculo={{ veiculo.pk }}" class="flex items-center justify-center gap-2 w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all">
+                <a href="{% url 'ordem_manutencao_add' %}?veiculo={{ veiculo.pk }}"
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                   style="background:rgba(210,153,34,0.12); color:#d29922; border:1px solid rgba(210,153,34,0.2)"
+                   onmouseover="this.style.background='rgba(210,153,34,0.2)'"
+                   onmouseout="this.style.background='rgba(210,153,34,0.12)'">
                     <i class="fas fa-wrench"></i> Nova Ordem de Manutenção
                 </a>
-                <a href="{% url 'veiculo_delete' veiculo.pk %}" class="flex items-center justify-center gap-2 w-full py-2.5 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-black uppercase tracking-wider transition-all">
+                <a href="{% url 'veiculo_delete' veiculo.pk %}"
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                   style="color:#f85149; border:1px solid rgba(248,81,73,0.2)"
+                   onmouseover="this.style.background='rgba(248,81,73,0.08)'"
+                   onmouseout="this.style.background='transparent'">
                     <i class="fas fa-trash"></i> Excluir
                 </a>
             </div>
 
             <!-- Documentos -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-                <p class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">Documentos</p>
+            <div class="card p-4">
+                <p class="text-xs font-bold uppercase tracking-wider mb-3" style="color:#484f58">Documentos</p>
                 <div class="space-y-2">
+
                     <!-- CRLV -->
-                    <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                        <span class="text-xs font-bold text-slate-600">CRLV</span>
+                    <div class="flex items-center justify-between p-2.5 rounded-lg"
+                         style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07)">
+                        <span class="text-xs font-bold" style="color:#8b949e">CRLV</span>
                         {% if veiculo.vencimento_crlv %}
                             {% if crlv_vencido %}
-                            <span class="text-[10px] font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">Vencido {{ veiculo.vencimento_crlv|date:"d/m/Y" }}</span>
+                            <span class="badge badge-danger" style="font-size:9px">Vencido {{ veiculo.vencimento_crlv|date:"d/m/Y" }}</span>
                             {% elif crlv_vencendo %}
-                            <span class="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Vence {{ veiculo.vencimento_crlv|date:"d/m/Y" }}</span>
+                            <span class="badge badge-warning" style="font-size:9px">Vence {{ veiculo.vencimento_crlv|date:"d/m/Y" }}</span>
                             {% else %}
-                            <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">OK — {{ veiculo.vencimento_crlv|date:"d/m/Y" }}</span>
+                            <span class="badge badge-success" style="font-size:9px">OK — {{ veiculo.vencimento_crlv|date:"d/m/Y" }}</span>
                             {% endif %}
                         {% else %}
-                            <span class="text-[10px] font-bold text-slate-400">Não informado</span>
+                            <span class="text-[10px] font-bold" style="color:#484f58">Não informado</span>
                         {% endif %}
                     </div>
+
                     <!-- Seguro -->
-                    <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                        <span class="text-xs font-bold text-slate-600">Seguro</span>
+                    <div class="flex items-center justify-between p-2.5 rounded-lg"
+                         style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07)">
+                        <span class="text-xs font-bold" style="color:#8b949e">Seguro</span>
                         {% if veiculo.vencimento_seguro %}
                             {% if seguro_vencido %}
-                            <span class="text-[10px] font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">Vencido {{ veiculo.vencimento_seguro|date:"d/m/Y" }}</span>
+                            <span class="badge badge-danger" style="font-size:9px">Vencido {{ veiculo.vencimento_seguro|date:"d/m/Y" }}</span>
                             {% elif seguro_vencendo %}
-                            <span class="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Vence {{ veiculo.vencimento_seguro|date:"d/m/Y" }}</span>
+                            <span class="badge badge-warning" style="font-size:9px">Vence {{ veiculo.vencimento_seguro|date:"d/m/Y" }}</span>
                             {% else %}
-                            <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">OK — {{ veiculo.vencimento_seguro|date:"d/m/Y" }}</span>
+                            <span class="badge badge-success" style="font-size:9px">OK — {{ veiculo.vencimento_seguro|date:"d/m/Y" }}</span>
                             {% endif %}
                         {% else %}
-                            <span class="text-[10px] font-bold text-slate-400">Não informado</span>
+                            <span class="text-[10px] font-bold" style="color:#484f58">Não informado</span>
                         {% endif %}
                     </div>
+
                     <!-- Revisão KM -->
                     {% if veiculo.km_proxima_revisao %}
-                    <div class="flex items-center justify-between p-2.5 {% if alerta_km_revisao %}bg-amber-50 border-amber-200{% else %}bg-slate-50 border-slate-100{% endif %} rounded-lg border">
-                        <span class="text-xs font-bold text-slate-600">Revisão</span>
-                        <span class="text-[10px] font-black {% if alerta_km_revisao %}text-amber-600{% else %}text-slate-500{% endif %}">
+                    <div class="flex items-center justify-between p-2.5 rounded-lg"
+                         style="background:{% if alerta_km_revisao %}rgba(210,153,34,0.08){% else %}rgba(255,255,255,0.03){% endif %}; border:1px solid {% if alerta_km_revisao %}rgba(210,153,34,0.2){% else %}rgba(255,255,255,0.07){% endif %}">
+                        <span class="text-xs font-bold" style="color:#8b949e">Revisão</span>
+                        <span class="text-[10px] font-bold" style="color:{% if alerta_km_revisao %}#d29922{% else %}#484f58{% endif %}">
                             {% if alerta_km_revisao %}<i class="fas fa-exclamation-triangle mr-1"></i>{% endif %}
                             {{ veiculo.km_proxima_revisao|intcomma }} km
                         </span>
                     </div>
                     {% endif %}
+
                     <!-- Arquivo CRLV -->
                     {% if veiculo.documento_impresso %}
-                    <a href="{{ veiculo.documento_impresso.url }}" target="_blank" class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:border-blue-400 transition-all">
-                        <i class="fas fa-file-pdf text-red-500"></i>
-                        <span class="text-xs font-bold text-slate-700">Visualizar CRLV (PDF)</span>
+                    <a href="{{ veiculo.documento_impresso.url }}" target="_blank"
+                       class="flex items-center gap-2 p-2.5 rounded-lg transition-all"
+                       style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07)"
+                       onmouseover="this.style.borderColor='rgba(56,139,253,0.3)'"
+                       onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+                        <i class="fas fa-file-pdf" style="color:#f85149"></i>
+                        <span class="text-xs font-bold" style="color:#c9d1d9">Visualizar CRLV (PDF)</span>
                     </a>
                     {% endif %}
                 </div>
@@ -176,16 +226,18 @@
 
             <!-- Ocorrências abertas -->
             {% if total_ocorrencias_abertas > 0 %}
-            <div class="bg-rose-50 border border-rose-200 rounded-xl p-5">
+            <div class="rounded-xl p-4" style="background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.2)">
                 <div class="flex items-center justify-between mb-3">
-                    <p class="text-xs font-black text-rose-700 uppercase tracking-wider">{{ total_ocorrencias_abertas }} Ocorrência{{ total_ocorrencias_abertas|pluralize }} Aberta{{ total_ocorrencias_abertas|pluralize }}</p>
-                    <a href="{% url 'ocorrencias_list' %}?veiculo={{ veiculo.placa }}" class="text-[10px] font-black text-rose-600 uppercase tracking-wider hover:underline">Ver todas →</a>
+                    <p class="text-xs font-bold uppercase tracking-wider" style="color:#f85149">{{ total_ocorrencias_abertas }} Ocorrência{{ total_ocorrencias_abertas|pluralize }} Aberta{{ total_ocorrencias_abertas|pluralize }}</p>
+                    <a href="{% url 'ocorrencias_list' %}?veiculo={{ veiculo.placa }}"
+                       class="text-[10px] font-bold uppercase tracking-wider hover:underline"
+                       style="color:#f85149">Ver todas →</a>
                 </div>
                 {% for oc in ocorrencias_abertas %}
-                <div class="flex items-center justify-between py-2 border-t border-rose-100 first:border-0">
-                    <p class="text-xs font-medium text-rose-700 truncate flex-1 mr-2">{{ oc.descricao|truncatechars:40 }}</p>
-                    <span class="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0
-                        {% if oc.status == 'aguardando' %}bg-rose-100 text-rose-600{% else %}bg-amber-100 text-amber-600{% endif %}">
+                <div class="flex items-center justify-between py-2" style="border-top:1px solid rgba(248,81,73,0.15)">
+                    <p class="text-xs font-medium truncate flex-1 mr-2" style="color:#8b949e">{{ oc.descricao|truncatechars:40 }}</p>
+                    <span class="badge flex-shrink-0" style="font-size:9px;
+                        {% if oc.status == 'aguardando' %}background:rgba(248,81,73,0.12);color:#f85149{% else %}background:rgba(210,153,34,0.12);color:#d29922{% endif %}">
                         {{ oc.get_status_display }}
                     </span>
                 </div>
@@ -195,80 +247,89 @@
 
         </div>
     </div>
-</div>
 
-{% if tem_km_historico %}
-<div class="max-w-5xl mx-auto mt-8 px-4">
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <!-- ── KM Chart ── -->
+    {% if tem_km_historico %}
+    <div class="card p-6 mt-6">
         <div class="flex items-center justify-between mb-5">
             <div>
-                <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em]">Histórico</p>
-                <h3 class="text-base font-black text-slate-800">Evolução da Quilometragem</h3>
+                <p class="text-[10px] uppercase font-bold tracking-[0.2em]" style="color:#484f58">Histórico</p>
+                <h3 class="text-base font-bold" style="color:#e6edf3">Evolução da Quilometragem</h3>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(56,139,253,0.12); color:#388bfd">
                 <i class="fas fa-tachometer-alt"></i>
             </div>
         </div>
         <canvas id="kmChart" height="80"></canvas>
     </div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const ctx = document.getElementById('kmChart');
-    if (!ctx) return;
-    new Chart(ctx.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: {{ km_labels|safe }},
-            datasets: [{
-                label: 'KM',
-                data: {{ km_data|safe }},
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59,130,246,0.08)',
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#3b82f6',
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                borderWidth: 2,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { display: false }, ticks: { font: { weight: '700', size: 11 } } },
-                y: {
-                    beginAtZero: false,
-                    grid: { color: '#f1f5f9' },
-                    ticks: {
-                        font: { size: 11 },
-                        callback: (v) => v.toLocaleString('pt-BR') + ' km'
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('kmChart');
+        if (!ctx) return;
+        new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ km_labels|safe }},
+                datasets: [{
+                    label: 'KM',
+                    data: {{ km_data|safe }},
+                    borderColor: '#388bfd',
+                    backgroundColor: 'rgba(56,139,253,0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#388bfd',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { weight: '700', size: 11 }, color: '#484f58' }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: 'rgba(255,255,255,0.06)' },
+                        ticks: {
+                            font: { size: 11 },
+                            color: '#484f58',
+                            callback: (v) => v.toLocaleString('pt-BR') + ' km'
+                        }
                     }
                 }
             }
-        }
+        });
     });
-});
-</script>
-{% endif %}
+    </script>
+    {% endif %}
 
-<div class="bg-white border-2 border-slate-100 rounded-[2.5rem] p-8 shadow-sm text-center">
-    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">QR Code de Inspeção</p>
-    
-    <div class="bg-slate-50 inline-block p-6 rounded-[2rem] mb-6 border border-slate-100">
-        <img src="{% url 'veiculo_qrcode' veiculo.id %}" 
-             alt="QR Code {{ veiculo.placa }}" 
-             class="w-48 h-48 object-contain">
+    <!-- ── QR Code ── -->
+    <div class="card p-8 mt-6 text-center">
+        <p class="text-[10px] font-bold uppercase tracking-[0.2em] mb-6" style="color:#484f58">QR Code de Inspeção</p>
+
+        <div class="inline-block p-6 rounded-[2rem] mb-6" style="background:white; border:1px solid rgba(255,255,255,0.1)">
+            <img src="{% url 'veiculo_qrcode' veiculo.id %}"
+                 alt="QR Code {{ veiculo.placa }}"
+                 class="w-48 h-48 object-contain">
+        </div>
+
+        <h3 class="text-2xl font-bold mb-2" style="color:#e6edf3">{{ veiculo.placa }}</h3>
+        <p class="text-sm font-bold mb-6 px-4" style="color:#484f58">
+            Aponte a câmera para iniciar um novo checklist deste veículo.
+        </p>
+
+        <a href="{% url 'etiquetas_list' %}"
+           class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors"
+           style="color:#388bfd"
+           onmouseover="this.style.color='#3fb950'"
+           onmouseout="this.style.color='#388bfd'">
+            <i class="fas fa-print"></i> Ir para central de etiquetas
+        </a>
     </div>
 
-    <h3 class="text-2xl font-black text-slate-900 mb-2">{{ veiculo.placa }}</h3>
-    <p class="text-sm font-bold text-slate-500 mb-8 px-4">
-        Aponte a câmera para iniciar um novo checklist deste veículo.
-    </p>
-
-    <a href="{% url 'etiquetas_list' %}" class="inline-flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-widest hover:text-blue-700 transition-colors">
-        <i class="fas fa-print"></i> Ir para central de etiquetas
-    </a>
 </div>
 {% endblock %}
