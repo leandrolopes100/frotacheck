@@ -56,26 +56,28 @@
 
     <!-- ── Filtros ── -->
     <div class="card p-3 mb-4">
-        <form method="GET" class="flex flex-wrap gap-3 items-center">
-            <div class="relative flex-1 min-w-[200px]">
+        <form method="GET" class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
+            <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs" style="color:#484f58"></i>
                 <input type="text" name="veiculo" value="{{ request.GET.veiculo }}" placeholder="Filtrar por placa ou modelo..."
                        class="form-input pl-10 text-sm">
             </div>
-            <select name="status" class="form-input min-w-[170px] text-sm cursor-pointer">
+            <select name="status" class="form-input w-full sm:w-auto sm:min-w-[170px] text-sm cursor-pointer">
                 <option value="">Todos os Status</option>
                 <option value="aguardando" {% if request.GET.status == 'aguardando' %}selected{% endif %}>Aguardando Reparo</option>
                 <option value="em_reparo" {% if request.GET.status == 'em_reparo' %}selected{% endif %}>Em Reparo</option>
                 <option value="resolvida" {% if request.GET.status == 'resolvida' %}selected{% endif %}>Resolvida</option>
             </select>
-            <button type="submit" class="btn-primary text-xs">
-                <i class="fas fa-filter"></i> Filtrar
-            </button>
-            {% if request.GET.veiculo or request.GET.status %}
-            <a href="?" class="btn-secondary text-xs" style="color:#f85149">
-                <i class="fas fa-times"></i>
-            </a>
-            {% endif %}
+            <div class="flex gap-2">
+                <button type="submit" class="btn-primary text-xs flex-1 sm:flex-initial justify-center">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                {% if request.GET.veiculo or request.GET.status %}
+                <a href="?" class="btn-secondary text-xs" style="color:#f85149">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
         </form>
     </div>
 

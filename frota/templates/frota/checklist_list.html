@@ -247,22 +247,22 @@
 
     <!-- ── Filtros ── -->
     <div class="card p-3 mb-4">
-        <form method="GET" action="." class="flex flex-wrap md:flex-nowrap items-center gap-2">
+        <form method="GET" action="." class="flex flex-col sm:flex-row sm:flex-wrap md:flex-nowrap items-stretch sm:items-center gap-2">
 
-            <div class="relative flex-1 min-w-[200px]">
+            <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
                 <i class="fas fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs" style="color:#484f58"></i>
                 <input type="text" name="veiculo" value="{{ request.GET.veiculo }}"
                        placeholder="Buscar por placa ou modelo..."
                        class="form-input pl-10 text-sm">
             </div>
 
-            <select name="status" class="form-input min-w-[140px] text-sm cursor-pointer">
+            <select name="status" class="form-input w-full sm:w-auto sm:min-w-[140px] text-sm cursor-pointer">
                 <option value="">Todos os Status</option>
                 <option value="ok"     {% if request.GET.status == 'ok' %}selected{% endif %}>Sem Avaria</option>
                 <option value="avaria" {% if request.GET.status == 'avaria' %}selected{% endif %}>Com Avaria</option>
             </select>
 
-            <select name="tipo" class="form-input min-w-[140px] text-sm cursor-pointer">
+            <select name="tipo" class="form-input w-full sm:w-auto sm:min-w-[140px] text-sm cursor-pointer">
                 <option value="">Todos os Tipos</option>
                 <option value="pre_viagem" {% if request.GET.tipo == 'pre_viagem' %}selected{% endif %}>Pré-Viagem</option>
                 <option value="pos_viagem" {% if request.GET.tipo == 'pos_viagem' %}selected{% endif %}>Pós-Viagem</option>
@@ -270,7 +270,7 @@
             </select>
 
             <div class="flex gap-2 flex-shrink-0">
-                <button type="submit" class="btn-primary text-xs">
+                <button type="submit" class="btn-primary text-xs flex-1 sm:flex-initial justify-center">
                     <i class="fas fa-filter"></i> Filtrar
                 </button>
                 {% if request.GET.veiculo or request.GET.status or request.GET.tipo %}

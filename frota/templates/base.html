@@ -21,8 +21,24 @@
     </script>
     <style>
         /* ============================================
-           FROTACHECK — SLATE LIGHT DESIGN SYSTEM
-        ============================================ */
+           FROTACHECK — DESIGN SYSTEM (tema escuro)
+           ============================================
+           Border-radius: 8px em botões/inputs (.btn-primary,
+           .btn-secondary, .form-input), 10px em cards (.card,
+           .kpi-card, .pagination), 12px+ em elementos maiores/
+           destacados (modais, telas de confirmação, CTAs "hero"
+           como o botão de login e o de envio do checklist).
+
+           Elevação: cards usam borda sutil (var(--border)) +
+           sombra leve; elementos "flutuantes" sobre outros
+           (dropdowns, modais) usam sombra mais forte
+           (0 8px 24px rgba(0,0,0,0.10)) em vez de borda.
+
+           Tipografia: títulos de página text-2xl font-bold;
+           títulos de seção/card text-xs font-bold uppercase
+           tracking-widest; rótulo de campo text-xs font-semibold
+           uppercase; corpo text-sm; legenda/meta text-xs.
+           ============================================ */
 
         :root {
             --bg-base:      #0d1117;
@@ -507,7 +523,7 @@
         ══════════════════════════ -->
         <aside id="sidebar"
                class="fixed inset-y-0 left-0 z-50 flex flex-col sidebar-transition -translate-x-full md:translate-x-0"
-               style="width:256px">
+               style="width:256px; max-width:82vw">
 
             <!-- Logo -->
             <div class="flex items-center justify-between px-4 py-4 border-b" style="border-color:var(--border)">
@@ -668,14 +684,48 @@
 
                         <!-- Alert bell -->
                         {% if user.is_patrao and alertas_total_geral > 0 %}
-                        <div class="relative w-9 h-9 flex items-center justify-center rounded-xl transition-all cursor-default"
-                             style="color:var(--text-secondary)"
-                             title="{{ alertas_total_geral }} alerta(s) pendente(s)">
-                            <i class="fas fa-bell text-sm"></i>
-                            <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1"
-                                  style="outline:2px solid var(--bg-base)">
-                                {{ alertas_total_geral }}
-                            </span>
+                        <div class="relative" id="alert-menu">
+                            <button onclick="toggleAlertMenu()"
+                                    class="relative w-9 h-9 flex items-center justify-center rounded-xl transition-all menu-toggle-hover"
+                                    style="color:var(--text-secondary)"
+                                    title="{{ alertas_total_geral }} alerta(s) pendente(s)">
+                                <i class="fas fa-bell text-sm"></i>
+                                <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1"
+                                      style="outline:2px solid var(--bg-base)">
+                                    {{ alertas_total_geral }}
+                                </span>
+                            </button>
+
+                            <div id="alert-dropdown"
+                                 class="hidden absolute right-0 top-full mt-2 w-64 rounded-xl overflow-hidden z-50"
+                                 style="background:var(--bg-card); border:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,0.10)">
+                                <div class="px-4 py-3 border-b" style="border-color:var(--border)">
+                                    <p class="text-xs font-semibold" style="color:var(--text-primary)">Alertas pendentes</p>
+                                </div>
+                                <div class="py-1">
+                                    {% if alertas_cnh_total > 0 %}
+                                    <a href="{% url 'funcionario_list' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors row-hover-fill">
+                                        <i class="fas fa-id-card text-sm" style="color:#d29922"></i>
+                                        <span class="flex-1" style="color:var(--text-secondary)">CNH vencendo/vencida</span>
+                                        <span class="text-xs font-bold" style="color:#d29922">{{ alertas_cnh_total }}</span>
+                                    </a>
+                                    {% endif %}
+                                    {% if alertas_docs_total > 0 %}
+                                    <a href="{% url 'veiculos_list' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors row-hover-fill">
+                                        <i class="fas fa-file-lines text-sm" style="color:#388bfd"></i>
+                                        <span class="flex-1" style="color:var(--text-secondary)">Documentos de veículo</span>
+                                        <span class="text-xs font-bold" style="color:#388bfd">{{ alertas_docs_total }}</span>
+                                    </a>
+                                    {% endif %}
+                                    {% if alertas_ocorrencias > 0 %}
+                                    <a href="{% url 'ocorrencias_list' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors row-hover-fill">
+                                        <i class="fas fa-triangle-exclamation text-sm" style="color:#f85149"></i>
+                                        <span class="flex-1" style="color:var(--text-secondary)">Ocorrências abertas</span>
+                                        <span class="text-xs font-bold" style="color:#f85149">{{ alertas_ocorrencias }}</span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         {% endif %}
 
@@ -785,6 +835,16 @@
             const menu = document.getElementById('user-menu');
             if (menu && !menu.contains(e.target))
                 document.getElementById('user-dropdown').classList.add('hidden');
+        });
+
+        // ── Dropdown de alertas ──
+        function toggleAlertMenu() {
+            document.getElementById('alert-dropdown').classList.toggle('hidden');
+        }
+        document.addEventListener('click', e => {
+            const menu = document.getElementById('alert-menu');
+            if (menu && !menu.contains(e.target))
+                document.getElementById('alert-dropdown').classList.add('hidden');
         });
 
         // ── Loading state genérico ao enviar formulários (POST) ──
