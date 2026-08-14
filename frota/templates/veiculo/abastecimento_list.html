@@ -135,10 +135,20 @@
         </p>
         <nav class="pagination">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="fas fa-chevron-left text-xs"></i></a>
+            <a href="?page={{ page_obj.previous_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+               class="page-btn"><i class="fas fa-chevron-left text-xs"></i></a>
             {% endif %}
+            {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="page-btn active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+                       class="page-btn">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="fas fa-chevron-right text-xs"></i></a>
+            <a href="?page={{ page_obj.next_page_number }}{% for k,v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}"
+               class="page-btn"><i class="fas fa-chevron-right text-xs"></i></a>
             {% endif %}
         </nav>
     </div>
