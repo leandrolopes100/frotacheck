@@ -10,13 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; }
-        body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #f1f5f9; }
+        body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #0d1117; }
 
         .brand-panel {
-            background-color: #0f172a;
+            background-color: #0d1117;
             background-image:
-                radial-gradient(ellipse 70% 50% at 50% -10%, rgba(22,163,74,0.25) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 85% 95%, rgba(37,99,235,0.08) 0%, transparent 50%);
+                radial-gradient(ellipse 70% 50% at 50% -10%, rgba(63,185,80,0.25) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 85% 95%, rgba(56,139,253,0.08) 0%, transparent 50%);
         }
 
         .dot-pattern {
@@ -27,20 +27,20 @@
         .form-input {
             width: 100%;
             padding: 10px 14px 10px 40px;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: #0d1117;
+            border: 1px solid rgba(255,255,255,0.12);
             border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
-            color: #0f172a;
+            color: #e6edf3;
             transition: border-color 0.15s, box-shadow 0.15s;
             outline: none;
         }
         .form-input:focus {
-            border-color: #16a34a;
-            box-shadow: 0 0 0 3px rgba(22,163,74,0.10);
+            border-color: #3fb950;
+            box-shadow: 0 0 0 3px rgba(63,185,80,0.10);
         }
-        .form-input::placeholder { color: #94a3b8; }
+        .form-input::placeholder { color: #8b949e; }
 
         @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
         .animate-fade-up { animation: fadeUp 0.4s ease forwards; }
@@ -54,25 +54,25 @@
     <div class="hidden lg:flex lg:w-[48%] brand-panel dot-pattern relative flex-col justify-between p-12 overflow-hidden">
 
         <!-- Decorative rings -->
-        <div class="absolute -top-32 -right-32 w-80 h-80 border rounded-full" style="border-color:rgba(22,163,74,0.10)"></div>
-        <div class="absolute -top-20 -right-20 w-56 h-56 border rounded-full" style="border-color:rgba(22,163,74,0.07)"></div>
-        <div class="absolute bottom-0 -left-24 w-72 h-72 border rounded-full" style="border-color:rgba(37,99,235,0.06)"></div>
+        <div class="absolute -top-32 -right-32 w-80 h-80 border rounded-full" style="border-color:rgba(63,185,80,0.10)"></div>
+        <div class="absolute -top-20 -right-20 w-56 h-56 border rounded-full" style="border-color:rgba(63,185,80,0.07)"></div>
+        <div class="absolute bottom-0 -left-24 w-72 h-72 border rounded-full" style="border-color:rgba(56,139,253,0.06)"></div>
 
         <!-- Top: Logo -->
         <div class="relative z-10">
             <div class="flex items-center gap-3 mb-12">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                     style="background:linear-gradient(135deg,#238636,#196c2e); box-shadow:0 6px 20px rgba(22,163,74,0.3)">
+                     style="background:linear-gradient(135deg,#238636,#196c2e); box-shadow:0 6px 20px rgba(63,185,80,0.3)">
                     <i class="fas fa-truck-fast text-white text-base"></i>
                 </div>
-                <span class="text-xl font-bold tracking-tight" style="color:#f1f5f9">FROTA<span style="color:#4ade80;font-weight:300">CHECK</span></span>
+                <span class="text-xl font-bold tracking-tight" style="color:#e6edf3">FROTA<span style="color:#3fb950;font-weight:300">CHECK</span></span>
             </div>
 
-            <h1 class="text-4xl font-bold leading-tight mb-4" style="color:#f1f5f9">
+            <h1 class="text-4xl font-bold leading-tight mb-4" style="color:#e6edf3">
                 Gestão de Frota<br>
-                <span style="color:#4ade80">Inteligente</span>
+                <span style="color:#3fb950">Inteligente</span>
             </h1>
-            <p class="text-sm leading-relaxed max-w-sm" style="color:#64748b">
+            <p class="text-sm leading-relaxed max-w-sm" style="color:#8b949e">
                 Controle total da sua frota com checklists digitais, verificação por GPS e relatórios de conformidade em tempo real.
             </p>
         </div>
@@ -82,45 +82,45 @@
 
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                     style="background:rgba(37,99,235,0.15); border:1px solid rgba(37,99,235,0.25)">
-                    <i class="fas fa-location-dot text-sm" style="color:#60a5fa"></i>
+                     style="background:rgba(56,139,253,0.15); border:1px solid rgba(56,139,253,0.25)">
+                    <i class="fas fa-location-dot text-sm" style="color:#388bfd"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-semibold" style="color:#e2e8f0">GPS em cada inspeção</p>
-                    <p class="text-xs mt-0.5" style="color:#64748b">Localização verificada e registrada automaticamente</p>
+                    <p class="text-sm font-semibold" style="color:#c9d1d9">GPS em cada inspeção</p>
+                    <p class="text-xs mt-0.5" style="color:#8b949e">Localização verificada e registrada automaticamente</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                     style="background:rgba(22,163,74,0.15); border:1px solid rgba(22,163,74,0.25)">
-                    <i class="fas fa-camera text-sm" style="color:#4ade80"></i>
+                     style="background:rgba(63,185,80,0.15); border:1px solid rgba(63,185,80,0.25)">
+                    <i class="fas fa-camera text-sm" style="color:#3fb950"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-semibold" style="color:#e2e8f0">Evidências fotográficas</p>
-                    <p class="text-xs mt-0.5" style="color:#64748b">Registro visual de avarias em tempo real</p>
+                    <p class="text-sm font-semibold" style="color:#c9d1d9">Evidências fotográficas</p>
+                    <p class="text-xs mt-0.5" style="color:#8b949e">Registro visual de avarias em tempo real</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                      style="background:rgba(240,136,62,0.15); border:1px solid rgba(240,136,62,0.25)">
-                    <i class="fas fa-chart-line text-sm" style="color:#fb923c"></i>
+                    <i class="fas fa-chart-line text-sm" style="color:#f0883e"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-semibold" style="color:#e2e8f0">Dashboard analítico</p>
-                    <p class="text-xs mt-0.5" style="color:#64748b">Métricas de saúde e conformidade ao vivo</p>
+                    <p class="text-sm font-semibold" style="color:#c9d1d9">Dashboard analítico</p>
+                    <p class="text-xs mt-0.5" style="color:#8b949e">Métricas de saúde e conformidade ao vivo</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                      style="background:rgba(163,113,247,0.15); border:1px solid rgba(163,113,247,0.25)">
-                    <i class="fas fa-qrcode text-sm" style="color:#c084fc"></i>
+                    <i class="fas fa-qrcode text-sm" style="color:#a371f7"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-semibold" style="color:#e2e8f0">QR Code por veículo</p>
-                    <p class="text-xs mt-0.5" style="color:#64748b">Inspeção rápida via celular</p>
+                    <p class="text-sm font-semibold" style="color:#c9d1d9">QR Code por veículo</p>
+                    <p class="text-xs mt-0.5" style="color:#8b949e">Inspeção rápida via celular</p>
                 </div>
             </div>
 
@@ -130,11 +130,11 @@
         <div class="relative z-10 flex items-center gap-3 pt-6 border-t" style="border-color:rgba(255,255,255,0.07)">
             <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                  style="background:rgba(240,136,62,0.15); border:1px solid rgba(240,136,62,0.2)">
-                <i class="fas fa-building text-sm" style="color:#fb923c"></i>
+                <i class="fas fa-building text-sm" style="color:#f0883e"></i>
             </div>
             <div>
-                <p class="text-[9px] font-semibold uppercase tracking-wider mb-0.5" style="color:#64748b">Parceiro Oficial</p>
-                <p class="text-sm font-bold" style="color:#fb923c">PELLIZZER <span style="color:#64748b; font-weight:400">Transportes</span></p>
+                <p class="text-[9px] font-semibold uppercase tracking-wider mb-0.5" style="color:#8b949e">Parceiro Oficial</p>
+                <p class="text-sm font-bold" style="color:#f0883e">PELLIZZER <span style="color:#8b949e; font-weight:400">Transportes</span></p>
             </div>
         </div>
 
@@ -143,7 +143,7 @@
     <!-- ══════════════════════════
          RIGHT PANEL — Form
     ══════════════════════════ -->
-    <div class="flex-1 flex items-center justify-center p-8 sm:p-12" style="background:#ffffff; border-left:1px solid #e2e8f0">
+    <div class="flex-1 flex items-center justify-center p-8 sm:p-12" style="background:#0d1117; border-left:1px solid rgba(255,255,255,0.08)">
         <div class="w-full max-w-sm animate-fade-up">
 
             <!-- Mobile logo -->
@@ -152,24 +152,24 @@
                      style="background:linear-gradient(135deg,#238636,#196c2e)">
                     <i class="fas fa-truck-fast text-white text-sm"></i>
                 </div>
-                <span class="text-xl font-bold tracking-tight" style="color:#0f172a">FROTA<span style="color:#16a34a;font-weight:300">CHECK</span></span>
+                <span class="text-xl font-bold tracking-tight" style="color:#e6edf3">FROTA<span style="color:#3fb950;font-weight:300">CHECK</span></span>
             </div>
 
             <!-- Heading -->
             <div class="mb-8">
-                <h2 class="text-2xl font-bold mb-1" style="color:#0f172a">Bem-vindo de volta</h2>
-                <p class="text-sm" style="color:#64748b">Acesse o painel operacional da sua frota.</p>
+                <h2 class="text-2xl font-bold mb-1" style="color:#e6edf3">Bem-vindo de volta</h2>
+                <p class="text-sm" style="color:#8b949e">Acesse o painel operacional da sua frota.</p>
             </div>
 
             <!-- Error -->
             {% if form.errors %}
             <div class="flex items-center gap-3 p-3.5 mb-6 rounded-xl border"
-                 style="background:rgba(220,38,38,0.06); border-color:rgba(220,38,38,0.18)">
+                 style="background:rgba(248,81,73,0.06); border-color:rgba(248,81,73,0.18)">
                 <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background:rgba(220,38,38,0.10)">
-                    <i class="fas fa-circle-exclamation text-xs" style="color:#dc2626"></i>
+                     style="background:rgba(248,81,73,0.10)">
+                    <i class="fas fa-circle-exclamation text-xs" style="color:#f85149"></i>
                 </div>
-                <p class="text-sm font-medium" style="color:#dc2626">Usuário ou senha incorretos. Tente novamente.</p>
+                <p class="text-sm font-medium" style="color:#f85149">Usuário ou senha incorretos. Tente novamente.</p>
             </div>
             {% endif %}
 
@@ -179,11 +179,11 @@
 
                 <!-- Username -->
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color:#475569">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color:#8b949e">
                         Usuário
                     </label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="color:#94a3b8">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="color:#8b949e">
                             <i class="fas fa-user text-sm"></i>
                         </span>
                         <input id="id_username" name="username" type="text"
@@ -195,11 +195,11 @@
 
                 <!-- Password -->
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color:#475569">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color:#8b949e">
                         Senha
                     </label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="color:#94a3b8">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="color:#8b949e">
                             <i class="fas fa-lock text-sm"></i>
                         </span>
                         <input id="id_password" name="password" type="password"
@@ -208,9 +208,9 @@
                                placeholder="••••••••">
                         <button type="button" id="toggle-password"
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors"
-                                style="color:#94a3b8"
-                                onmouseover="this.style.color='#475569'"
-                                onmouseout="this.style.color='#94a3b8'">
+                                style="color:#8b949e"
+                                onmouseover="this.style.color='#c9d1d9'"
+                                onmouseout="this.style.color='#8b949e'">
                             <i class="fas fa-eye text-sm" id="eye-icon"></i>
                         </button>
                     </div>
@@ -219,16 +219,16 @@
                 <!-- Submit -->
                 <button type="submit"
                         class="w-full py-3 text-sm font-semibold rounded-xl transition-all mt-2"
-                        style="background:linear-gradient(135deg,#16a34a,#15803d); color:#ffffff; box-shadow:0 4px 14px rgba(22,163,74,0.25)"
-                        onmouseover="this.style.boxShadow='0 6px 20px rgba(22,163,74,0.40)'"
-                        onmouseout="this.style.boxShadow='0 4px 14px rgba(22,163,74,0.25)'">
+                        style="background:linear-gradient(135deg,#3fb950,#238636); color:#ffffff; box-shadow:0 4px 14px rgba(63,185,80,0.25)"
+                        onmouseover="this.style.boxShadow='0 6px 20px rgba(63,185,80,0.40)'"
+                        onmouseout="this.style.boxShadow='0 4px 14px rgba(63,185,80,0.25)'">
                     <i class="fas fa-arrow-right-to-bracket mr-2"></i>
                     Entrar no Sistema
                 </button>
 
             </form>
 
-            <p class="text-center text-xs mt-10" style="color:#94a3b8">
+            <p class="text-center text-xs mt-10" style="color:#8b949e">
                 &copy; Dev. Leandro Lopes &nbsp;·&nbsp; FrotaCheck v1.0
             </p>
         </div>

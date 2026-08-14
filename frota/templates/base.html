@@ -25,24 +25,28 @@
         ============================================ */
 
         :root {
-            --bg-base:      #f1f5f9;
-            --bg-sidebar:   #ffffff;
-            --bg-card:      #ffffff;
-            --bg-elevated:  #f8fafc;
-            --bg-input:     #ffffff;
-            --border:       #e2e8f0;
-            --border-soft:  #f1f5f9;
-            --text-primary:   #0f172a;
-            --text-secondary: #475569;
-            --text-muted:     #94a3b8;
-            --green:      #16a34a;
-            --green-glow: rgba(22,163,74,0.12);
-            --red:        #dc2626;
-            --red-dim:    rgba(220,38,38,0.10);
-            --yellow:     #d97706;
-            --yellow-dim: rgba(217,119,6,0.10);
-            --blue:       #2563eb;
-            --blue-dim:   rgba(37,99,235,0.10);
+            --bg-base:      #0d1117;
+            --bg-sidebar:   #161b22;
+            --bg-card:      #161b22;
+            --bg-elevated:  #1c2128;
+            --bg-input:     #0d1117;
+            --border:       rgba(255,255,255,0.08);
+            --border-soft:  rgba(255,255,255,0.05);
+            --border-input: rgba(255,255,255,0.12);
+            --text-primary:   #e6edf3;
+            --text-secondary: #c9d1d9;
+            --text-muted:     #8b949e;
+            --text-dim:       #484f58;
+            --green:      #3fb950;
+            --green-glow: rgba(63,185,80,0.12);
+            --red:        #f85149;
+            --red-dim:    rgba(248,81,73,0.10);
+            --red-fill:       #da3633;
+            --red-fill-hover: #b91c1c;
+            --yellow:     #d29922;
+            --yellow-dim: rgba(210,153,34,0.10);
+            --blue:       #388bfd;
+            --blue-dim:   rgba(56,139,253,0.10);
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -63,7 +67,7 @@
         }
 
         .sidebar-scroll::-webkit-scrollbar { width: 3px; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
         .sidebar-transition { transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
 
         .nav-section {
@@ -93,12 +97,12 @@
         }
 
         .nav-item:hover {
-            background: rgba(0,0,0,0.04);
+            background: rgba(255,255,255,0.04);
             color: var(--text-primary);
         }
 
         .nav-item.active {
-            background: rgba(22,163,74,0.08);
+            background: rgba(63,185,80,0.08);
             color: var(--green);
         }
 
@@ -126,7 +130,7 @@
 
         /* ── Header ── */
         .app-header {
-            background: rgba(255,255,255,0.95);
+            background: rgba(13,17,23,0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
@@ -148,7 +152,7 @@
             gap: 7px;
             padding: 8px 16px;
             background: var(--green);
-            color: #ffffff;
+            color: #0d1117;
             border-radius: 8px;
             font-size: 13.5px;
             font-weight: 600;
@@ -156,11 +160,11 @@
             cursor: pointer;
             text-decoration: none;
             transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-            box-shadow: 0 1px 4px rgba(22,163,74,0.25);
+            box-shadow: 0 1px 4px rgba(63,185,80,0.25);
         }
         .btn-primary:hover {
-            background: #15803d;
-            box-shadow: 0 4px 16px rgba(22,163,74,0.3);
+            background: #238636;
+            box-shadow: 0 4px 16px rgba(63,185,80,0.3);
         }
         .btn-primary:active { transform: scale(0.98); }
 
@@ -169,7 +173,7 @@
             align-items: center;
             gap: 7px;
             padding: 8px 16px;
-            background: #ffffff;
+            background: rgba(255,255,255,0.05);
             color: var(--text-secondary);
             border-radius: 8px;
             font-size: 13.5px;
@@ -182,7 +186,7 @@
         }
         .btn-secondary:hover {
             background: var(--bg-elevated);
-            border-color: #cbd5e1;
+            border-color: rgba(255,255,255,0.15);
             color: var(--text-primary);
         }
 
@@ -197,11 +201,11 @@
             font-weight: 600;
             white-space: nowrap;
         }
-        .badge-success { background: rgba(22,163,74,0.10);  color: #15803d; }
-        .badge-danger  { background: rgba(220,38,38,0.10);  color: var(--red); }
-        .badge-warning { background: rgba(217,119,6,0.10);  color: #b45309; }
-        .badge-info    { background: rgba(37,99,235,0.10);  color: var(--blue); }
-        .badge-neutral { background: rgba(0,0,0,0.06);      color: var(--text-secondary); }
+        .badge-success { background: rgba(63,185,80,0.10);  color: var(--green); }
+        .badge-danger  { background: rgba(248,81,73,0.10);  color: var(--red); }
+        .badge-warning { background: rgba(210,153,34,0.10); color: var(--yellow); }
+        .badge-info    { background: rgba(56,139,253,0.10); color: var(--blue); }
+        .badge-neutral { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
 
         /* ── Alert banners ── */
         .alert-item {
@@ -212,9 +216,9 @@
             border-radius: 10px;
             border-width: 1px;
         }
-        .alert-danger  { background: rgba(220,38,38,0.06);  border-color: rgba(220,38,38,0.18); }
-        .alert-warning { background: rgba(217,119,6,0.06);  border-color: rgba(217,119,6,0.18); }
-        .alert-neutral { background: rgba(0,0,0,0.03);      border-color: var(--border); }
+        .alert-danger  { background: rgba(248,81,73,0.06);  border-color: rgba(248,81,73,0.18); }
+        .alert-warning { background: rgba(210,153,34,0.06); border-color: rgba(210,153,34,0.18); }
+        .alert-neutral { background: rgba(255,255,255,0.03); border-color: var(--border); }
 
         /* ── Toasts ── */
         @keyframes toastIn  { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -242,7 +246,7 @@
             color: var(--text-secondary);
         }
         .data-table tbody tr:last-child td { border-bottom: none; }
-        .data-table tbody tr:hover td { background: rgba(0,0,0,0.02); }
+        .data-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
         /* ── KPI Cards ── */
         .kpi-card {
@@ -270,7 +274,7 @@
             width: 100%;
             padding: 9px 14px;
             background: var(--bg-input);
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-input);
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
@@ -280,7 +284,7 @@
         }
         .form-input:focus {
             border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(22,163,74,0.10);
+            box-shadow: 0 0 0 3px rgba(63,185,80,0.10);
         }
         .form-input::placeholder { color: var(--text-muted); }
 
@@ -308,8 +312,8 @@
             transition: all 0.12s;
             text-decoration: none;
         }
-        .page-btn:hover { background: rgba(0,0,0,0.04); color: var(--green); }
-        .page-btn.active { background: var(--green); color: #ffffff; font-weight: 700; }
+        .page-btn:hover { background: rgba(255,255,255,0.04); color: var(--green); }
+        .page-btn.active { background: var(--green); color: #0d1117; font-weight: 700; }
 
         /* ── Global form styles (applies to all templates) ── */
         .main-area input[type="text"],
@@ -325,7 +329,7 @@
             width: 100%;
             padding: 9px 12px;
             background: var(--bg-input);
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-input);
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
@@ -337,12 +341,12 @@
         .main-area select:focus,
         .main-area textarea:focus {
             border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(22,163,74,0.10);
+            box-shadow: 0 0 0 3px rgba(63,185,80,0.10);
         }
         .main-area input::placeholder,
         .main-area textarea::placeholder { color: var(--text-muted); }
         .main-area select { cursor: pointer; }
-        .main-area select option { background: #ffffff; color: var(--text-primary); }
+        .main-area select option { background: var(--bg-input); color: var(--text-primary); }
         .main-area label {
             display: block;
             font-size: 12px;
@@ -431,7 +435,7 @@
                 <button onclick="closeSidebar()"
                         class="md:hidden w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
                         style="color:var(--text-muted)"
-                        onmouseover="this.style.background='rgba(0,0,0,0.05)';this.style.color='var(--text-secondary)'"
+                        onmouseover="this.style.background='rgba(255,255,255,0.05)';this.style.color='var(--text-secondary)'"
                         onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">
                     <i class="fas fa-xmark text-sm"></i>
                 </button>
@@ -489,7 +493,7 @@
                     <span>Colaboradores</span>
                     {% if alertas_cnh_total > 0 %}
                     <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-                          style="background:rgba(220,38,38,0.10); color:#dc2626">{{ alertas_cnh_total }}</span>
+                          style="background:rgba(248,81,73,0.10); color:#f85149">{{ alertas_cnh_total }}</span>
                     {% endif %}
                 </a>
 
@@ -509,7 +513,7 @@
                     <span>Ocorrências</span>
                     {% if alertas_ocorrencias > 0 %}
                     <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-                          style="background:rgba(220,38,38,0.10); color:#dc2626">{{ alertas_ocorrencias }}</span>
+                          style="background:rgba(248,81,73,0.10); color:#f85149">{{ alertas_ocorrencias }}</span>
                     {% endif %}
                 </a>
 
@@ -549,7 +553,7 @@
                             class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors flex-shrink-0"
                             style="color:var(--text-muted)"
                             title="Sair"
-                            onmouseover="this.style.background='rgba(220,38,38,0.08)';this.style.color='#dc2626'"
+                            onmouseover="this.style.background='rgba(248,81,73,0.08)';this.style.color='#f85149'"
                             onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">
                         <i class="fas fa-arrow-right-from-bracket text-xs"></i>
                     </button>
@@ -570,7 +574,7 @@
                     <button onclick="openSidebar()"
                             class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl transition-all flex-shrink-0"
                             style="color:var(--text-secondary)"
-                            onmouseover="this.style.background='rgba(0,0,0,0.05)';this.style.color='var(--text-primary)'"
+                            onmouseover="this.style.background='rgba(255,255,255,0.05)';this.style.color='var(--text-primary)'"
                             onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)'">
                         <i class="fas fa-bars-staggered text-sm"></i>
                     </button>
@@ -600,7 +604,7 @@
                         <div class="relative" id="user-menu">
                             <button onclick="toggleUserMenu()"
                                     class="flex items-center gap-2 pl-2 pr-3 h-9 rounded-xl transition-all"
-                                    onmouseover="this.style.background='rgba(0,0,0,0.05)'"
+                                    onmouseover="this.style.background='rgba(255,255,255,0.05)'"
                                     onmouseout="this.style.background='transparent'">
                                 <div class="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0"
                                      style="background:rgba(63,185,80,0.15); color:#3fb950">
@@ -621,8 +625,8 @@
                                 </div>
                                 <button onclick="openLogoutModal()"
                                         class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors"
-                                        style="color:#dc2626"
-                                        onmouseover="this.style.background='rgba(220,38,38,0.06)'"
+                                        style="color:#f85149"
+                                        onmouseover="this.style.background='rgba(248,81,73,0.06)'"
                                         onmouseout="this.style.background='transparent'">
                                     <i class="fas fa-arrow-right-from-bracket text-sm"></i>
                                     Sair do sistema
@@ -660,9 +664,9 @@
             <div class="mt-6 flex gap-3">
                 <button onclick="closeLogoutModal()"
                         class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors"
-                        style="background:rgba(0,0,0,0.04); color:var(--text-secondary); border:1px solid var(--border)"
-                        onmouseover="this.style.background='rgba(0,0,0,0.07)'"
-                        onmouseout="this.style.background='rgba(0,0,0,0.04)'">
+                        style="background:rgba(255,255,255,0.04); color:var(--text-secondary); border:1px solid var(--border)"
+                        onmouseover="this.style.background='rgba(255,255,255,0.07)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.04)'">
                     Cancelar
                 </button>
                 <form action="{% url 'logout' %}" method="post" class="flex-1">
