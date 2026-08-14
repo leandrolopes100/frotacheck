@@ -18,10 +18,8 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 print:grid-cols-2 print:gap-4">
         {% for veiculo in veiculos %}
-        <div class="rounded-[2rem] p-6 text-center border-2 transition-all break-inside-avoid"
-             style="background:white; border-color:#e2e8f0; color:#0f172a"
-             onmouseover="this.style.borderColor='#3fb950';this.style.boxShadow='0 4px 20px rgba(63,185,80,0.15)'"
-             onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+        <div class="rounded-[2rem] p-6 text-center border-2 transition-all break-inside-avoid etiqueta-card"
+             style="background:white; border-color:#e2e8f0; color:#0f172a">
 
             <div class="flex items-center justify-center gap-2 mb-4">
                 <div class="w-6 h-6 rounded-lg flex items-center justify-center text-white text-[10px]"
@@ -50,6 +48,7 @@
 </div>
 
 <style>
+    .etiqueta-card:hover { border-color: #3fb950 !important; box-shadow: 0 4px 20px rgba(63,185,80,0.15); }
     @media print {
         aside, header, .print\:hidden { display: none !important; }
         main, .md\:pl-72 { padding: 0 !important; margin: 0 !important; }

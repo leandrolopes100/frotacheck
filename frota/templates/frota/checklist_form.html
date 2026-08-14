@@ -11,10 +11,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors"
-                   style="color:#484f58"
-                   onmouseover="this.style.color='#3fb950'"
-                   onmouseout="this.style.color='#484f58'">Dashboard</a>
+                <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors link-muted">Dashboard</a>
                 <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
                 <span class="text-xs font-semibold" style="color:#3fb950">Nova Inspeção</span>
             </div>
@@ -172,10 +169,8 @@
                         <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="4"
                               style="background:rgba(255,255,255,0.06); color:#484f58">0/4</span>
                         <button type="button" onclick="marcarTodos('group-iluminacao', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors"
-                                style="color:#3fb950"
-                                onmouseover="this.style.background='rgba(63,185,80,0.1)'"
-                                onmouseout="this.style.background='transparent'">
+                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
+                                style="color:#3fb950">
                             Marcar todos
                         </button>
                     </div>
@@ -201,10 +196,8 @@
                         <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="6"
                               style="background:rgba(255,255,255,0.06); color:#484f58">0/6</span>
                         <button type="button" onclick="marcarTodos('group-mecanica', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors"
-                                style="color:#3fb950"
-                                onmouseover="this.style.background='rgba(63,185,80,0.1)'"
-                                onmouseout="this.style.background='transparent'">
+                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
+                                style="color:#3fb950">
                             Marcar todos
                         </button>
                     </div>
@@ -232,10 +225,8 @@
                         <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="7"
                               style="background:rgba(255,255,255,0.06); color:#484f58">0/7</span>
                         <button type="button" onclick="marcarTodos('group-externa', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors"
-                                style="color:#3fb950"
-                                onmouseover="this.style.background='rgba(63,185,80,0.1)'"
-                                onmouseout="this.style.background='transparent'">
+                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
+                                style="color:#3fb950">
                             Marcar todos
                         </button>
                     </div>
@@ -264,10 +255,8 @@
                         <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="10"
                               style="background:rgba(255,255,255,0.06); color:#484f58">0/10</span>
                         <button type="button" onclick="marcarTodos('group-interna', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors"
-                                style="color:#3fb950"
-                                onmouseover="this.style.background='rgba(63,185,80,0.1)'"
-                                onmouseout="this.style.background='transparent'">
+                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
+                                style="color:#3fb950">
                             Marcar todos
                         </button>
                     </div>
@@ -310,10 +299,7 @@
                     {% for hidden in foto_form.hidden_fields %}{{ hidden }}{% endfor %}
 
                     <button type="button" onclick="removeFoto(this)"
-                            class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-                            style="color:#484f58"
-                            onmouseover="this.style.background='rgba(248,81,73,0.1)';this.style.color='#f85149'"
-                            onmouseout="this.style.background='transparent';this.style.color='#484f58'">
+                            class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--red"
                         <i class="fas fa-xmark text-sm"></i>
                     </button>
 
@@ -411,10 +397,7 @@
 <template id="foto-template">
     <div class="foto-item relative rounded-xl overflow-hidden foto-new" style="border:1px solid rgba(255,255,255,0.08); background:#1c2128">
         <button type="button" onclick="removeFoto(this)"
-                class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-                style="color:#484f58"
-                onmouseover="this.style.background='rgba(248,81,73,0.1)';this.style.color='#f85149'"
-                onmouseout="this.style.background='transparent';this.style.color='#484f58'">
+                class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--red"
             <i class="fas fa-xmark text-sm"></i>
         </button>
 

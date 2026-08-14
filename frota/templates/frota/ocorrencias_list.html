@@ -9,10 +9,7 @@
     <!-- ── Page header ── -->
     <div class="mb-6">
         <div class="flex items-center gap-2 mb-1">
-            <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors"
-               style="color:#484f58"
-               onmouseover="this.style.color='#3fb950'"
-               onmouseout="this.style.color='#484f58'">Início</a>
+            <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors link-muted">Início</a>
             <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
             <span class="text-xs font-semibold" style="color:#3fb950">Ocorrências</span>
         </div>
@@ -128,19 +125,13 @@
             <!-- Ações -->
             <div class="flex items-center gap-2 flex-shrink-0">
                 <a href="{% url 'checklist_detail' oc.checklist.pk %}"
-                   class="p-2 rounded-xl transition-all"
-                   style="color:#484f58"
-                   onmouseover="this.style.background='rgba(56,139,253,0.1)';this.style.color='#388bfd'"
-                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                   class="p-2 rounded-xl transition-all icon-btn icon-btn--blue"
                    title="Ver inspeção original">
                     <i class="far fa-eye text-base"></i>
                 </a>
                 {% if oc.status != 'resolvida' %}
                 <a href="{% url 'ocorrencia_update' oc.pk %}"
-                   class="p-2 rounded-xl transition-all"
-                   style="color:#484f58"
-                   onmouseover="this.style.background='rgba(210,153,34,0.1)';this.style.color='#d29922'"
-                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                   class="p-2 rounded-xl transition-all icon-btn icon-btn--yellow"
                    title="Atualizar status">
                     <i class="fas fa-pen text-base"></i>
                 </a>

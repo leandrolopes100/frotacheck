@@ -57,10 +57,8 @@
                     <p class="text-xs mt-0.5" style="color:#8b949e">Motoristas com habilitação vencida não devem conduzir.</p>
                 </div>
                 <a href="{% url 'funcionario_list' %}"
-                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors"
-                   style="background:rgba(248,81,73,0.1); color:#f85149; border:1px solid rgba(248,81,73,0.2)"
-                   onmouseover="this.style.background='rgba(248,81,73,0.18)'"
-                   onmouseout="this.style.background='rgba(248,81,73,0.1)'">
+                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors pill-hover-red"
+                   style="background:rgba(248,81,73,0.1); color:#f85149; border:1px solid rgba(248,81,73,0.2)">
                     Ver <i class="fas fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
@@ -76,10 +74,8 @@
                     <p class="text-xs mt-0.5" style="color:#8b949e">Providencie a renovação com antecedência.</p>
                 </div>
                 <a href="{% url 'funcionario_list' %}"
-                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors"
-                   style="background:rgba(210,153,34,0.1); color:#d29922; border:1px solid rgba(210,153,34,0.2)"
-                   onmouseover="this.style.background='rgba(210,153,34,0.18)'"
-                   onmouseout="this.style.background='rgba(210,153,34,0.1)'">
+                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors pill-hover-yellow"
+                   style="background:rgba(210,153,34,0.1); color:#d29922; border:1px solid rgba(210,153,34,0.2)">
                     Ver <i class="fas fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
@@ -95,10 +91,8 @@
                     <p class="text-xs mt-0.5" style="color:#8b949e">CRLV ou Seguro irregular — regularize antes de circular.</p>
                 </div>
                 <a href="{% url 'veiculos_list' %}"
-                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors"
-                   style="background:rgba(248,81,73,0.1); color:#f85149; border:1px solid rgba(248,81,73,0.2)"
-                   onmouseover="this.style.background='rgba(248,81,73,0.18)'"
-                   onmouseout="this.style.background='rgba(248,81,73,0.1)'">
+                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors pill-hover-red"
+                   style="background:rgba(248,81,73,0.1); color:#f85149; border:1px solid rgba(248,81,73,0.2)">
                     Ver <i class="fas fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
@@ -114,10 +108,8 @@
                     <p class="text-xs mt-0.5" style="color:#8b949e">Verifique o abastecimento antes da próxima viagem.</p>
                 </div>
                 <a href="{% url 'abastecimento_add' %}"
-                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors"
-                   style="background:rgba(240,136,62,0.1); color:#f0883e; border:1px solid rgba(240,136,62,0.2)"
-                   onmouseover="this.style.background='rgba(240,136,62,0.18)'"
-                   onmouseout="this.style.background='rgba(240,136,62,0.1)'">
+                   class="text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 flex items-center gap-1.5 transition-colors pill-hover-orange"
+                   style="background:rgba(240,136,62,0.1); color:#f0883e; border:1px solid rgba(240,136,62,0.2)">
                     Registrar <i class="fas fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
@@ -367,27 +359,18 @@
                         <td class="text-right">
                             <div class="flex justify-end items-center gap-1">
                                 <a href="{% url 'checklist_detail' c.id %}"
-                                   class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
-                                   style="color:#484f58"
-                                   onmouseover="this.style.background='rgba(56,139,253,0.1)';this.style.color='#388bfd'"
-                                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                                   class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--blue"
                                    title="Visualizar">
                                     <i class="fas fa-eye text-sm"></i>
                                 </a>
                                 {% if user.is_patrao %}
                                 <a href="{% url 'checklist_update' c.id %}"
-                                   class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
-                                   style="color:#484f58"
-                                   onmouseover="this.style.background='rgba(63,185,80,0.1)';this.style.color='#3fb950'"
-                                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                                   class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--green"
                                    title="Editar">
                                     <i class="fas fa-pen text-sm"></i>
                                 </a>
                                 <a href="{% url 'checklist_delete' c.id %}"
-                                   class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
-                                   style="color:#484f58"
-                                   onmouseover="this.style.background='rgba(248,81,73,0.1)';this.style.color='#f85149'"
-                                   onmouseout="this.style.background='transparent';this.style.color='#484f58'"
+                                   class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--red"
                                    title="Excluir">
                                     <i class="fas fa-trash text-sm"></i>
                                 </a>
@@ -432,10 +415,8 @@
         <div class="md:hidden divide-y" style="border-color:rgba(255,255,255,0.05)">
             {% for c in checklists %}
             <a href="{% url 'checklist_detail' c.id %}"
-               class="block p-4 transition-colors"
-               style="color:inherit"
-               onmouseover="this.style.background='rgba(255,255,255,0.02)'"
-               onmouseout="this.style.background='transparent'">
+               class="block p-4 transition-colors row-hover-fill"
+               style="color:inherit">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <div class="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0"

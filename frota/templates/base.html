@@ -365,6 +365,95 @@
             background: var(--border);
             margin: 10px 12px;
         }
+
+        /* ── Utilitários de :hover (substituem onmouseover/onmouseout inline) ── */
+
+        /* Link de breadcrumb/navegação secundária ("Início", títulos de trilha) */
+        .link-muted { color: var(--text-dim); transition: color 0.12s; }
+        .link-muted:hover { color: var(--green); }
+
+        /* Ícone/link de destaque (placa, "voltar") que esverdeia no hover */
+        .link-accent-hover { color: var(--blue); transition: color 0.12s; }
+        .link-accent-hover:hover { color: var(--green); }
+
+        /* Botão de ícone de ação em tabela/card (editar, ver, etc.) */
+        .icon-btn { color: var(--text-dim); transition: background 0.12s, color 0.12s; }
+        .icon-btn--blue:hover    { background: rgba(56,139,253,0.1);  color: var(--blue); }
+        .icon-btn--green:hover   { background: rgba(63,185,80,0.1);   color: var(--green); }
+        .icon-btn--red:hover     { background: rgba(248,81,73,0.1);   color: var(--red); }
+        .icon-btn--yellow:hover  { background: rgba(210,153,34,0.1);  color: var(--yellow); }
+        .icon-btn--neutral       { color: var(--text-muted); }
+        .icon-btn--neutral:hover { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+
+        /* Botão outline vermelho (ex.: liberar bloqueio, sair do dropdown) */
+        .btn-outline-red { color: var(--red); transition: background 0.12s; }
+        .btn-outline-red:hover { background: rgba(248,81,73,0.08); }
+
+        /* Preenchimento sólido vermelho (confirmar exclusão, confirmar saída) */
+        .btn-danger-fill { background: var(--red-fill); color: #fff; transition: background 0.12s; }
+        .btn-danger-fill:hover { background: var(--red-fill-hover); }
+
+        /* Botão "Cancelar" nas telas de confirmação de exclusão */
+        .btn-cancel-outline {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            transition: background 0.12s;
+        }
+        .btn-cancel-outline:hover { background: rgba(255,255,255,0.09); }
+
+        /* Pílula de status/alerta que só clareia no hover, mesma cor */
+        .pill-hover-red:hover    { background: rgba(248,81,73,0.18)  !important; }
+        .pill-hover-yellow:hover { background: rgba(210,153,34,0.18) !important; }
+        .pill-hover-orange:hover { background: rgba(240,136,62,0.18) !important; }
+
+        /* Linha/área que só recebe um leve destaque de fundo no hover */
+        .row-hover-fill:hover { background: rgba(255,255,255,0.02); }
+
+        /* Específicos do base.html (sidebar/header/modal) */
+        .nav-cta-hover:hover { background: rgba(63,185,80,0.18); border-color: rgba(63,185,80,0.35); }
+        .icon-btn--strong { color: var(--text-secondary); }
+        .icon-btn--strong:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .menu-toggle-hover:hover { background: rgba(255,255,255,0.05); }
+
+        /* Botão secundário neutro (ex.: liberar bloqueio de veículo) */
+        .btn-neutral-outline:hover { background: rgba(255,255,255,0.1); }
+
+        /* Card/link cuja borda apenas destaca de cor no hover */
+        .border-hover-blue:hover { border-color: rgba(56,139,253,0.3) !important; }
+
+        /* Texto verde que só ganha um fundo sutil no hover (mesma cor) */
+        .fill-hover-green:hover { background: rgba(63,185,80,0.1); }
+
+        /* Card de listagem (grid) que "levanta" no hover */
+        .card-hover-lift { box-shadow: none; transition: box-shadow 0.2s, border-color 0.2s; }
+        .card-hover-lift:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.14); }
+
+        /* Botão flutuante sobre imagem (ex.: ações no card de veículo) */
+        .overlay-btn--yellow:hover { color: var(--yellow) !important; }
+        .overlay-btn--red:hover { color: var(--red) !important; }
+
+        /* Botão "voltar" (seta/chevron no cabeçalho de telas de edição) */
+        .icon-btn--back { color: var(--text-dim); transition: background 0.12s, color 0.12s; }
+        .icon-btn--back:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+
+        /* Texto apagado que vira vermelho no hover (ex.: remover item) */
+        .text-hover-red { color: var(--text-dim); transition: color 0.12s; }
+        .text-hover-red:hover { color: var(--red); }
+
+        /* Área de soltar arquivo (upload) — só a borda destaca no hover */
+        .dropzone-hover:hover { border-color: rgba(63,185,80,0.4) !important; }
+
+        /* Elemento que só perde opacidade no hover */
+        .opacity-hover { transition: opacity 0.12s; }
+        .opacity-hover:hover { opacity: 0.8; }
+
+        /* Card cuja borda clareia no hover (grid de listagem) */
+        .border-hover-white { transition: border-color 0.2s; }
+        .border-hover-white:hover { border-color: rgba(255,255,255,0.14); }
+
+        /* Área de soltar arquivo com texto que também vira verde no hover */
+        .dropzone-hover-text:hover { border-color: rgba(63,185,80,0.4) !important; color: var(--green) !important; }
     </style>
 
     <!-- Toast logic -->
@@ -433,10 +522,7 @@
                     </div>
                 </div>
                 <button onclick="closeSidebar()"
-                        class="md:hidden w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-                        style="color:var(--text-muted)"
-                        onmouseover="this.style.background='rgba(255,255,255,0.05)';this.style.color='var(--text-secondary)'"
-                        onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">
+                        class="md:hidden w-7 h-7 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--neutral">
                     <i class="fas fa-xmark text-sm"></i>
                 </button>
             </div>
@@ -444,10 +530,8 @@
             <!-- Nav CTA -->
             <div class="px-3 pt-4 pb-2">
                 <a href="{% url 'checklist_add' %}"
-                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
-                   style="background:rgba(63,185,80,0.12); color:#3fb950; border:1px solid rgba(63,185,80,0.2)"
-                   onmouseover="this.style.background='rgba(63,185,80,0.18)';this.style.borderColor='rgba(63,185,80,0.35)'"
-                   onmouseout="this.style.background='rgba(63,185,80,0.12)';this.style.borderColor='rgba(63,185,80,0.2)'">
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-semibold transition-all nav-cta-hover"
+                   style="background:rgba(63,185,80,0.12); color:#3fb950; border:1px solid rgba(63,185,80,0.2)">
                     <i class="fas fa-plus text-xs"></i>
                     Nova Inspeção
                 </a>
@@ -550,11 +634,9 @@
                         </p>
                     </div>
                     <button onclick="openLogoutModal()"
-                            class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors flex-shrink-0"
+                            class="w-7 h-7 flex items-center justify-center rounded-lg transition-colors flex-shrink-0 icon-btn icon-btn--red"
                             style="color:var(--text-muted)"
-                            title="Sair"
-                            onmouseover="this.style.background='rgba(248,81,73,0.08)';this.style.color='#f85149'"
-                            onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">
+                            title="Sair">
                         <i class="fas fa-arrow-right-from-bracket text-xs"></i>
                     </button>
                 </div>
@@ -572,10 +654,7 @@
 
                     <!-- Mobile hamburger -->
                     <button onclick="openSidebar()"
-                            class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl transition-all flex-shrink-0"
-                            style="color:var(--text-secondary)"
-                            onmouseover="this.style.background='rgba(255,255,255,0.05)';this.style.color='var(--text-primary)'"
-                            onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)'">
+                            class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl transition-all flex-shrink-0 icon-btn--strong">
                         <i class="fas fa-bars-staggered text-sm"></i>
                     </button>
 
@@ -603,9 +682,7 @@
                         <!-- User menu -->
                         <div class="relative" id="user-menu">
                             <button onclick="toggleUserMenu()"
-                                    class="flex items-center gap-2 pl-2 pr-3 h-9 rounded-xl transition-all"
-                                    onmouseover="this.style.background='rgba(255,255,255,0.05)'"
-                                    onmouseout="this.style.background='transparent'">
+                                    class="flex items-center gap-2 pl-2 pr-3 h-9 rounded-xl transition-all menu-toggle-hover">
                                 <div class="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0"
                                      style="background:rgba(63,185,80,0.15); color:#3fb950">
                                     {{ user.username|slice:":2"|upper }}
@@ -624,10 +701,7 @@
                                     </p>
                                 </div>
                                 <button onclick="openLogoutModal()"
-                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors"
-                                        style="color:#f85149"
-                                        onmouseover="this.style.background='rgba(248,81,73,0.06)'"
-                                        onmouseout="this.style.background='transparent'">
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors btn-outline-red">
                                     <i class="fas fa-arrow-right-from-bracket text-sm"></i>
                                     Sair do sistema
                                 </button>
@@ -663,19 +737,13 @@
             </div>
             <div class="mt-6 flex gap-3">
                 <button onclick="closeLogoutModal()"
-                        class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors"
-                        style="background:rgba(255,255,255,0.04); color:var(--text-secondary); border:1px solid var(--border)"
-                        onmouseover="this.style.background='rgba(255,255,255,0.07)'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+                        class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors btn-cancel-outline">
                     Cancelar
                 </button>
                 <form action="{% url 'logout' %}" method="post" class="flex-1">
                     {% csrf_token %}
                     <button type="submit"
-                            class="w-full py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors"
-                            style="background:#da3633; color:white"
-                            onmouseover="this.style.background='#b91c1c'"
-                            onmouseout="this.style.background='#da3633'">
+                            class="w-full py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors btn-danger-fill">
                         Confirmar Saída
                     </button>
                 </form>

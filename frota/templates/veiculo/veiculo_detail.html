@@ -14,10 +14,7 @@
     <!-- ── Nav ── -->
     <div class="mb-6">
         <a href="{% url 'veiculos_list' %}"
-           class="group flex items-center gap-2 text-xs font-semibold transition-colors w-fit mb-3"
-           style="color:#484f58"
-           onmouseover="this.style.color='#3fb950'"
-           onmouseout="this.style.color='#484f58'">
+           class="group flex items-center gap-2 text-xs font-semibold transition-colors w-fit mb-3 link-muted">
             <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
             Voltar à frota
         </a>
@@ -100,10 +97,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="action" value="liberar">
                     <button type="submit"
-                            class="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                            style="background:#da3633; color:white"
-                            onmouseover="this.style.background='#b91c1c'"
-                            onmouseout="this.style.background='#da3633'">
+                            class="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all btn-danger-fill">
                         <i class="fas fa-lock-open mr-1"></i> Liberar Veículo
                     </button>
                 </form>
@@ -116,10 +110,8 @@
                     <input type="hidden" name="action" value="bloquear">
                     <input type="text" name="motivo" placeholder="Motivo do bloqueio..." class="form-input text-xs">
                     <button type="submit"
-                            class="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                            style="color:#f85149; border:1px solid rgba(248,81,73,0.2)"
-                            onmouseover="this.style.background='rgba(248,81,73,0.08)'"
-                            onmouseout="this.style.background='transparent'">
+                            class="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all btn-outline-red"
+                            style="color:#f85149; border:1px solid rgba(248,81,73,0.2)">
                         <i class="fas fa-lock mr-1"></i> Bloquear Veículo
                     </button>
                 </form>
@@ -131,10 +123,8 @@
                 <form action="{% url 'alternar_status' veiculo.pk %}" method="POST">
                     {% csrf_token %}
                     <button type="submit"
-                            class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                            style="background:rgba(255,255,255,0.06); color:#c9d1d9; border:1px solid rgba(255,255,255,0.1)"
-                            onmouseover="this.style.background='rgba(255,255,255,0.1)'"
-                            onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                            class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all btn-neutral-outline"
+                            style="background:rgba(255,255,255,0.06); color:#c9d1d9; border:1px solid rgba(255,255,255,0.1)">
                         <i class="fas fa-power-off"></i>
                         {% if veiculo.ativo %}Desativar{% else %}Ativar{% endif %} Veículo
                     </button>
@@ -144,17 +134,13 @@
                     <i class="fas fa-pen"></i> Editar Cadastro
                 </a>
                 <a href="{% url 'ordem_manutencao_add' %}?veiculo={{ veiculo.pk }}"
-                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                   style="background:rgba(210,153,34,0.12); color:#d29922; border:1px solid rgba(210,153,34,0.2)"
-                   onmouseover="this.style.background='rgba(210,153,34,0.2)'"
-                   onmouseout="this.style.background='rgba(210,153,34,0.12)'">
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all pill-hover-yellow"
+                   style="background:rgba(210,153,34,0.12); color:#d29922; border:1px solid rgba(210,153,34,0.2)">
                     <i class="fas fa-wrench"></i> Nova Ordem de Manutenção
                 </a>
                 <a href="{% url 'veiculo_delete' veiculo.pk %}"
-                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                   style="color:#f85149; border:1px solid rgba(248,81,73,0.2)"
-                   onmouseover="this.style.background='rgba(248,81,73,0.08)'"
-                   onmouseout="this.style.background='transparent'">
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all btn-outline-red"
+                   style="color:#f85149; border:1px solid rgba(248,81,73,0.2)">
                     <i class="fas fa-trash"></i> Excluir
                 </a>
             </div>
@@ -213,10 +199,8 @@
                     <!-- Arquivo CRLV -->
                     {% if veiculo.documento_impresso %}
                     <a href="{% url 'veiculo_documento_download' veiculo.pk %}" target="_blank"
-                       class="flex items-center gap-2 p-2.5 rounded-lg transition-all"
-                       style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07)"
-                       onmouseover="this.style.borderColor='rgba(56,139,253,0.3)'"
-                       onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+                       class="flex items-center gap-2 p-2.5 rounded-lg transition-all border-hover-blue"
+                       style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07)">
                         <i class="fas fa-file-pdf" style="color:#f85149"></i>
                         <span class="text-xs font-bold" style="color:#c9d1d9">Visualizar CRLV (PDF)</span>
                     </a>
@@ -325,10 +309,7 @@
         </p>
 
         <a href="{% url 'etiquetas_list' %}"
-           class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors"
-           style="color:#388bfd"
-           onmouseover="this.style.color='#3fb950'"
-           onmouseout="this.style.color='#388bfd'">
+           class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors link-accent-hover">
             <i class="fas fa-print"></i> Ir para central de etiquetas
         </a>
     </div>

@@ -10,10 +10,7 @@
     <div class="mb-8 flex items-center justify-between">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <a href="{% url 'funcionario_list' %}" class="text-xs font-medium transition-colors"
-                   style="color:#484f58"
-                   onmouseover="this.style.color='#3fb950'"
-                   onmouseout="this.style.color='#484f58'">Colaboradores</a>
+                <a href="{% url 'funcionario_list' %}" class="text-xs font-medium transition-colors link-muted">Colaboradores</a>
                 <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
                 <span class="text-xs font-semibold" style="color:#3fb950">Novo</span>
             </div>
@@ -21,10 +18,7 @@
             <p class="text-sm mt-1" style="color:#8b949e">Gerencie os acessos e credenciais dos motoristas.</p>
         </div>
         <a href="javascript:history.back()"
-           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
-           style="color:#484f58"
-           onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='#e6edf3'"
-           onmouseout="this.style.background='transparent';this.style.color='#484f58'">
+           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors icon-btn--back">
             <i class="fas fa-arrow-left"></i>
         </a>
     </div>

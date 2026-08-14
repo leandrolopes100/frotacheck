@@ -11,10 +11,7 @@
     <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors"
-                   style="color:#484f58"
-                   onmouseover="this.style.color='#3fb950'"
-                   onmouseout="this.style.color='#484f58'">Início</a>
+                <a href="{% url 'checklist_list' %}" class="text-xs font-medium transition-colors link-muted">Início</a>
                 <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
                 <span class="text-xs font-semibold" style="color:#3fb950">Frota de Veículos</span>
             </div>
@@ -34,10 +31,7 @@
     <!-- ── Grid de veículos ── -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for veiculo in veiculos %}
-        <div class="group card overflow-hidden hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
-             style="box-shadow:none"
-             onmouseover="this.style.boxShadow='0 8px 30px rgba(0,0,0,0.4)';this.style.borderColor='rgba(255,255,255,0.14)'"
-             onmouseout="this.style.boxShadow='none';this.style.borderColor='rgba(255,255,255,0.08)'">
+        <div class="group card overflow-hidden hover:-translate-y-0.5 transition-all duration-200 flex flex-col card-hover-lift">
 
             <!-- Foto 16:9 -->
             <div class="relative aspect-video overflow-hidden flex-shrink-0"
@@ -81,18 +75,14 @@
                 {% if user.is_patrao %}
                 <div class="absolute top-3 left-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <a href="{% url 'veiculo_update' veiculo.pk %}"
-                       class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-md"
+                       class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-md overlay-btn--yellow"
                        style="background:rgba(28,33,40,0.92); color:#8b949e"
-                       onmouseover="this.style.color='#d29922'"
-                       onmouseout="this.style.color='#8b949e'"
                        title="Editar">
                         <i class="fas fa-pen text-xs"></i>
                     </a>
                     <a href="{% url 'veiculo_delete' veiculo.pk %}"
-                       class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-md"
+                       class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-md overlay-btn--red"
                        style="background:rgba(28,33,40,0.92); color:#8b949e"
-                       onmouseover="this.style.color='#f85149'"
-                       onmouseout="this.style.color='#8b949e'"
                        title="Excluir">
                         <i class="fas fa-trash text-xs"></i>
                     </a>
@@ -122,10 +112,7 @@
                         </p>
                     </div>
                     <a href="{% url 'veiculo_detail' veiculo.pk %}"
-                       class="text-xs font-semibold flex items-center gap-1 transition-colors"
-                       style="color:#388bfd"
-                       onmouseover="this.style.color='#3fb950'"
-                       onmouseout="this.style.color='#388bfd'">
+                       class="text-xs font-semibold flex items-center gap-1 transition-colors link-accent-hover"
                         Detalhes <i class="fas fa-arrow-right text-[10px]"></i>
                     </a>
                 </div>

@@ -10,10 +10,7 @@
     <!-- ── Nav ── -->
     <div class="flex items-center justify-between mb-6">
         <a href="{% url 'checklist_list' %}"
-           class="flex items-center gap-2 text-xs font-semibold transition-colors group"
-           style="color:#484f58"
-           onmouseover="this.style.color='#3fb950'"
-           onmouseout="this.style.color='#484f58'">
+           class="flex items-center gap-2 text-xs font-semibold transition-colors group link-muted">
             <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
             Voltar ao Dashboard
         </a>
@@ -109,10 +106,7 @@
             {% if checklist.latitude %}
                 <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}"
                    target="_blank"
-                   class="flex items-center gap-2 text-xs font-semibold transition-colors"
-                   style="color:#388bfd"
-                   onmouseover="this.style.color='#3fb950'"
-                   onmouseout="this.style.color='#388bfd'">
+                   class="flex items-center gap-2 text-xs font-semibold transition-colors link-accent-hover">
                     <i class="fas fa-location-dot"></i> Ver GPS
                 </a>
             {% else %}
@@ -135,10 +129,7 @@
             </div>
             <a href="https://www.google.com/maps/search/?api=1&query={{ checklist.latitude|stringformat:"f" }},{{ checklist.longitude|stringformat:"f" }}"
                target="_blank"
-               class="text-xs font-semibold transition-colors flex items-center gap-1"
-               style="color:#388bfd"
-               onmouseover="this.style.color='#3fb950'"
-               onmouseout="this.style.color='#388bfd'">
+               class="text-xs font-semibold transition-colors flex items-center gap-1 link-accent-hover">
                 <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
                 Abrir no Google Maps
             </a>

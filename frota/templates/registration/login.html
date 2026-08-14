@@ -44,6 +44,9 @@
 
         @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
         .animate-fade-up { animation: fadeUp 0.4s ease forwards; }
+
+        .toggle-pass-hover:hover { color: #c9d1d9; }
+        .login-btn-hover:hover { box-shadow: 0 6px 20px rgba(63,185,80,0.40); }
     </style>
 </head>
 <body class="h-full flex">
@@ -207,10 +210,8 @@
                                class="form-input"
                                placeholder="••••••••">
                         <button type="button" id="toggle-password"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors"
-                                style="color:#8b949e"
-                                onmouseover="this.style.color='#c9d1d9'"
-                                onmouseout="this.style.color='#8b949e'">
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors toggle-pass-hover"
+                                style="color:#8b949e">
                             <i class="fas fa-eye text-sm" id="eye-icon"></i>
                         </button>
                     </div>
@@ -218,10 +219,8 @@
 
                 <!-- Submit -->
                 <button type="submit" id="login-submit-btn"
-                        class="w-full py-3 text-sm font-semibold rounded-xl transition-all mt-2"
-                        style="background:linear-gradient(135deg,#3fb950,#238636); color:#ffffff; box-shadow:0 4px 14px rgba(63,185,80,0.25)"
-                        onmouseover="this.style.boxShadow='0 6px 20px rgba(63,185,80,0.40)'"
-                        onmouseout="this.style.boxShadow='0 4px 14px rgba(63,185,80,0.25)'">
+                        class="w-full py-3 text-sm font-semibold rounded-xl transition-all mt-2 login-btn-hover"
+                        style="background:linear-gradient(135deg,#3fb950,#238636); color:#ffffff; box-shadow:0 4px 14px rgba(63,185,80,0.25)">
                     <span id="login-btn-text"><i class="fas fa-arrow-right-to-bracket mr-2"></i>Entrar no Sistema</span>
                 </button>
 

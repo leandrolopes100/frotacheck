@@ -4,10 +4,7 @@
            class="form-input pl-9 pr-9 text-sm {{ input_width_class|default:'w-52' }}"
            style="border-radius:8px">
     {% if request.GET.busca %}
-    <a href="?" class="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-       style="color:#484f58"
-       onmouseover="this.style.color='#f85149'"
-       onmouseout="this.style.color='#484f58'">
+    <a href="?" class="absolute right-3 top-1/2 -translate-y-1/2 transition-colors text-hover-red">
         <i class="fas fa-xmark text-xs"></i>
     </a>
     {% endif %}

@@ -36,18 +36,13 @@
                 {% csrf_token %}
 
                 <a href="{% url 'funcionario_list' %}"
-                   class="flex-1 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all text-center"
-                   style="background:rgba(255,255,255,0.05); color:#8b949e; border:1px solid rgba(255,255,255,0.08)"
-                   onmouseover="this.style.background='rgba(255,255,255,0.09)'"
-                   onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                   class="flex-1 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all text-center btn-cancel-outline"
+                   style="color:#8b949e">
                     Cancelar e Voltar
                 </a>
 
                 <button type="submit"
-                        class="flex-1 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
-                        style="background:#da3633; color:white"
-                        onmouseover="this.style.background='#b91c1c'"
-                        onmouseout="this.style.background='#da3633'">
+                        class="flex-1 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all btn-danger-fill">
                     Confirmar Exclusão
                 </button>
             </form>

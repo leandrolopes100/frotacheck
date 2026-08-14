@@ -12,10 +12,7 @@
             <p class="text-sm mt-1" style="color:#8b949e">Atualize as informações e registros fotográficos do protocolo #{{ checklist.id }}.</p>
         </div>
         <a href="javascript:history.back()"
-           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors text-lg"
-           style="color:#484f58"
-           onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='#e6edf3'"
-           onmouseout="this.style.background='transparent';this.style.color='#484f58'">
+           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors text-lg icon-btn--back">
             <i class="fas fa-arrow-left"></i>
         </a>
     </div>
@@ -65,10 +62,8 @@
             <div style="border-color:rgba(255,255,255,0.05)">
                 {% for field in form %}
                     {% if field.field.widget.input_type == "checkbox" %}
-                    <label class="px-6 py-4 flex items-center justify-between transition-colors cursor-pointer"
-                           style="border-bottom:1px solid rgba(255,255,255,0.04)"
-                           onmouseover="this.style.background='rgba(255,255,255,0.02)'"
-                           onmouseout="this.style.background='transparent'">
+                    <label class="px-6 py-4 flex items-center justify-between transition-colors cursor-pointer row-hover-fill"
+                           style="border-bottom:1px solid rgba(255,255,255,0.04)">
                         <span class="text-sm font-medium" style="color:#c9d1d9">{{ field.label }}</span>
                         <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}"
                                class="w-5 h-5 rounded cursor-pointer accent-emerald-500"
@@ -95,10 +90,7 @@
                     {% for hidden in foto_form.hidden_fields %}{{ hidden }}{% endfor %}
 
                     <button type="button" onclick="marcarExclusao(this)"
-                            class="absolute top-3 right-3 transition-colors z-10 btn-remover"
-                            style="color:#484f58"
-                            onmouseover="this.style.color='#f85149'"
-                            onmouseout="this.style.color='#484f58'">
+                            class="absolute top-3 right-3 transition-colors z-10 btn-remover text-hover-red">
                         <i class="fas fa-trash-alt"></i>
                     </button>
 
@@ -106,11 +98,9 @@
 
                     <div class="flex flex-col sm:flex-row gap-4">
                         <div class="w-full sm:w-36 shrink-0">
-                            <div class="preview-box w-full h-28 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer transition-all"
+                            <div class="preview-box w-full h-28 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer transition-all dropzone-hover"
                                  style="background:#161b22; border:2px dashed rgba(255,255,255,0.12)"
-                                 onclick="this.parentElement.querySelector('input[type=file]').click()"
-                                 onmouseover="this.style.borderColor='rgba(63,185,80,0.4)'"
-                                 onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
+                                 onclick="this.parentElement.querySelector('input[type=file]').click()">
                                 {% if foto_form.instance.imagem %}
                                     <img src="{{ foto_form.instance.imagem.url }}" class="w-full h-full object-cover">
                                 {% else %}
@@ -147,10 +137,7 @@
 <template id="foto-template">
     <div class="foto-item p-4 rounded-xl flex flex-col gap-4 relative" style="background:#1c2128; border:1px solid rgba(255,255,255,0.08)">
         <button type="button" onclick="this.closest('.foto-item').remove()"
-                class="absolute top-3 right-3 transition-colors z-10"
-                style="color:#484f58"
-                onmouseover="this.style.color='#f85149'"
-                onmouseout="this.style.color='#484f58'">
+                class="absolute top-3 right-3 transition-colors z-10 text-hover-red">
             <i class="fas fa-trash-alt"></i>
         </button>
         <div class="flex flex-col sm:flex-row gap-4">

@@ -8,10 +8,7 @@
     <div class="mb-6 flex items-start justify-between">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <a href="{% url 'ordem_manutencao_list' %}" class="text-xs font-medium transition-colors"
-                   style="color:#484f58"
-                   onmouseover="this.style.color='#3fb950'"
-                   onmouseout="this.style.color='#484f58'">Manutenção</a>
+                <a href="{% url 'ordem_manutencao_list' %}" class="text-xs font-medium transition-colors link-muted">Manutenção</a>
                 <i class="fas fa-chevron-right text-[9px]" style="color:#30363d"></i>
                 <span class="text-xs font-semibold" style="color:#3fb950">{% if object %}Editar{% else %}Nova{% endif %}</span>
             </div>
@@ -20,10 +17,7 @@
             </h1>
         </div>
         <a href="{% url 'ordem_manutencao_list' %}"
-           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
-           style="color:#484f58"
-           onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='#e6edf3'"
-           onmouseout="this.style.background='transparent';this.style.color='#484f58'">
+           class="w-9 h-9 flex items-center justify-center rounded-xl transition-colors icon-btn--back">
             <i class="fas fa-arrow-left"></i>
         </a>
     </div>
