@@ -23,22 +23,7 @@
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
-            <form method="GET" class="relative">
-                <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs" style="color:#484f58"></i>
-                <input type="text" name="busca" placeholder="Buscar placa ou modelo..."
-                       value="{{ request.GET.busca }}"
-                       class="form-input pl-9 pr-9 text-sm w-56"
-                       style="border-radius:8px">
-                {% if request.GET.busca %}
-                <a href="{% url 'veiculos_list' %}"
-                   class="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-                   style="color:#484f58"
-                   onmouseover="this.style.color='#f85149'"
-                   onmouseout="this.style.color='#484f58'">
-                    <i class="fas fa-xmark text-xs"></i>
-                </a>
-                {% endif %}
-            </form>
+            {% include "frota/_busca_simples.html" with placeholder="Buscar placa ou modelo..." input_width_class="w-56" %}
             <a href="{% url 'veiculo_add' %}" class="btn-primary text-xs flex-shrink-0">
                 <i class="fas fa-plus"></i>
                 Novo Veículo
