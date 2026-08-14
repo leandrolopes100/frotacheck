@@ -76,8 +76,65 @@
 
     </div>
 
-    <!-- ── Tabela ── -->
-    <div class="card overflow-hidden">
+    <!-- ── Cards (mobile) ── -->
+    <div class="sm:hidden space-y-3">
+        {% for s in situacao %}
+        <div class="card p-4">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="text-sm font-bold truncate" style="color:#e6edf3">{{ s.veiculo.modelo }}</p>
+                    <p class="text-xs font-bold tracking-widest" style="color:#388bfd">{{ s.veiculo.placa }}</p>
+                </div>
+                {% if s.inspecionado_hoje %}
+                <span class="badge badge-success flex-shrink-0" style="font-size:10px"><i class="fas fa-check text-[9px]"></i> Hoje</span>
+                {% else %}
+                <span class="badge badge-danger flex-shrink-0" style="font-size:10px"><i class="fas fa-times text-[9px]"></i> Hoje</span>
+                {% endif %}
+            </div>
+
+            {% if s.ultima_inspecao %}
+            <p class="text-xs font-medium" style="color:#c9d1d9">{{ s.ultima_inspecao.data_realizada|date:"d/m/Y H:i" }}</p>
+            <p class="text-xs mb-3" style="color:#484f58">{{ s.ultima_inspecao.get_tipo_display }} · {{ s.ultima_inspecao.motorista.nome_completo|default:"—" }}</p>
+            {% else %}
+            <p class="text-xs italic mb-3" style="color:#484f58">Nenhuma inspeção registrada</p>
+            {% endif %}
+
+            {% if s.ocorrencias_abertas > 0 or s.veiculo.bloqueado %}
+            <div class="flex items-center flex-wrap gap-2 mb-3">
+                {% if s.ocorrencias_abertas > 0 %}
+                <a href="{% url 'ocorrencias_list' %}?veiculo={{ s.veiculo.placa }}" class="badge badge-warning" style="font-size:10px">
+                    <i class="fas fa-triangle-exclamation text-[9px]"></i> {{ s.ocorrencias_abertas }} ocorrência{{ s.ocorrencias_abertas|pluralize }}
+                </a>
+                {% endif %}
+                {% if s.veiculo.bloqueado %}
+                <span class="badge badge-danger" style="font-size:10px"><i class="fas fa-lock text-[9px]"></i> Bloqueado</span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="flex items-center justify-end gap-1 pt-2" style="border-top:1px solid rgba(255,255,255,0.05)">
+                <a href="{% url 'veiculo_detail' s.veiculo.pk %}" class="p-2 rounded-lg transition-all" style="color:#484f58" title="Detalhes do veículo">
+                    <i class="fas fa-truck text-sm"></i>
+                </a>
+                {% if s.ultima_inspecao %}
+                <a href="{% url 'checklist_detail' s.ultima_inspecao.pk %}" class="p-2 rounded-lg transition-all" style="color:#484f58" title="Ver última inspeção">
+                    <i class="far fa-eye text-sm"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'checklist_add' %}?veiculo_id={{ s.veiculo.pk }}" class="p-2 rounded-lg transition-all" style="color:#484f58" title="Nova inspeção">
+                    <i class="fas fa-plus text-sm"></i>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card py-16 text-center text-sm font-bold" style="color:#484f58">
+            Nenhum veículo ativo cadastrado.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ── Tabela (tablet/desktop) ── -->
+    <div class="hidden sm:block card overflow-hidden">
         <div class="overflow-x-auto">
             <table class="data-table">
                 <thead>

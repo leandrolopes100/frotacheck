@@ -69,8 +69,45 @@
         </form>
     </div>
 
-    <!-- ── Tabela ── -->
-    <div class="card overflow-hidden">
+    <!-- ── Cards (mobile) ── -->
+    <div class="sm:hidden space-y-3">
+        {% for a in abastecimentos %}
+        <div class="card p-4">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="text-sm font-bold truncate" style="color:#e6edf3">{{ a.veiculo.modelo }}</p>
+                    <p class="text-xs font-bold tracking-widest" style="color:#388bfd">{{ a.veiculo.placa }}</p>
+                </div>
+                <span class="badge badge-neutral flex-shrink-0" style="font-size:10px">{{ a.get_tipo_combustivel_display }}</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-medium mb-3" style="color:#8b949e">
+                <span><i class="far fa-calendar mr-1"></i>{{ a.data|date:"d/m/Y H:i" }}</span>
+                {% if a.motorista %}<span class="truncate"><i class="fas fa-user mr-1"></i>{{ a.motorista.nome_completo }}</span>{% endif %}
+            </div>
+            <div class="grid grid-cols-3 gap-2 pt-3" style="border-top:1px solid rgba(255,255,255,0.05)">
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-wider" style="color:#484f58">Litros</p>
+                    <p class="text-sm font-bold" style="color:#c9d1d9">{{ a.litros|floatformat:1 }} L</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-wider" style="color:#484f58">Valor</p>
+                    <p class="text-sm font-bold" style="color:#3fb950">R$ {{ a.valor_total|floatformat:2|intcomma }}</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-wider" style="color:#484f58">KM</p>
+                    <p class="text-sm font-medium" style="color:#8b949e">{{ a.km_atual|intcomma }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card py-16 text-center text-sm font-bold" style="color:#484f58">
+            Nenhum abastecimento registrado.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ── Tabela (tablet/desktop) ── -->
+    <div class="hidden sm:block card overflow-hidden">
         <div class="overflow-x-auto">
             <table class="data-table">
                 <thead>

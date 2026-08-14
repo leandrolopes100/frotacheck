@@ -87,8 +87,54 @@
         </form>
     </div>
 
-    <!-- ── Tabela ── -->
-    <div class="card overflow-hidden">
+    <!-- ── Cards (mobile) ── -->
+    <div class="sm:hidden space-y-3">
+        {% for ordem in ordens %}
+        <div class="card p-4">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="text-xs font-bold" style="color:#484f58">#{{ ordem.pk }}</p>
+                    <p class="text-sm font-bold truncate" style="color:#e6edf3">{{ ordem.veiculo.modelo }}</p>
+                    <p class="text-xs font-bold tracking-widest" style="color:#388bfd">{{ ordem.veiculo.placa }}</p>
+                </div>
+                {% if ordem.status == 'aberta' %}
+                    <span class="badge badge-danger flex-shrink-0" style="font-size:10px">Aberta</span>
+                {% elif ordem.status == 'agendada' %}
+                    <span class="badge badge-info flex-shrink-0" style="font-size:10px">Agendada</span>
+                {% elif ordem.status == 'em_andamento' %}
+                    <span class="badge badge-warning flex-shrink-0" style="font-size:10px">Em Andamento</span>
+                {% elif ordem.status == 'concluida' %}
+                    <span class="badge badge-success flex-shrink-0" style="font-size:10px">Concluída</span>
+                {% else %}
+                    <span class="badge badge-neutral flex-shrink-0" style="font-size:10px">{{ ordem.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <p class="text-sm font-medium mb-3" style="color:#c9d1d9">{{ ordem.descricao }}</p>
+            <div class="flex items-center justify-between text-xs font-medium pt-3" style="color:#8b949e; border-top:1px solid rgba(255,255,255,0.05)">
+                <span>{{ ordem.responsavel|default:"—" }}</span>
+                <span>{{ ordem.data_agendada|date:"d/m/Y"|default:"—" }}</span>
+            </div>
+            <div class="flex items-center justify-between mt-3">
+                <p class="text-sm font-bold" style="color:{% if ordem.custo %}#3fb950{% else %}#30363d{% endif %}">
+                    {% if ordem.custo %}R$ {{ ordem.custo|floatformat:2|intcomma }}{% else %}—{% endif %}
+                </p>
+                <a href="{% url 'ordem_manutencao_update' ordem.pk %}"
+                   class="p-2 rounded-lg inline-flex transition-all"
+                   style="color:#484f58"
+                   title="Editar">
+                    <i class="fas fa-pen text-sm"></i>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card py-16 text-center text-sm font-bold" style="color:#484f58">
+            Nenhuma ordem de manutenção encontrada.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ── Tabela (tablet/desktop) ── -->
+    <div class="hidden sm:block card overflow-hidden">
         <div class="overflow-x-auto">
             <table class="data-table">
                 <thead>
