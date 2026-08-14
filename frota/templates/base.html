@@ -718,6 +718,21 @@
             if (menu && !menu.contains(e.target))
                 document.getElementById('user-dropdown').classList.add('hidden');
         });
+
+        // ── Loading state genérico ao enviar formulários (POST) ──
+        // O botão de envio do checklist (#submit-btn) tem seu próprio controle
+        // de estado (aguarda GPS, mensagem própria) e não é tocado aqui.
+        document.querySelectorAll('.main-area form').forEach(function (form) {
+            if (form.method !== 'post') return;
+            form.addEventListener('submit', function () {
+                const btn = form.querySelector('button[type="submit"]');
+                if (!btn || btn.id === 'submit-btn' || btn.disabled) return;
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+                btn.style.cursor = 'not-allowed';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            });
+        });
     </script>
 
     <!-- Django messages → toasts -->

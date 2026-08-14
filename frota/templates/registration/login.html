@@ -174,7 +174,7 @@
             {% endif %}
 
             <!-- Form -->
-            <form method="POST" class="space-y-4">
+            <form method="POST" class="space-y-4" id="login-form">
                 {% csrf_token %}
 
                 <!-- Username -->
@@ -217,13 +217,12 @@
                 </div>
 
                 <!-- Submit -->
-                <button type="submit"
+                <button type="submit" id="login-submit-btn"
                         class="w-full py-3 text-sm font-semibold rounded-xl transition-all mt-2"
                         style="background:linear-gradient(135deg,#3fb950,#238636); color:#ffffff; box-shadow:0 4px 14px rgba(63,185,80,0.25)"
                         onmouseover="this.style.boxShadow='0 6px 20px rgba(63,185,80,0.40)'"
                         onmouseout="this.style.boxShadow='0 4px 14px rgba(63,185,80,0.25)'">
-                    <i class="fas fa-arrow-right-to-bracket mr-2"></i>
-                    Entrar no Sistema
+                    <span id="login-btn-text"><i class="fas fa-arrow-right-to-bracket mr-2"></i>Entrar no Sistema</span>
                 </button>
 
             </form>
@@ -249,6 +248,17 @@
         }
 
         document.getElementById('id_username')?.focus();
+
+        // ── Loading state ao entrar ──
+        document.getElementById('login-form')?.addEventListener('submit', function () {
+            const btn  = document.getElementById('login-submit-btn');
+            const text = document.getElementById('login-btn-text');
+            if (!btn || btn.disabled) return;
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            btn.style.cursor = 'not-allowed';
+            text.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Entrando...';
+        });
     </script>
 
 </body>
