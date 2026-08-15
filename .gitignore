@@ -52,6 +52,9 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+#claude
+.claude/
+CLAUDE.md
 
 # Unit test / coverage reports
 htmlcov/
