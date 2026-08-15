@@ -18,7 +18,7 @@
     </div>
 
     <!-- ── KPIs ── -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="kpi-card">
             <div class="flex items-center gap-4">
                 <div class="kpi-icon" style="background:rgba(248,81,73,0.12); color:#f85149">
@@ -43,6 +43,17 @@
         </div>
         <div class="kpi-card">
             <div class="flex items-center gap-4">
+                <div class="kpi-icon" style="background:rgba(240,136,62,0.12); color:#f0883e">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider" style="color:#484f58">Atrasadas</p>
+                    <p class="text-2xl font-bold" style="color:#e6edf3">{{ total_atrasadas }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="flex items-center gap-4">
                 <div class="kpi-icon" style="background:rgba(63,185,80,0.12); color:#3fb950">
                     <i class="fas fa-circle-check"></i>
                 </div>
@@ -53,6 +64,15 @@
             </div>
         </div>
     </div>
+
+    <!-- ── Aviso de filtro padrão ── -->
+    {% if filtro_padrao_ativo %}
+    <div class="flex items-center gap-2 mb-4 text-xs font-medium" style="color:#484f58">
+        <i class="fas fa-filter"></i>
+        <span>Mostrando apenas ocorrências em aberto, da mais antiga para a mais nova.</span>
+        <a href="?status=" class="font-bold hover:underline" style="color:#388bfd">Ver todas</a>
+    </div>
+    {% endif %}
 
     <!-- ── Filtros ── -->
     <div class="card p-3 mb-4">
@@ -84,61 +104,108 @@
     <!-- ── Lista de ocorrências ── -->
     <div class="space-y-3">
         {% for oc in ocorrencias %}
-        <div class="card p-5 flex flex-col sm:flex-row gap-4 items-start">
-            <!-- Status badge -->
-            <div class="flex-shrink-0 mt-0.5">
-                {% if oc.status == 'aguardando' %}
-                <span class="badge badge-danger" style="font-size:10px; padding:6px 12px">
-                    <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#f85149"></span> Aguardando
-                </span>
-                {% elif oc.status == 'em_reparo' %}
-                <span class="badge badge-warning" style="font-size:10px; padding:6px 12px">
-                    <i class="fas fa-wrench text-[9px]"></i> Em Reparo
-                </span>
-                {% else %}
-                <span class="badge badge-success" style="font-size:10px; padding:6px 12px">
-                    <i class="fas fa-check text-[9px]"></i> Resolvida
-                </span>
-                {% endif %}
-            </div>
-
-            <!-- Conteúdo -->
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="text-sm font-bold" style="color:#e6edf3">{{ oc.veiculo.modelo }}</span>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-md tracking-wider"
-                          style="color:#388bfd; background:rgba(56,139,253,0.1); border:1px solid rgba(56,139,253,0.15)">
-                        {{ oc.veiculo.placa }}
+        <div class="card p-5" {% if oc.atrasada %}style="border-color:rgba(240,136,62,0.45)"{% endif %}>
+            <div class="flex flex-col sm:flex-row gap-4 items-start">
+                <!-- Status badge -->
+                <div class="flex-shrink-0 mt-0.5">
+                    {% if oc.status == 'aguardando' %}
+                    <span class="badge badge-danger" style="font-size:10px; padding:6px 12px">
+                        <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#f85149"></span> Aguardando
                     </span>
+                    {% elif oc.status == 'em_reparo' %}
+                    <span class="badge badge-warning" style="font-size:10px; padding:6px 12px">
+                        <i class="fas fa-wrench text-[9px]"></i> Em Reparo
+                    </span>
+                    {% else %}
+                    <span class="badge badge-success" style="font-size:10px; padding:6px 12px">
+                        <i class="fas fa-check text-[9px]"></i> Resolvida
+                    </span>
+                    {% endif %}
                 </div>
-                <p class="text-sm font-medium leading-relaxed" style="color:#8b949e">{{ oc.descricao }}</p>
-                <div class="flex items-center gap-4 mt-2 text-xs font-medium" style="color:#484f58">
-                    <span><i class="far fa-calendar mr-1"></i>{{ oc.criada_em|date:"d/m/Y H:i" }}</span>
-                    {% if oc.resolvida_por %}<span><i class="fas fa-user-check mr-1"></i>{{ oc.resolvida_por.username }}</span>{% endif %}
+
+                <!-- Conteúdo -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <span class="text-sm font-bold" style="color:#e6edf3">{{ oc.veiculo.modelo }}</span>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-md tracking-wider"
+                              style="color:#388bfd; background:rgba(56,139,253,0.1); border:1px solid rgba(56,139,253,0.15)">
+                            {{ oc.veiculo.placa }}
+                        </span>
+                        {% if oc.critica %}
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider"
+                              style="color:#f85149; background:rgba(248,81,73,0.1); border:1px solid rgba(248,81,73,0.2)">
+                            <i class="fas fa-triangle-exclamation text-[9px]"></i> Crítica
+                        </span>
+                        {% endif %}
+                        {% if oc.veiculo.bloqueado %}
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider"
+                              style="color:#f0883e; background:rgba(240,136,62,0.1); border:1px solid rgba(240,136,62,0.2)">
+                            <i class="fas fa-lock text-[9px]"></i> Veículo bloqueado
+                        </span>
+                        {% endif %}
+                        {% if oc.atrasada %}
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider"
+                              style="color:#f0883e; background:rgba(240,136,62,0.1); border:1px solid rgba(240,136,62,0.2)">
+                            Atrasada
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-sm font-medium leading-relaxed" style="color:#8b949e">{{ oc.descricao }}</p>
+                    <div class="flex items-center gap-4 mt-2 text-xs font-medium" style="color:#484f58">
+                        <span title="{{ oc.criada_em|date:'d/m/Y H:i' }}"><i class="far fa-calendar mr-1"></i>{{ oc.criada_em|naturaltime }}</span>
+                        {% if oc.resolvida_por %}<span><i class="fas fa-user-check mr-1"></i>{{ oc.resolvida_por.username }}</span>{% endif %}
+                    </div>
+                    {% if oc.nota_resolucao %}
+                    <p class="mt-2 text-xs font-medium rounded-lg px-3 py-1.5"
+                       style="color:#3fb950; background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.2)">
+                        <i class="fas fa-note-sticky mr-1"></i>{{ oc.nota_resolucao }}
+                    </p>
+                    {% endif %}
                 </div>
-                {% if oc.nota_resolucao %}
-                <p class="mt-2 text-xs font-medium rounded-lg px-3 py-1.5"
-                   style="color:#3fb950; background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.2)">
-                    <i class="fas fa-note-sticky mr-1"></i>{{ oc.nota_resolucao }}
-                </p>
-                {% endif %}
+
+                <!-- Ações -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="{% url 'checklist_detail' oc.checklist.pk %}"
+                       class="p-2 rounded-xl transition-all icon-btn icon-btn--blue"
+                       title="Ver inspeção original">
+                        <i class="far fa-eye text-base"></i>
+                    </a>
+                    {% if oc.status != 'resolvida' %}
+                    <button type="button" onclick="toggleResolverForm({{ oc.pk }})"
+                            class="p-2 rounded-xl transition-all icon-btn icon-btn--green"
+                            title="Resolver">
+                        <i class="fas fa-check text-base"></i>
+                    </button>
+                    <a href="{% url 'ocorrencia_update' oc.pk %}"
+                       class="p-2 rounded-xl transition-all icon-btn icon-btn--yellow"
+                       title="Atualizar status">
+                        <i class="fas fa-pen text-base"></i>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
 
-            <!-- Ações -->
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <a href="{% url 'checklist_detail' oc.checklist.pk %}"
-                   class="p-2 rounded-xl transition-all icon-btn icon-btn--blue"
-                   title="Ver inspeção original">
-                    <i class="far fa-eye text-base"></i>
-                </a>
-                {% if oc.status != 'resolvida' %}
-                <a href="{% url 'ocorrencia_update' oc.pk %}"
-                   class="p-2 rounded-xl transition-all icon-btn icon-btn--yellow"
-                   title="Atualizar status">
-                    <i class="fas fa-pen text-base"></i>
-                </a>
-                {% endif %}
-            </div>
+            {% if oc.status != 'resolvida' %}
+            <form method="post" action="{% url 'ocorrencia_update' oc.pk %}"
+                  id="resolver-form-{{ oc.pk }}" class="hidden mt-4 pt-4"
+                  style="border-top:1px solid rgba(255,255,255,0.06)">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="resolvida">
+                <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#484f58">
+                    Nota de resolução
+                </label>
+                <textarea name="nota_resolucao" rows="2" required
+                          placeholder="Descreva o que foi feito para resolver..."></textarea>
+                <div class="flex items-center gap-2 mt-2">
+                    <button type="submit" class="btn-primary text-xs">
+                        <i class="fas fa-check"></i> Confirmar resolução
+                    </button>
+                    <button type="button" onclick="toggleResolverForm({{ oc.pk }})" class="btn-secondary text-xs">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+            {% endif %}
         </div>
         {% empty %}
         <div class="card py-20 text-center">
@@ -181,4 +248,10 @@
     {% endif %}
 
 </div>
+
+<script>
+function toggleResolverForm(pk) {
+    document.getElementById('resolver-form-' + pk).classList.toggle('hidden');
+}
+</script>
 {% endblock %}

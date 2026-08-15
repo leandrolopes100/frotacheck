@@ -25,9 +25,9 @@ AUTH_USER_MODEL = 'frota.Usuario'
 LOGIN_REDIRECT_URL = 'checklist_list'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 1700
-SESSION_SAVE_EVERY_REQUEST = False  # não grava sessão em toda requisição
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 28800  # 8h — cobre um turno de trabalho
+SESSION_SAVE_EVERY_REQUEST = True  # renova o prazo a cada requisição (sliding expiration)
 
 # ── Segurança HTTP ─────────────────────────────────────────────────────────────
 SECURE_BROWSER_XSS_FILTER = True
@@ -104,8 +104,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'frotacheck'),
+        'USER': os.environ.get('DB_USER', 'frotacheck'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -190,3 +194,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'FrotaCheck <noreply@frotacheck.com.br>')
+# Evita que a requisição do motorista fique travada indefinidamente se o
+# servidor SMTP não responder (ex.: porta bloqueada por firewall).
+EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10'))

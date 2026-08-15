@@ -108,7 +108,7 @@
                     <div>
                         <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:#484f58">Valor FIPE</p>
                         <p class="text-sm font-semibold mt-0.5" style="color:{% if veiculo.fipe %}#3fb950{% else %}#30363d{% endif %}">
-                            {% if veiculo.fipe %}R$ {{ veiculo.fipe|floatformat:2|intcomma }}{% else %}—{% endif %}
+                            {% if veiculo.fipe %}R$ {{ veiculo.fipe|intcomma }}{% else %}—{% endif %}
                         </p>
                     </div>
                     <a href="{% url 'veiculo_detail' veiculo.pk %}"

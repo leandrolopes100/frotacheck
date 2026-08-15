@@ -1,6 +1,8 @@
 import csv
+import logging
 import os
 from datetime import timedelta
+from decimal import Decimal
 from io import BytesIO
 
 import qrcode
@@ -18,17 +20,21 @@ from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, View
 
 from .forms import (
-    AbastecimentoForm, ChecklistForm, FotoAvariaFormSet, NovoFuncionarioForm,
-    OcorrenciaUpdateForm, OrdemManutencaoForm, VeiculoForm,
+    AbastecimentoForm, ChecklistCreateForm, ChecklistForm, FotoAvariaFormSet,
+    NovoFuncionarioForm, OcorrenciaUpdateForm, OrdemManutencaoForm, VeiculoForm,
 )
 from .models import (
     Abastecimento, Checklist, Funcionario,
     OcorrenciaAvaria, OrdemManutencao, Usuario, Veiculo,
 )
 from .utils import (
-    CAMPO_LABELS, CAMPOS_AVARIA, criar_ocorrencia_para_checklist,
-    get_filtro_avaria, get_filtro_ok, get_itens_com_falha, tem_avaria_critica,
+    CAMPO_LABELS, CAMPOS_AVARIA, ITENS_CRITICOS, OCORRENCIA_DIAS_ALERTA,
+    criar_ocorrencia_para_checklist, gerar_motivo_bloqueio_automatico,
+    get_filtro_avaria, get_filtro_ok,
+    get_itens_com_falha, veiculo_tem_ocorrencia_critica_aberta,
 )
+
+logger = logging.getLogger('frota.auditoria')
 
 
 # ── MIXINS ────────────────────────────────────────────────────────────────────
@@ -44,57 +50,79 @@ class GestorRequiredMixin(UserPassesTestMixin):
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 
-def _enviar_email_avaria_critica(checklist):
-    """Envia e-mail aos gestores quando itens críticos falham. Falha silenciosamente."""
+def _enviar_email_avaria(checklist):
+    """Envia e-mail aos gestores quando o checklist tem alguma avaria.
+    Registra sucesso/falha em logs/auditoria.log — o envio nunca derruba
+    a requisição do motorista (checklist já foi salvo antes desta chamada)."""
     if not getattr(django_settings, 'EMAIL_HOST_USER', ''):
         return
 
-    if not tem_avaria_critica(checklist):
-        return
-
-    chave_cache = f'email_avaria_critica_{checklist.pk}'
+    chave_cache = f'email_avaria_{checklist.pk}'
     if cache.get(chave_cache):
         return  # e-mail já enviado para este checklist nas últimas 2h
     cache.set(chave_cache, True, 60 * 60 * 2)
 
-    gestores_emails = list(
+    gestores_emails = list(dict.fromkeys(
         Usuario.objects.filter(is_patrao=True)
         .exclude(email='').values_list('email', flat=True)
-    )
+    ))
     if not gestores_emails:
+        logger.warning(
+            'Checklist #%s com avaria, mas nenhum gestor tem e-mail cadastrado — nenhum alerta enviado.',
+            checklist.pk,
+        )
         return
 
     itens = get_itens_com_falha(checklist)
-    from .utils import ITENS_CRITICOS
     itens_criticos_falhos = [
         CAMPO_LABELS.get(c, c) for c in ITENS_CRITICOS
         if not getattr(checklist, c, True)
     ]
+    critico = bool(itens_criticos_falhos)
+
+    secao_criticos = (
+        "Itens CRÍTICOS com falha:\n"
+        + "\n".join(f"  • {i}" for i in itens_criticos_falhos) + "\n\n"
+    ) if critico else ""
+
+    aviso_bloqueio = (
+        "\nVeículo bloqueado automaticamente para despacho até a resolução da(s) avaria(s) crítica(s).\n"
+    ) if critico else ""
 
     corpo = (
-        f"ALERTA DE SEGURANÇA — FrotaCheck\n\n"
+        f"{'ALERTA DE SEGURANÇA' if critico else 'Aviso de avaria'} — FrotaCheck\n\n"
         f"Veículo : {checklist.veiculo.marca} {checklist.veiculo.modelo} ({checklist.veiculo.placa})\n"
         f"Motorista: {checklist.motorista.nome_completo if checklist.motorista else 'N/A'}\n"
         f"Data    : {checklist.data_realizada.strftime('%d/%m/%Y %H:%M')}\n"
-        f"KM      : {checklist.km_atual}\n\n"
-        f"Itens CRÍTICOS com falha:\n"
-        + "\n".join(f"  • {i}" for i in itens_criticos_falhos)
-        + f"\n\nTodos os itens com falha:\n"
+        f"KM      : {checklist.km_atual}\n"
+        f"{aviso_bloqueio}\n"
+        f"{secao_criticos}"
+        f"Todos os itens com falha:\n"
         + "\n".join(f"  • {i}" for i in itens)
         + f"\n\nObservações: {checklist.observacoes or 'Nenhuma'}\n\n"
         f"Acesse o sistema para acompanhar a ocorrência."
     )
 
+    assunto_prefixo = "[ALERTA] Avaria crítica" if critico else "[Aviso] Avaria registrada"
+
     try:
         send_mail(
-            subject=f"[ALERTA] Avaria crítica — {checklist.veiculo.placa}",
+            subject=f"{assunto_prefixo} — {checklist.veiculo.placa}",
             message=corpo,
             from_email=getattr(django_settings, 'DEFAULT_FROM_EMAIL', 'FrotaCheck'),
             recipient_list=gestores_emails,
-            fail_silently=True,
+            fail_silently=False,
+        )
+        logger.info(
+            'E-mail de avaria enviado — checklist #%s, veículo %s, %d destinatário(s).',
+            checklist.pk, checklist.veiculo.placa, len(gestores_emails),
         )
     except Exception:
-        pass
+        cache.delete(chave_cache)
+        logger.exception(
+            'Falha ao enviar e-mail de avaria — checklist #%s, veículo %s.',
+            checklist.pk, checklist.veiculo.placa,
+        )
 
 
 # ── CHECKLIST VIEWS ───────────────────────────────────────────────────────────
@@ -253,6 +281,7 @@ class ChecklistListView(LoginRequiredMixin, CheckListBaseView, ListView):
 
 class ChecklistCreateView(LoginRequiredMixin, QrCodeMixin, CheckListBaseView, CreateView):
     template_name = 'frota/checklist_form.html'
+    form_class = ChecklistCreateForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -287,9 +316,17 @@ class ChecklistCreateView(LoginRequiredMixin, QrCodeMixin, CheckListBaseView, Cr
                 if self.object.tem_avaria:
                     criar_ocorrencia_para_checklist(self.object)
 
-            # E-mail fora da transação (falha silenciosa)
+                itens_criticos_falhos = [c for c in ITENS_CRITICOS if not getattr(self.object, c)]
+                if itens_criticos_falhos:
+                    veiculo_lock = Veiculo.objects.select_for_update().get(pk=self.object.veiculo_id)
+                    veiculo_lock.bloqueado = True
+                    veiculo_lock.bloqueio_automatico = True
+                    veiculo_lock.motivo_bloqueio = gerar_motivo_bloqueio_automatico(self.object)
+                    veiculo_lock.save(update_fields=['bloqueado', 'bloqueio_automatico', 'motivo_bloqueio'])
+
+            # E-mail fora da transação, registrado em logs/auditoria.log
             if self.object.tem_avaria:
-                _enviar_email_avaria_critica(self.object)
+                _enviar_email_avaria(self.object)
 
             return redirect(self.success_url)
 
@@ -430,22 +467,40 @@ class OcorrenciaListView(LoginRequiredMixin, GestorRequiredMixin, ListView):
         qs = OcorrenciaAvaria.objects.select_related('veiculo', 'checklist', 'resolvida_por')
         status = self.request.GET.get('status')
         veiculo = self.request.GET.get('veiculo')
+
         if status:
             qs = qs.filter(status=status)
+        elif status is None:
+            # Entrada normal (sem filtro nenhum na URL): esconde resolvidas
+            # para focar no que ainda precisa de ação.
+            qs = qs.exclude(status='resolvida')
+        # status == '' (opção "Todos os Status" escolhida explicitamente):
+        # não filtra por status, mostra o histórico completo.
+
         if veiculo:
             qs = qs.filter(Q(veiculo__placa__icontains=veiculo) | Q(veiculo__modelo__icontains=veiculo))
+
+        if status is None or status in ('aguardando', 'em_reparo'):
+            # Visões "em aberto" mostram a mais antiga primeiro, para que
+            # nada fique esquecido enterrado nas últimas páginas.
+            qs = qs.order_by('criada_em')
+
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        limite_atraso = timezone.now() - timedelta(days=OCORRENCIA_DIAS_ALERTA)
         contagens = OcorrenciaAvaria.objects.aggregate(
             aguardando=Count('id', filter=Q(status='aguardando')),
             em_reparo=Count('id', filter=Q(status='em_reparo')),
             resolvidas=Count('id', filter=Q(status='resolvida')),
+            atrasadas=Count('id', filter=~Q(status='resolvida') & Q(criada_em__lte=limite_atraso)),
         )
         context['total_aguardando'] = contagens['aguardando']
         context['total_em_reparo'] = contagens['em_reparo']
         context['total_resolvidas'] = contagens['resolvidas']
+        context['total_atrasadas'] = contagens['atrasadas']
+        context['filtro_padrao_ativo'] = self.request.GET.get('status') is None
         return context
 
 
@@ -459,7 +514,20 @@ class OcorrenciaUpdateView(LoginRequiredMixin, GestorRequiredMixin, UpdateView):
         obj = form.save(commit=False)
         if obj.status == 'resolvida' and not obj.resolvida_por:
             obj.resolvida_por = self.request.user
-        obj.save()
+
+        with transaction.atomic():
+            obj.save()
+            if obj.status == 'resolvida':
+                veiculo = Veiculo.objects.select_for_update().get(pk=obj.veiculo_id)
+                if veiculo.bloqueio_automatico and not veiculo_tem_ocorrencia_critica_aberta(
+                    veiculo, excluir_pk=obj.pk
+                ):
+                    veiculo.bloqueado = False
+                    veiculo.bloqueio_automatico = False
+                    veiculo.motivo_bloqueio = ''
+                    veiculo.save(update_fields=['bloqueado', 'bloqueio_automatico', 'motivo_bloqueio'])
+                    messages.success(self.request, f"Veículo {veiculo.placa} desbloqueado automaticamente.")
+
         messages.success(self.request, f"Ocorrência do veículo {obj.veiculo.placa} atualizada.")
         return redirect(self.success_url)
 
@@ -610,11 +678,13 @@ class VeiculoBloqueioView(LoginRequiredMixin, GestorRequiredMixin, View):
         action = request.POST.get('action')
         if action == 'bloquear':
             veiculo.bloqueado = True
+            veiculo.bloqueio_automatico = False
             veiculo.motivo_bloqueio = request.POST.get('motivo', '').strip()
             veiculo.save()
             messages.warning(request, f"Veículo {veiculo.placa} bloqueado para despacho.")
         elif action == 'liberar':
             veiculo.bloqueado = False
+            veiculo.bloqueio_automatico = False
             veiculo.motivo_bloqueio = ''
             veiculo.save()
             messages.success(request, f"Veículo {veiculo.placa} liberado para despacho.")
@@ -644,7 +714,7 @@ class OrdemManutencaoListView(LoginRequiredMixin, GestorRequiredMixin, ListView)
         context['total_abertas'] = OrdemManutencao.objects.filter(status='aberta').count()
         context['total_andamento'] = OrdemManutencao.objects.filter(status='em_andamento').count()
         custo = OrdemManutencao.objects.filter(status='concluida').aggregate(t=Sum('custo'))['t']
-        context['custo_total'] = custo or 0
+        context['custo_total'] = (custo or Decimal('0.00')).quantize(Decimal('0.01'))
         return context
 
 
@@ -693,8 +763,10 @@ class AbastecimentoListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         qs = self.get_queryset()
         totais = qs.aggregate(litros=Sum('litros'), valor=Sum('valor_total'))
-        context['total_litros'] = totais['litros'] or 0
-        context['total_valor'] = totais['valor'] or 0
+        litros = totais['litros'] or Decimal('0.0')
+        valor = totais['valor'] or Decimal('0.00')
+        context['total_litros'] = litros.quantize(Decimal('0.1'))
+        context['total_valor'] = valor.quantize(Decimal('0.01'))
         return context
 
 

@@ -35,7 +35,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-[9px] font-black uppercase tracking-widest" style="color:#484f58">Valor FIPE</p>
-                    <p class="text-sm font-bold mt-0.5" style="color:#c9d1d9">R$ {{ veiculo.fipe|floatformat:2|intcomma }}</p>
+                    <p class="text-sm font-bold mt-0.5" style="color:#c9d1d9">R$ {{ veiculo.fipe|default_if_none:"0.00"|intcomma }}</p>
                 </div>
             </div>
 

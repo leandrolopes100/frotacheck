@@ -53,7 +53,7 @@
                     <h3 class="font-bold text-sm mb-1" style="color:#388bfd">Status Patrimonial</h3>
                     <p class="text-sm leading-relaxed" style="color:#8b949e">
                         Este veículo, fabricado em <strong style="color:#c9d1d9">{{ veiculo.ano }}</strong>, possui um valor de mercado (FIPE) atual de
-                        <strong style="color:#c9d1d9">R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</strong>.
+                        <strong style="color:#c9d1d9">R$ {{ veiculo.fipe|default_if_none:"0.00"|intcomma }}</strong>.
                         Mantenha a documentação e as informações atualizadas para preservar o valor do ativo.
                     </p>
                 </div>
@@ -72,7 +72,7 @@
                     </div>
                     <div class="px-6 py-4 flex justify-between" style="border-bottom:1px solid rgba(255,255,255,0.05)">
                         <span class="text-sm" style="color:#8b949e">Valor FIPE</span>
-                        <span class="text-sm font-bold" style="color:#3fb950">R$ {{ veiculo.fipe|floatformat:2|intcomma|default:"0,00" }}</span>
+                        <span class="text-sm font-bold" style="color:#3fb950">R$ {{ veiculo.fipe|default_if_none:"0.00"|intcomma }}</span>
                     </div>
                     <div class="px-6 py-4 flex justify-between">
                         <span class="text-sm" style="color:#8b949e">Criado em</span>

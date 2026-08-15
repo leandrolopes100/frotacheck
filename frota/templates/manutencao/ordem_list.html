@@ -52,7 +52,7 @@
                 </div>
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wider" style="color:#484f58">Custo Total (Concluídas)</p>
-                    <p class="text-2xl font-bold" style="color:#3fb950">R$ {{ custo_total|floatformat:2|intcomma }}</p>
+                    <p class="text-2xl font-bold" style="color:#3fb950">R$ {{ custo_total|intcomma }}</p>
                 </div>
             </div>
         </div>
@@ -115,7 +115,7 @@
             </div>
             <div class="flex items-center justify-between mt-3">
                 <p class="text-sm font-bold" style="color:{% if ordem.custo %}#3fb950{% else %}#30363d{% endif %}">
-                    {% if ordem.custo %}R$ {{ ordem.custo|floatformat:2|intcomma }}{% else %}—{% endif %}
+                    {% if ordem.custo %}R$ {{ ordem.custo|intcomma }}{% else %}—{% endif %}
                 </p>
                 <a href="{% url 'ordem_manutencao_update' ordem.pk %}"
                    class="p-2 rounded-lg inline-flex transition-all"
@@ -184,7 +184,7 @@
                         </td>
                         <td class="text-right">
                             <p class="text-sm font-bold" style="color:{% if ordem.custo %}#3fb950{% else %}#30363d{% endif %}">
-                                {% if ordem.custo %}R$ {{ ordem.custo|floatformat:2|intcomma }}{% else %}—{% endif %}
+                                {% if ordem.custo %}R$ {{ ordem.custo|intcomma }}{% else %}—{% endif %}
                             </p>
                         </td>
                         <td class="text-right">

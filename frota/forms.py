@@ -4,6 +4,7 @@ from .models import (
     Checklist, Usuario, Funcionario, FotoAvaria, Veiculo,
     OcorrenciaAvaria, OrdemManutencao, Abastecimento,
 )
+from .utils import CAMPOS_AVARIA, CAMPO_LABELS
 
 
 # ── Validadores de documentos brasileiros ─────────────────────────────────────
@@ -68,6 +69,26 @@ class ChecklistForm(forms.ModelForm):
             raise forms.ValidationError(
                 "Não foi possível confirmar sua localização. Permita o acesso ao "
                 "GPS e tente novamente — o envio do checklist exige localização confirmada."
+            )
+        return cleaned_data
+
+
+class ChecklistCreateForm(ChecklistForm):
+    """Só usada na criação (ChecklistCreateView) — exige que o motorista
+    tenha revisado todos os itens antes de enviar, não só os que ele achou
+    por bem tocar. Não é usada na edição (ChecklistUpdateView), que já
+    parte de valores reais preenchidos, não de um formulário em branco."""
+    itens_tocados = forms.CharField(required=False, widget=forms.HiddenInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tocados = {t for t in (cleaned_data.get('itens_tocados') or '').split(',') if t}
+        faltando = [c for c in CAMPOS_AVARIA if c not in tocados]
+        if faltando:
+            labels = [CAMPO_LABELS.get(c, c) for c in faltando]
+            raise forms.ValidationError(
+                "Revise todos os itens antes de enviar. Itens não verificados: "
+                + ", ".join(labels) + "."
             )
         return cleaned_data
 

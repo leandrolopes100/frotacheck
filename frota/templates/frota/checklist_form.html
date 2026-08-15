@@ -116,6 +116,7 @@
         {{ fotos.management_form }}
         <input type="hidden" name="latitude"  id="id_latitude">
         <input type="hidden" name="longitude" id="id_longitude">
+        <input type="hidden" name="itens_tocados" id="id_itens_tocados">
 
         <div class="space-y-5">
 
@@ -130,7 +131,7 @@
 
             <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {% for field in form %}
-                    {% if field.field.widget.input_type != "checkbox" and field.name != "latitude" and field.name != "longitude" and field.name != "observacoes" %}
+                    {% if field.field.widget.input_type != "checkbox" and field.name != "latitude" and field.name != "longitude" and field.name != "itens_tocados" and field.name != "observacoes" %}
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color:#8b949e">
                             {{ field.label }}
@@ -153,7 +154,7 @@
                 <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
                      style="background:#3fb950; color:#0d1117">2</div>
                 <span class="text-xs font-bold uppercase tracking-wider" style="color:#e6edf3">Itens de Segurança</span>
-                <span class="ml-auto text-[10px] font-semibold" style="color:#484f58">27 itens no total</span>
+                <span class="ml-auto text-[10px] font-semibold" style="color:#484f58">28 itens no total</span>
             </div>
 
             <!-- Iluminação -->
@@ -168,11 +169,6 @@
                     <div class="flex items-center gap-2">
                         <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="4"
                               style="background:rgba(255,255,255,0.06); color:#484f58">0/4</span>
-                        <button type="button" onclick="marcarTodos('group-iluminacao', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
-                                style="color:#3fb950">
-                            Marcar todos
-                        </button>
                     </div>
                 </div>
                 <div id="group-iluminacao" style="border-color:rgba(255,255,255,0.04)">
@@ -195,11 +191,6 @@
                     <div class="flex items-center gap-2">
                         <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="6"
                               style="background:rgba(255,255,255,0.06); color:#484f58">0/6</span>
-                        <button type="button" onclick="marcarTodos('group-mecanica', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
-                                style="color:#3fb950">
-                            Marcar todos
-                        </button>
                     </div>
                 </div>
                 <div id="group-mecanica">
@@ -224,11 +215,6 @@
                     <div class="flex items-center gap-2">
                         <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="7"
                               style="background:rgba(255,255,255,0.06); color:#484f58">0/7</span>
-                        <button type="button" onclick="marcarTodos('group-externa', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
-                                style="color:#3fb950">
-                            Marcar todos
-                        </button>
                     </div>
                 </div>
                 <div id="group-externa">
@@ -252,13 +238,8 @@
                         <span class="text-xs font-bold" style="color:#c9d1d9">Interna</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="10"
-                              style="background:rgba(255,255,255,0.06); color:#484f58">0/10</span>
-                        <button type="button" onclick="marcarTodos('group-interna', this)"
-                                class="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors fill-hover-green"
-                                style="color:#3fb950">
-                            Marcar todos
-                        </button>
+                        <span class="group-counter text-[10px] font-semibold px-2 py-0.5 rounded-full transition-all" data-total="11"
+                              style="background:rgba(255,255,255,0.06); color:#484f58">0/11</span>
                     </div>
                 </div>
                 <div id="group-interna">
@@ -272,6 +253,7 @@
                     {% include "frota/_checklist_item.html" with field=form.teto %}
                     {% include "frota/_checklist_item.html" with field=form.tacografo %}
                     {% include "frota/_checklist_item.html" with field=form.carga %}
+                    {% include "frota/_checklist_item.html" with field=form.tablet_cigame %}
                 </div>
             </div>
 
@@ -434,14 +416,19 @@
 </template>
 
 <style>
-    .checklist-row { min-height: 52px; }
-    .checklist-row .check-visual { border: 2px solid rgba(255,255,255,0.2); border-radius: 5px; }
-    .checklist-row .check-visual.is-checked {
-        background: #3fb950 !important;
-        border-color: #3fb950 !important;
-    }
-    .checklist-row.is-checked { background: rgba(63,185,80,0.08); border-left-color: #3fb950 !important; }
-    .checklist-row.is-checked .check-label { color: #484f58; }
+    .checklist-row { min-height: 52px; border-left-color: transparent; }
+    .checklist-row:hover { background: rgba(255,255,255,0.03); }
+    .checklist-row .check-label { color: #c9d1d9; }
+
+    .checklist-row.is-ok { background: rgba(63,185,80,0.08) !important; border-left-color: #3fb950 !important; }
+    .checklist-row.is-ok .check-label { color: #8b949e; }
+
+    .checklist-row.is-avaria { background: rgba(248,81,73,0.08) !important; border-left-color: #f85149 !important; }
+    .checklist-row.is-avaria .check-label { color: #f85149; font-weight: 600; }
+
+    .check-btn { background: transparent; border-color: rgba(255,255,255,0.15); color: #8b949e; }
+    .check-btn-ok.is-active { background: #3fb950 !important; border-color: #3fb950 !important; color: #0d1117 !important; }
+    .check-btn-avaria.is-active { background: #f85149 !important; border-color: #f85149 !important; color: #0d1117 !important; }
 
     @keyframes fotoIn {
         from { opacity: 0; transform: scale(0.96) translateY(8px); }
@@ -475,28 +462,55 @@
 </style>
 
 <script>
-function onItemToggle(cb) {
-    const row    = cb.closest('.checklist-row');
-    const visual = row.querySelector('.check-visual');
-    const mark   = row.querySelector('.check-mark');
-    const badge  = row.querySelector('.check-badge');
-    const label  = row.querySelector('.check-label');
+const TOCADOS = new Set();
+const TOTAL_ITENS = document.querySelectorAll('.checklist-cb').length;
+let gpsConfirmado = false;
 
-    if (cb.checked) {
-        row.classList.add('is-checked');
-        row.style.borderLeftColor = '#3fb950';
-        if (visual) { visual.style.background = '#3fb950'; visual.style.borderColor = '#3fb950'; }
-        if (mark)   { mark.classList.remove('opacity-0', 'scale-50'); mark.classList.add('opacity-100', 'scale-100'); }
-        if (badge)  { badge.textContent = 'OK'; badge.style.cssText = 'background:rgba(63,185,80,0.15);color:#3fb950'; }
-        if (label)  label.style.color = '#484f58';
+function atualizarBotaoEnvio() {
+    const btn     = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    if (gpsConfirmado && TOCADOS.size === TOTAL_ITENS) {
+        btn.disabled = false;
+        btn.classList.add('btn-submit-ok');
+        btn.style.cursor = 'pointer';
+        btnText.innerHTML = '<i class="fas fa-check-circle text-sm"></i> Finalizar e Enviar Checklist';
     } else {
-        row.classList.remove('is-checked');
-        row.style.borderLeftColor = 'transparent';
-        if (visual) { visual.style.background = '#0d1117'; visual.style.borderColor = 'rgba(255,255,255,0.2)'; }
-        if (mark)   { mark.classList.add('opacity-0', 'scale-50'); mark.classList.remove('opacity-100', 'scale-100'); }
-        if (badge)  { badge.textContent = '—'; badge.style.cssText = 'color:#30363d'; }
-        if (label)  label.style.color = '#c9d1d9';
+        btn.disabled = true;
+        btn.classList.remove('btn-submit-ok');
+        btn.style.cursor = 'not-allowed';
+        if (!gpsConfirmado) {
+            btnText.innerHTML = '<i class="fas fa-lock text-sm"></i> Aguardando GPS para finalizar';
+        } else {
+            const faltam = TOTAL_ITENS - TOCADOS.size;
+            btnText.innerHTML = `<i class="fas fa-list-check text-sm"></i> Revise mais ${faltam} ${faltam === 1 ? 'item' : 'itens'} para enviar`;
+        }
     }
+}
+
+function definirItem(btn, valor) {
+    const row       = btn.closest('.checklist-row');
+    const cb        = row.querySelector('.checklist-cb');
+    const btnOk     = row.querySelector('.check-btn-ok');
+    const btnAvaria = row.querySelector('.check-btn-avaria');
+
+    cb.checked = valor;
+    TOCADOS.add(cb.name);
+    const tocadosInput = document.getElementById('id_itens_tocados');
+    if (tocadosInput) tocadosInput.value = Array.from(TOCADOS).join(',');
+    atualizarBotaoEnvio();
+
+    row.classList.remove('is-ok', 'is-avaria');
+    btnOk.classList.remove('is-active');
+    btnAvaria.classList.remove('is-active');
+
+    if (valor) {
+        row.classList.add('is-ok');
+        btnOk.classList.add('is-active');
+    } else {
+        row.classList.add('is-avaria');
+        btnAvaria.classList.add('is-active');
+    }
+
     atualizarContador(cb);
 }
 
@@ -507,25 +521,18 @@ function atualizarContador(cb) {
     const counter = header?.querySelector('.group-counter');
     if (!counter) return;
 
-    const total   = group.querySelectorAll('.checklist-cb').length;
-    const checked = group.querySelectorAll('.checklist-cb:checked').length;
-    counter.textContent = `${checked}/${total}`;
+    const itens    = Array.from(group.querySelectorAll('.checklist-cb'));
+    const total    = itens.length;
+    const revisado = itens.filter(c => TOCADOS.has(c.name)).length;
+    counter.textContent = `${revisado}/${total}`;
 
-    if (checked === total && total > 0) {
+    if (revisado === total && total > 0) {
         counter.style.cssText = 'background:rgba(63,185,80,0.15);color:#3fb950';
-    } else if (checked > 0) {
+    } else if (revisado > 0) {
         counter.style.cssText = 'background:rgba(63,185,80,0.08);color:#3fb950';
     } else {
         counter.style.cssText = 'background:rgba(255,255,255,0.06);color:#484f58';
     }
-}
-
-function marcarTodos(groupId, btn) {
-    const group  = document.getElementById(groupId);
-    const cbs    = group.querySelectorAll('.checklist-cb');
-    const anyOff = Array.from(cbs).some(cb => !cb.checked);
-    cbs.forEach(cb => { cb.checked = anyOff; onItemToggle(cb); });
-    btn.textContent = anyOff ? 'Desmarcar todos' : 'Marcar todos';
 }
 
 function initContadores() {
@@ -537,18 +544,16 @@ function initContadores() {
 
 function initCheckboxVisuals() {
     document.querySelectorAll('.checklist-cb:checked').forEach(cb => {
-        const row    = cb.closest('.checklist-row');
-        const visual = row?.querySelector('.check-visual');
-        const mark   = row?.querySelector('.check-mark');
-        const badge  = row?.querySelector('.check-badge');
-        const label  = row?.querySelector('.check-label');
+        const row   = cb.closest('.checklist-row');
+        const btnOk = row?.querySelector('.check-btn-ok');
 
-        if (row)    { row.classList.add('is-checked'); row.style.borderLeftColor = '#3fb950'; }
-        if (visual) { visual.style.background = '#3fb950'; visual.style.borderColor = '#3fb950'; }
-        if (mark)   { mark.classList.remove('opacity-0', 'scale-50'); }
-        if (badge)  { badge.textContent = 'OK'; badge.style.cssText = 'background:rgba(63,185,80,0.15);color:#3fb950'; }
-        if (label)  label.style.color = '#484f58';
+        TOCADOS.add(cb.name);
+        if (row)   row.classList.add('is-ok');
+        if (btnOk) btnOk.classList.add('is-active');
     });
+    const tocadosInput = document.getElementById('id_itens_tocados');
+    if (tocadosInput) tocadosInput.value = Array.from(TOCADOS).join(',');
+    atualizarBotaoEnvio();
 }
 
 const STEP_SECTIONS = ['step-identificacao', 'step-vistoria', 'step-evidencias', 'step-envio'];
@@ -585,8 +590,6 @@ const stepObserver = new IntersectionObserver(entries => {
 }, { threshold: 0.4, rootMargin: '-60px 0px -40% 0px' });
 
 function setupGPS() {
-    const btn       = document.getElementById('submit-btn');
-    const btnText   = document.getElementById('btn-text');
     const gpsStatus = document.getElementById('gps-status');
     const gpsIcon   = document.getElementById('gps-icon');
     const gpsIconW  = document.getElementById('gps-icon-wrap');
@@ -618,10 +621,8 @@ function setupGPS() {
         gpsDot.style.background     = '#3fb950';
         gpsDot.classList.remove('animate-pulse');
 
-        btn.disabled = false;
-        btn.classList.add('btn-submit-ok');
-        btn.style.cursor = 'pointer';
-        btnText.innerHTML = '<i class="fas fa-check-circle text-sm"></i> Finalizar e Enviar Checklist';
+        gpsConfirmado = true;
+        atualizarBotaoEnvio();
     }
 
     function onError() {

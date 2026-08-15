@@ -71,6 +71,9 @@ cover/
 # Translations
 *.mo
 
+# Script local com credenciais reais de e-mail — nunca versionar
+run_local.ps1
+
 # Django stuff:
 
 # Flask stuff:

@@ -83,6 +83,9 @@ class Veiculo(models.Model):
     # Bloqueio para despacho
     bloqueado = models.BooleanField(default=False, verbose_name="Bloqueado para Despacho")
     motivo_bloqueio = models.TextField(blank=True, null=True, verbose_name="Motivo do Bloqueio")
+    bloqueio_automatico = models.BooleanField(
+        default=False, verbose_name="Bloqueio Automático (Avaria Crítica)",
+    )
 
     class Meta:
         ordering = ['-criado_em']
@@ -151,6 +154,7 @@ class Checklist(models.Model):
     teto = models.BooleanField(default=False, verbose_name="Teto OK?")
     tacografo = models.BooleanField(default=False, verbose_name="Tacógrafo Ok?")
     carga = models.BooleanField(default=False, verbose_name="Carga Ok?")
+    tablet_cigame = models.BooleanField(default=False, verbose_name="Tablet Entregas CIGAME Ok?")
 
     observacoes = models.TextField(blank=True, null=True)
 
@@ -177,6 +181,7 @@ class Checklist(models.Model):
                 ("Freio de Mão", self.freio_mao), ("Ar Condicionado", self.ar_condicionado),
                 ("Som", self.som), ("Teto", self.teto),
                 ("Tacógrafo", self.tacografo), ("Carga", self.carga),
+                ("Tablet Entregas CIGAME", self.tablet_cigame),
             ],
         }
 
@@ -184,6 +189,11 @@ class Checklist(models.Model):
     def tem_avaria(self):
         from .utils import CAMPOS_AVARIA
         return any(not getattr(self, campo) for campo in CAMPOS_AVARIA)
+
+    @property
+    def tem_item_critico_reprovado(self):
+        from .utils import ITENS_CRITICOS
+        return any(not getattr(self, campo) for campo in ITENS_CRITICOS)
 
     def __str__(self):
         return f"{self.nome_checklist} - {self.veiculo.placa}"
@@ -249,6 +259,20 @@ class OcorrenciaAvaria(models.Model):
 
     def __str__(self):
         return f"{self.veiculo.placa} — {self.get_status_display()} ({self.criada_em.strftime('%d/%m/%Y')})"
+
+    @property
+    def dias_em_aberto(self):
+        fim = self.atualizada_em if self.status == 'resolvida' else timezone.now()
+        return (fim - self.criada_em).days
+
+    @property
+    def atrasada(self):
+        from .utils import OCORRENCIA_DIAS_ALERTA
+        return self.status != 'resolvida' and self.dias_em_aberto >= OCORRENCIA_DIAS_ALERTA
+
+    @property
+    def critica(self):
+        return self.checklist.tem_item_critico_reprovado
 
 
 # ── ORDEM DE MANUTENÇÃO ───────────────────────────────────────────────────────

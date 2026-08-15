@@ -4,6 +4,8 @@ Django==6.0.2
 django-axes==8.3.1
 django-widget-tweaks==1.5.1
 pillow==12.1.1
+psycopg==3.3.4
+psycopg-binary==3.3.4
 qrcode==8.2
 sqlparse==0.5.5
 tzdata==2025.3

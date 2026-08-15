@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-FrotaCheck — sistema de gestão de ativos e conformidade veicular para transportadoras: checklists digitais de vistoria (com validação de GPS e evidências fotográficas), controle de ocorrências de avaria, ordens de manutenção, abastecimento e cadastro de funcionários/veículos. Django 6.0.2, Tailwind CSS via CDN, SQLite (dev; Postgres planejado para produção, ver README.md).
+FrotaCheck — sistema de gestão de ativos e conformidade veicular para transportadoras: checklists digitais de vistoria (com validação de GPS e evidências fotográficas), controle de ocorrências de avaria, ordens de manutenção, abastecimento e cadastro de funcionários/veículos. Django 6.0.2, Tailwind CSS via CDN, PostgreSQL (dev e produção, ver README.md).
 
 ## Commands
 
@@ -19,7 +19,9 @@ Venv Windows em `venv/` (usa `Scripts/python.exe`, não `bin/`).
 - System check: `... manage.py check` (use `--deploy` para ver avisos de prontidão para produção)
 - Popular banco com dados de demonstração (recusa rodar se `DEBUG=False`): `... manage.py popular_fixtures` — cria usuário `gestor`/`demo1234`, 4 motoristas (`demo1234`), 5 veículos, checklists, ocorrências, ordens de manutenção e abastecimentos
 
-`DJANGO_SECRET_KEY` é **obrigatória**: `core/settings.py` levanta `ImproperlyConfigured` se ela não estiver definida e `DEBUG=False` (que é o padrão do arquivo). Não há loader de `.env` no projeto — `.env.example` só documenta o nome da variável; exporte-a manualmente no shell.
+`DJANGO_SECRET_KEY` é **obrigatória**: `core/settings.py` levanta `ImproperlyConfigured` se ela não estiver definida e `DEBUG=False` (que é o padrão do arquivo). Não há loader de `.env` no projeto — `.env.example` só documenta o nome das variáveis; exporte-as manualmente no shell (ou use `run_local.ps1`, fora do git, com as credenciais reais).
+
+Banco de dados é PostgreSQL, configurado via `DB_NAME`/`DB_USER`/`DB_PASSWORD`/`DB_HOST`/`DB_PORT` em `core/settings.py` (todas com `os.environ.get`, com padrões pensados para um Postgres local chamado `frotacheck`). `DB_PASSWORD` precisa ser exportada mesmo localmente, já que o padrão é uma string vazia.
 
 ## Architecture
 

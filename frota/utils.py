@@ -8,7 +8,7 @@ CAMPOS_AVARIA = [
     'macaco', 'chave_roda', 'lataria', 'buzina',
     'iluminacao_interna', 'bancos', 'tapetes',
     'freio_mao', 'ar_condicionado', 'som', 'teto',
-    'tacografo', 'carga',
+    'tacografo', 'carga', 'tablet_cigame',
 ]
 
 CAMPO_LABELS = {
@@ -20,6 +20,7 @@ CAMPO_LABELS = {
     'buzina': 'Buzina', 'iluminacao_interna': 'Luz Interna', 'bancos': 'Bancos',
     'tapetes': 'Tapetes', 'freio_mao': 'Freio de Mão', 'ar_condicionado': 'Ar Condicionado',
     'som': 'Som', 'teto': 'Teto', 'tacografo': 'Tacógrafo', 'carga': 'Carga',
+    'tablet_cigame': 'Tablet Entregas CIGAME',
 }
 
 # Itens que representam risco direto à segurança
@@ -28,6 +29,9 @@ ITENS_CRITICOS = [
     'pneus', 'amortecedor', 'bateria',
     'freio_mao', 'vazamentos', 'arrefecimento_radiador',
 ]
+
+# Dias em aberto a partir dos quais uma OcorrenciaAvaria é sinalizada como atrasada
+OCORRENCIA_DIAS_ALERTA = 3
 
 
 def get_filtro_avaria():
@@ -50,11 +54,6 @@ def get_itens_com_falha(checklist):
     ]
 
 
-def tem_avaria_critica(checklist):
-    """True se algum item crítico de segurança falhou."""
-    return any(not getattr(checklist, campo, True) for campo in ITENS_CRITICOS)
-
-
 def criar_ocorrencia_para_checklist(checklist):
     """Cria um registro OcorrenciaAvaria para um checklist com avarias."""
     from .models import OcorrenciaAvaria
@@ -67,3 +66,26 @@ def criar_ocorrencia_para_checklist(checklist):
         descricao=', '.join(itens),
         status='aguardando',
     )
+
+
+def gerar_motivo_bloqueio_automatico(checklist):
+    """Monta o texto de motivo_bloqueio para o bloqueio automático por
+    avaria crítica, citando o checklist de origem e os itens reprovados."""
+    itens = [CAMPO_LABELS.get(c, c) for c in ITENS_CRITICOS if not getattr(checklist, c, True)]
+    return (
+        f"Bloqueio automático — item(ns) crítico(s) reprovado(s) no checklist #{checklist.pk} "
+        f"({checklist.data_realizada.strftime('%d/%m/%Y %H:%M')}): " + ", ".join(itens)
+    )
+
+
+def veiculo_tem_ocorrencia_critica_aberta(veiculo, excluir_pk=None):
+    """True se o veículo tem alguma OcorrenciaAvaria não resolvida cujo
+    checklist de origem reprovou algum item crítico de segurança."""
+    from .models import OcorrenciaAvaria
+    q_critico = Q()
+    for campo in ITENS_CRITICOS:
+        q_critico |= Q(**{f'checklist__{campo}': False})
+    qs = OcorrenciaAvaria.objects.filter(veiculo=veiculo).exclude(status='resolvida').filter(q_critico)
+    if excluir_pk:
+        qs = qs.exclude(pk=excluir_pk)
+    return qs.exists()
