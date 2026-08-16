@@ -19,7 +19,10 @@ if not SECRET_KEY:
             "ambiente antes de subir a aplicação com DEBUG=False."
         )
 
-ALLOWED_HOSTS = ['192.168.27.100', '127.0.0.1', '172.20.10.3']
+ALLOWED_HOSTS = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS',
+    '192.168.27.100,127.0.0.1,172.20.10.3',
+).split(',')
 AUTH_USER_MODEL = 'frota.Usuario'
 
 LOGIN_REDIRECT_URL = 'checklist_list'
@@ -44,6 +47,12 @@ if _HTTPS_ENABLED:
     SECURE_HSTS_SECONDS = 31536000
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# Obrigatório com HTTPS atrás de proxy (Nginx) — sem isso, todo POST
+# autenticado (login, checklist) quebra com erro 403 de CSRF.
+_CSRF_TRUSTED_ORIGINS = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '')
+if _CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS = _CSRF_TRUSTED_ORIGINS.split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -136,6 +145,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
