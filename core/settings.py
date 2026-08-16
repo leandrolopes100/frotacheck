@@ -45,8 +45,10 @@ _HTTPS_ENABLED = os.environ.get('DJANGO_HTTPS_ENABLED', 'False') == 'True'
 if _HTTPS_ENABLED:
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Obrigatório com HTTPS atrás de proxy (Nginx) — sem isso, todo POST
 # autenticado (login, checklist) quebra com erro 403 de CSRF.
