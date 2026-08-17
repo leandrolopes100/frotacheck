@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br" class="h-full">
 <head>
@@ -46,7 +47,7 @@
         .toggle-pass-hover:hover { color: #c9d1d9; }
 
         .footer-link { text-decoration: none; transition: color 0.12s; }
-        .footer-link:hover { color: #c9d1d9; text-decoration: underline; }
+        .footer-link:hover { color: #56d364; text-decoration: underline; }
     </style>
 </head>
 <body class="h-full">
@@ -175,16 +176,22 @@
             <!-- ══════════════════════════
                  RODAPÉ — sempre visível (desktop, tablet e mobile)
             ══════════════════════════ -->
-            <footer class="px-6 sm:px-10 py-5 flex flex-col items-center text-center sm:flex-row sm:items-center sm:justify-between sm:text-left gap-2"
+            <footer class="px-6 sm:px-10 py-5 flex flex-col items-center text-center sm:flex-row sm:items-center sm:justify-between sm:text-left gap-3"
                     style="border-top:1px solid rgba(255,255,255,0.06)">
-                <div class="flex items-baseline gap-2">
-                    <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#484f58">Parceiro Oficial</span>
-                    <span class="text-sm font-bold" style="color:#f0883e">PELLIZZER <span style="color:#f0883e; font-weight:500; opacity:0.85">Transportes</span></span>
+                <div class="flex items-center gap-3">
+                    <div class="rounded-md p-1 flex-shrink-0" style="background:#fff">
+                        <img src="{% static 'frota/img/pellizzer.png' %}" alt="Pellizzer Transportes"
+                             class="h-7 w-auto object-contain" style="max-width:110px">
+                    </div>
+                    <div class="flex flex-col items-start leading-tight">
+                        <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#484f58">Parceiro Oficial</span>
+                        <span class="text-sm font-bold" style="color:#f0883e">PELLIZZER <span style="color:#f0883e; font-weight:500; opacity:0.85">Transportes</span></span>
+                    </div>
                 </div>
                 <p class="text-xs" style="color:#484f58">
-                    &copy; FrotaCheck &nbsp;·&nbsp; Dev.
+                    &copy; FrotaCheck &nbsp;·&nbsp; Desenvolvido por
                     <a href="https://www.lopsystem.com.br/" target="_blank" rel="noopener noreferrer"
-                       class="footer-link" style="color:#484f58">Leandro Lopes</a>
+                       class="footer-link text-sm font-bold" style="color:#3fb950">Leandro Lopes</a>
                 </p>
             </footer>
         </main>

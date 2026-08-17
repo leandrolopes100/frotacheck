@@ -37,10 +37,7 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# Ligar via DJANGO_HTTPS_ENABLED=True assim que houver HTTPS na frente da
-# aplicação (proxy/Nginx com certificado). Desligado por padrão porque hoje
-# o app roda em rede local sem TLS — ligado sem HTTPS de verdade, o
-# SECURE_SSL_REDIRECT deixaria a aplicação inacessível.
+
 _HTTPS_ENABLED = os.environ.get('DJANGO_HTTPS_ENABLED', 'False') == 'True'
 if _HTTPS_ENABLED:
     SECURE_SSL_REDIRECT = True
