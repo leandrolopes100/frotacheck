@@ -235,14 +235,14 @@
 
 <!-- ── Lightbox ── -->
 <div id="photoModal"
-     class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-     style="background:rgba(15,23,42,0.92); backdrop-filter:blur(8px)"
+     class="modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center p-4"
      onclick="closeModal()">
-    <div class="relative max-w-5xl w-full" onclick="event.stopPropagation()">
-        <img id="modalImg" src="" class="w-full h-auto rounded-xl shadow-2xl" style="ring:1px solid rgba(255,255,255,0.1)">
-        <button onclick="closeModal()"
-                class="absolute -top-11 right-0 flex items-center gap-2 text-white/70 hover:text-white text-xs font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-white/10">
-            <i class="fas fa-xmark"></i> Fechar
+    <div class="modal-panel relative max-w-5xl w-full p-2" onclick="event.stopPropagation()">
+        <img id="modalImg" src="" class="w-full h-auto rounded-xl block" alt="Foto de avaria ampliada">
+        <button type="button" id="photoModalCloseBtn" onclick="closeModal()" aria-label="Fechar"
+                class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                style="background:rgba(0,0,0,0.55); color:#fff; backdrop-filter:blur(4px)">
+            <i class="fas fa-xmark text-sm"></i>
         </button>
     </div>
 </div>
@@ -261,21 +261,19 @@
     });
 
     function openModal(url) {
-        const modal = document.getElementById('photoModal');
         document.getElementById('modalImg').src = url;
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        document.body.style.overflow = 'hidden';
+        openOverlay(document.getElementById('photoModal'));
+        document.getElementById('photoModalCloseBtn')?.focus();
     }
 
     function closeModal() {
-        const modal = document.getElementById('photoModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        document.body.style.overflow = '';
+        closeOverlay(document.getElementById('photoModal'));
     }
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !document.getElementById('photoModal').classList.contains('hidden'))
+            closeModal();
+    });
 </script>
 
 <style>

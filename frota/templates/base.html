@@ -236,6 +236,40 @@
         .alert-warning { background: rgba(210,153,34,0.06); border-color: rgba(210,153,34,0.18); }
         .alert-neutral { background: rgba(255,255,255,0.03); border-color: var(--border); }
 
+        /* ── Superfícies elevadas (modais, popovers) ── */
+        .modal-backdrop {
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: 0;
+            transition: opacity 0.18s ease;
+        }
+        .modal-backdrop.is-open { opacity: 1; }
+
+        .modal-panel {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10), 0 24px 60px rgba(0,0,0,0.35);
+            transform: scale(0.96);
+            transition: transform 0.18s cubic-bezier(0.16,1,0.3,1);
+        }
+        .modal-backdrop.is-open .modal-panel { transform: scale(1); }
+
+        .popover-panel {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.14), 0 4px 10px rgba(0,0,0,0.08);
+            opacity: 0;
+            transform-origin: top right;
+            transform: translateY(-4px) scale(0.98);
+            transition: opacity 0.14s ease, transform 0.14s cubic-bezier(0.16,1,0.3,1);
+        }
+        .popover-panel.is-open { opacity: 1; transform: translateY(0) scale(1); }
+
+        @media (prefers-reduced-motion: reduce) {
+            .modal-backdrop, .modal-panel, .popover-panel { transition: none; }
+        }
+
         /* ── Toasts ── */
         @keyframes toastIn  { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
@@ -697,8 +731,7 @@
                             </button>
 
                             <div id="alert-dropdown"
-                                 class="hidden absolute right-0 top-full mt-2 w-64 rounded-xl overflow-hidden z-50"
-                                 style="background:var(--bg-card); border:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,0.10)">
+                                 class="popover-panel hidden absolute right-0 top-full mt-2 w-64 overflow-hidden z-50">
                                 <div class="px-4 py-3 border-b" style="border-color:var(--border)">
                                     <p class="text-xs font-semibold" style="color:var(--text-primary)">Alertas pendentes</p>
                                 </div>
@@ -742,8 +775,7 @@
                             </button>
 
                             <div id="user-dropdown"
-                                 class="hidden absolute right-0 top-full mt-2 w-52 rounded-xl overflow-hidden z-50"
-                                 style="background:var(--bg-card); border:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,0.10)">
+                                 class="popover-panel hidden absolute right-0 top-full mt-2 w-52 overflow-hidden z-50">
                                 <div class="px-4 py-3 border-b" style="border-color:var(--border)">
                                     <p class="text-xs font-semibold truncate" style="color:var(--text-primary)">{{ user.username }}</p>
                                     <p class="text-[11px] mt-0.5" style="color:var(--text-muted)">
@@ -773,10 +805,8 @@
          LOGOUT MODAL
     ══════════════════════════ -->
     <div id="logoutModal"
-         class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4"
-         style="background:rgba(0,0,0,0.75); backdrop-filter:blur(6px)">
-        <div class="rounded-2xl max-w-sm w-full p-6 shadow-2xl"
-             style="background:var(--bg-elevated); border:1px solid var(--border)">
+         class="modal-backdrop hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="modal-panel max-w-sm w-full p-6">
             <div class="text-center">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4"
                      style="background:rgba(248,81,73,0.1); color:#f85149">
@@ -786,7 +816,7 @@
                 <p class="text-sm mt-1.5" style="color:var(--text-secondary)">Sua sessão será encerrada com segurança.</p>
             </div>
             <div class="mt-6 flex gap-3">
-                <button onclick="closeLogoutModal()"
+                <button type="button" id="logoutCancelBtn" onclick="closeLogoutModal()"
                         class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors btn-cancel-outline">
                     Cancelar
                 </button>
@@ -820,31 +850,65 @@
             setTimeout(() => overlay.classList.add('hidden'), 300);
         }
 
+        // ── Overlay (modal) genérico: fade + scale, trava o scroll do body ──
+        function openOverlay(el) {
+            el.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-open')));
+        }
+        function closeOverlay(el) {
+            el.classList.remove('is-open');
+            document.body.style.overflow = '';
+            setTimeout(() => el.classList.add('hidden'), 180);
+        }
+
+        // ── Popover (dropdown) genérico: fade + slide sutil ──
+        function togglePopover(el) {
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-open')));
+            } else {
+                closePopover(el);
+            }
+        }
+        function closePopover(el) {
+            if (el.classList.contains('hidden')) return;
+            el.classList.remove('is-open');
+            setTimeout(() => el.classList.add('hidden'), 140);
+        }
+
         // ── Logout modal ──
-        function openLogoutModal()  { document.getElementById('logoutModal').classList.remove('hidden'); }
-        function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
+        function openLogoutModal() {
+            openOverlay(document.getElementById('logoutModal'));
+            document.getElementById('logoutCancelBtn')?.focus();
+        }
+        function closeLogoutModal() { closeOverlay(document.getElementById('logoutModal')); }
         window.addEventListener('click', e => {
             if (e.target === document.getElementById('logoutModal')) closeLogoutModal();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && !document.getElementById('logoutModal').classList.contains('hidden'))
+                closeLogoutModal();
         });
 
         // ── User dropdown ──
         function toggleUserMenu() {
-            document.getElementById('user-dropdown').classList.toggle('hidden');
+            togglePopover(document.getElementById('user-dropdown'));
         }
         document.addEventListener('click', e => {
             const menu = document.getElementById('user-menu');
             if (menu && !menu.contains(e.target))
-                document.getElementById('user-dropdown').classList.add('hidden');
+                closePopover(document.getElementById('user-dropdown'));
         });
 
         // ── Dropdown de alertas ──
         function toggleAlertMenu() {
-            document.getElementById('alert-dropdown').classList.toggle('hidden');
+            togglePopover(document.getElementById('alert-dropdown'));
         }
         document.addEventListener('click', e => {
             const menu = document.getElementById('alert-menu');
             if (menu && !menu.contains(e.target))
-                document.getElementById('alert-dropdown').classList.add('hidden');
+                closePopover(document.getElementById('alert-dropdown'));
         });
 
         // ── Loading state genérico ao enviar formulários (POST) ──
