@@ -20,7 +20,6 @@
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
-            {% include "frota/_busca_simples.html" with placeholder="Buscar placa ou modelo..." input_width_class="w-56" %}
             <a href="{% url 'veiculo_add' %}" class="btn-primary text-xs flex-shrink-0">
                 <i class="fas fa-plus"></i>
                 Novo Veículo
@@ -28,10 +27,44 @@
         </div>
     </div>
 
+    <!-- ── Filtros ── -->
+    <div class="card p-3 mb-6">
+        <form method="GET" class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
+            <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
+                <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs" style="color:#484f58"></i>
+                <input type="text" name="busca" value="{{ request.GET.busca }}" placeholder="Buscar placa ou modelo..."
+                       class="form-input pl-9 text-sm">
+            </div>
+            <select name="status" class="form-input w-full sm:w-auto sm:min-w-[180px] text-sm cursor-pointer">
+                <option value="">Todos os Status</option>
+                <option value="ativo" {% if request.GET.status == 'ativo' %}selected{% endif %}>Ativos</option>
+                <option value="inativo" {% if request.GET.status == 'inativo' %}selected{% endif %}>Inativos</option>
+                <option value="bloqueado" {% if request.GET.status == 'bloqueado' %}selected{% endif %}>Bloqueados</option>
+                <option value="doc_vencida" {% if request.GET.status == 'doc_vencida' %}selected{% endif %}>Documentação vencida</option>
+                <option value="doc_vencendo" {% if request.GET.status == 'doc_vencendo' %}selected{% endif %}>Documentação vencendo</option>
+            </select>
+            <div class="flex gap-2">
+                <button type="submit" class="btn-primary text-xs flex-1 sm:flex-initial justify-center">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                {% if request.GET.busca or request.GET.status %}
+                <a href="?" class="btn-secondary text-xs" style="color:#f85149">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
     <!-- ── Grid de veículos ── -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for veiculo in veiculos %}
-        <div class="group card overflow-hidden hover:-translate-y-0.5 transition-all duration-200 flex flex-col card-hover-lift">
+        <div class="group card relative overflow-hidden hover:-translate-y-0.5 transition-all duration-200 flex flex-col card-hover-lift"
+             {% if veiculo.documentacao_vencida %}
+             style="border-color:rgba(248,81,73,0.4)"
+             {% elif veiculo.documentacao_vencendo %}
+             style="border-color:rgba(210,153,34,0.4)"
+             {% endif %}>
 
             <!-- Foto 16:9 -->
             <div class="relative aspect-video overflow-hidden flex-shrink-0"
@@ -73,7 +106,7 @@
 
                 <!-- Ações hover -->
                 {% if user.is_patrao %}
-                <div class="absolute top-3 left-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div class="absolute top-3 left-3 z-20 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <a href="{% url 'veiculo_update' veiculo.pk %}"
                        class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-md overlay-btn--yellow"
                        style="background:rgba(28,33,40,0.92); color:#8b949e"
@@ -97,11 +130,22 @@
                         <h3 class="text-sm font-bold leading-tight" style="color:#e6edf3">{{ veiculo.modelo }}</h3>
                         <p class="text-xs font-medium mt-0.5" style="color:#484f58">{{ veiculo.marca }} &nbsp;·&nbsp; {{ veiculo.ano }}</p>
                     </div>
-                    {% if veiculo.bloqueado %}
-                    <span class="badge badge-danger flex-shrink-0" style="font-size:10px">
-                        <i class="fas fa-lock text-[9px]"></i> Bloqueado
-                    </span>
-                    {% endif %}
+                    <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                        {% if veiculo.bloqueado %}
+                        <span class="badge badge-danger" style="font-size:10px">
+                            <i class="fas fa-lock text-[9px]"></i> Bloqueado
+                        </span>
+                        {% endif %}
+                        {% if veiculo.documentacao_vencida %}
+                        <span class="badge badge-danger" style="font-size:10px">
+                            <i class="fas fa-file-circle-exclamation text-[9px]"></i> Doc. vencida
+                        </span>
+                        {% elif veiculo.documentacao_vencendo %}
+                        <span class="badge badge-warning" style="font-size:10px">
+                            <i class="fas fa-clock text-[9px]"></i> Vence em breve
+                        </span>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="mt-4 pt-4 flex items-center justify-between" style="border-top:1px solid rgba(255,255,255,0.05)">
@@ -112,7 +156,7 @@
                         </p>
                     </div>
                     <a href="{% url 'veiculo_detail' veiculo.pk %}"
-                       class="text-xs font-semibold flex items-center gap-1 transition-colors link-accent-hover"
+                       class="stretched-link text-xs font-semibold flex items-center gap-1 transition-colors link-accent-hover">
                         Detalhes <i class="fas fa-arrow-right text-[10px]"></i>
                     </a>
                 </div>

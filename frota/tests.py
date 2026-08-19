@@ -399,6 +399,44 @@ class ChecklistAvariaEmailTests(TestCase):
         _enviar_email_avaria(checklist)
         self.assertEqual(len(mail.outbox), 1)
 
+    def test_email_html_inclui_fotos_com_url_absoluta_e_escapa_html_malicioso(self):
+        import base64
+        png_1x1 = base64.b64decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='
+        )
+        foto = SimpleUploadedFile('avaria.png', png_1x1, content_type='image/png')
+        dados = self._dados_base(campos_ok=[c for c in CAMPOS_AVARIA if c != 'farol'])
+        dados.update({
+            'fotos-TOTAL_FORMS': '1',
+            'fotos-0-imagem': foto,
+            'fotos-0-descricao': '<script>alert(1)</script> Farol quebrado',
+            'observacoes': '<img src=x onerror=alert(1)>',
+        })
+        self.client.login(username='motorista_email', password='senha-teste-123')
+        response = self.client.post(reverse('checklist_add'), dados)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+        self.assertEqual(len(email.alternatives), 1)
+        html, mimetype = email.alternatives[0]
+        self.assertEqual(mimetype, 'text/html')
+
+        # Foto referenciada com URL absoluta (precisa abrir fora do navegador logado)
+        # e já convertida pra webp (compressão feita em FotoAvaria.save()).
+        self.assertIn('http://testserver/media/checklists/avarias/', html)
+        self.assertIn('.webp', html)
+
+        # HTML/script malicioso em campos de usuário (descrição da foto,
+        # observações) precisa vir escapado — nunca executável no cliente de e-mail.
+        self.assertNotIn('<script>alert(1)</script>', html)
+        self.assertIn('&lt;script&gt;alert(1)&lt;/script&gt;', html)
+        self.assertNotIn('<img src=x onerror=alert(1)>', html)
+
+        # Tabela da grade de fotos precisa fechar todas as linhas que abre,
+        # senão o HTML fica malformado em qualquer contagem de fotos.
+        self.assertEqual(html.count('<tr>'), html.count('</tr>'))
+
 
 @override_settings(EMAIL_HOST_USER='remetente@exemplo.com')
 class VeiculoAutoBloqueioTests(TestCase):

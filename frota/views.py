@@ -9,12 +9,13 @@ import qrcode
 from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.db import IntegrityError, transaction
 from django.core.cache import cache
 from django.db.models import Count, OuterRef, Q, Subquery, Sum
 from django.http import FileResponse, Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, View
@@ -50,10 +51,15 @@ class GestorRequiredMixin(UserPassesTestMixin):
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 
-def _enviar_email_avaria(checklist):
+def _enviar_email_avaria(checklist, request=None):
     """Envia e-mail aos gestores quando o checklist tem alguma avaria.
     Registra sucesso/falha em logs/auditoria.log — o envio nunca derruba
-    a requisição do motorista (checklist já foi salvo antes desta chamada)."""
+    a requisição do motorista (checklist já foi salvo antes desta chamada).
+
+    `request` é opcional (mantém compatibilidade com chamadas fora do ciclo
+    de request, ex.: testes) e é usado apenas para montar URLs absolutas
+    das fotos e do link de acesso ao sistema no corpo HTML. Sem ele, o
+    e-mail é enviado normalmente, só sem essas URLs."""
     if not getattr(django_settings, 'EMAIL_HOST_USER', ''):
         return
 
@@ -89,6 +95,20 @@ def _enviar_email_avaria(checklist):
         "\nVeículo bloqueado automaticamente para despacho até a resolução da(s) avaria(s) crítica(s).\n"
     ) if critico else ""
 
+    # URLs absolutas (fotos + link do checklist) só são montáveis com um request
+    # disponível (ex.: chamadas de teste passam apenas o checklist). Sem isso,
+    # o e-mail HTML simplesmente não exibe a seção de fotos nem o link direto.
+    checklist_url = request.build_absolute_uri(
+        reverse('checklist_detail', args=[checklist.pk])
+    ) if request is not None else None
+
+    fotos_ctx = []
+    if request is not None:
+        fotos_ctx = [
+            {'url': request.build_absolute_uri(foto.imagem.url), 'descricao': foto.descricao}
+            for foto in checklist.fotos_avarias.all() if foto.imagem
+        ]
+
     corpo = (
         f"{'ALERTA DE SEGURANÇA' if critico else 'Aviso de avaria'} — FrotaCheck\n\n"
         f"Veículo : {checklist.veiculo.marca} {checklist.veiculo.modelo} ({checklist.veiculo.placa})\n"
@@ -100,22 +120,33 @@ def _enviar_email_avaria(checklist):
         f"Todos os itens com falha:\n"
         + "\n".join(f"  • {i}" for i in itens)
         + f"\n\nObservações: {checklist.observacoes or 'Nenhuma'}\n\n"
-        f"Acesse o sistema para acompanhar a ocorrência."
+        + (f"Acesse o sistema para acompanhar a ocorrência: {checklist_url}"
+           if checklist_url else "Acesse o sistema para acompanhar a ocorrência.")
     )
 
     assunto_prefixo = "[ALERTA] Avaria crítica" if critico else "[Aviso] Avaria registrada"
 
     try:
-        send_mail(
+        email = EmailMultiAlternatives(
             subject=f"{assunto_prefixo} — {checklist.veiculo.placa}",
-            message=corpo,
+            body=corpo,
             from_email=getattr(django_settings, 'DEFAULT_FROM_EMAIL', 'FrotaCheck'),
-            recipient_list=gestores_emails,
-            fail_silently=False,
+            to=gestores_emails,
         )
+        html_body = render_to_string('email/avaria_alerta.html', {
+            'critico': critico,
+            'checklist': checklist,
+            'itens_criticos_falhos': itens_criticos_falhos,
+            'itens': itens,
+            'aviso_bloqueio': bool(critico),
+            'fotos': fotos_ctx,
+            'checklist_url': checklist_url,
+        })
+        email.attach_alternative(html_body, "text/html")
+        email.send(fail_silently=False)
         logger.info(
-            'E-mail de avaria enviado — checklist #%s, veículo %s, %d destinatário(s).',
-            checklist.pk, checklist.veiculo.placa, len(gestores_emails),
+            'E-mail de avaria enviado — checklist #%s, veículo %s, %d destinatário(s), %d foto(s).',
+            checklist.pk, checklist.veiculo.placa, len(gestores_emails), len(fotos_ctx),
         )
     except Exception:
         cache.delete(chave_cache)
@@ -326,7 +357,7 @@ class ChecklistCreateView(LoginRequiredMixin, QrCodeMixin, CheckListBaseView, Cr
 
             # E-mail fora da transação, registrado em logs/auditoria.log
             if self.object.tem_avaria:
-                _enviar_email_avaria(self.object)
+                _enviar_email_avaria(self.object, request=self.request)
 
             return redirect(self.success_url)
 
@@ -466,7 +497,7 @@ class OcorrenciaListView(LoginRequiredMixin, GestorRequiredMixin, ListView):
     def get_queryset(self):
         qs = OcorrenciaAvaria.objects.select_related('veiculo', 'checklist', 'resolvida_por')
         status = self.request.GET.get('status')
-        veiculo = self.request.GET.get('veiculo')
+        busca = self.request.GET.get('busca')
 
         if status:
             qs = qs.filter(status=status)
@@ -477,8 +508,8 @@ class OcorrenciaListView(LoginRequiredMixin, GestorRequiredMixin, ListView):
         # status == '' (opção "Todos os Status" escolhida explicitamente):
         # não filtra por status, mostra o histórico completo.
 
-        if veiculo:
-            qs = qs.filter(Q(veiculo__placa__icontains=veiculo) | Q(veiculo__modelo__icontains=veiculo))
+        if busca:
+            qs = qs.filter(Q(veiculo__placa__icontains=busca) | Q(veiculo__modelo__icontains=busca))
 
         if status is None or status in ('aguardando', 'em_reparo'):
             # Visões "em aberto" mostram a mais antiga primeiro, para que
@@ -576,6 +607,26 @@ class VeiculoListView(LoginRequiredMixin, VeiculoBaseView, ListView):
             queryset = queryset.filter(
                 Q(placa__icontains=busca) | Q(marca__icontains=busca) | Q(modelo__icontains=busca)
             )
+
+        status = self.request.GET.get('status')
+        if status:
+            hoje = timezone.now().date()
+            limite = hoje + timedelta(days=30)
+            doc_vencida_q = Q(vencimento_crlv__lt=hoje) | Q(vencimento_seguro__lt=hoje)
+            if status == 'ativo':
+                queryset = queryset.filter(ativo=True)
+            elif status == 'inativo':
+                queryset = queryset.filter(ativo=False)
+            elif status == 'bloqueado':
+                queryset = queryset.filter(bloqueado=True)
+            elif status == 'doc_vencida':
+                queryset = queryset.filter(doc_vencida_q)
+            elif status == 'doc_vencendo':
+                queryset = queryset.filter(
+                    Q(vencimento_crlv__gte=hoje, vencimento_crlv__lte=limite) |
+                    Q(vencimento_seguro__gte=hoje, vencimento_seguro__lte=limite)
+                ).exclude(doc_vencida_q)
+
         return queryset.order_by('-ativo', '-id')
 
 
@@ -702,11 +753,11 @@ class OrdemManutencaoListView(LoginRequiredMixin, GestorRequiredMixin, ListView)
     def get_queryset(self):
         qs = OrdemManutencao.objects.select_related('veiculo', 'ocorrencia')
         status = self.request.GET.get('status')
-        veiculo = self.request.GET.get('veiculo')
+        busca = self.request.GET.get('busca')
         if status:
             qs = qs.filter(status=status)
-        if veiculo:
-            qs = qs.filter(Q(veiculo__placa__icontains=veiculo) | Q(veiculo__modelo__icontains=veiculo))
+        if busca:
+            qs = qs.filter(Q(veiculo__placa__icontains=busca) | Q(veiculo__modelo__icontains=busca))
         return qs
 
     def get_context_data(self, **kwargs):
@@ -805,7 +856,19 @@ class FuncionarioListView(LoginRequiredMixin, GestorRequiredMixin, FuncionarioBa
         queryset = super().get_queryset()
         busca = self.request.GET.get('busca')
         if busca:
-            queryset = queryset.filter(nome_completo__icontains=busca)
+            queryset = queryset.filter(Q(nome_completo__icontains=busca) | Q(cpf__icontains=busca))
+
+        status = self.request.GET.get('status')
+        if status:
+            hoje = timezone.now().date()
+            limite = hoje + timedelta(days=30)
+            if status == 'vencida':
+                queryset = queryset.filter(validade_cnh__lt=hoje)
+            elif status == 'vencendo':
+                queryset = queryset.filter(validade_cnh__gte=hoje, validade_cnh__lte=limite)
+            elif status == 'valida':
+                queryset = queryset.filter(validade_cnh__gt=limite)
+
         return queryset
 
     def get_context_data(self, **kwargs):

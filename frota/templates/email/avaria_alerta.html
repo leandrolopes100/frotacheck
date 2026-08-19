@@ -1,0 +1,121 @@
+{% load humanize %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if critico %}Alerta de segurança{% else %}Aviso de avaria{% endif %} — FrotaCheck</title>
+</head>
+<body style="margin:0; padding:0; background:#f2f4f7; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f4f7; padding:24px 12px;">
+<tr>
+<td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:10px; overflow:hidden; border:1px solid #e3e6ea;">
+
+    <!-- Cabeçalho -->
+    <tr>
+        <td style="background:{% if critico %}#f85149{% else %}#d29922{% endif %}; padding:20px 24px;">
+            <p style="margin:0; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.85);">FrotaCheck</p>
+            <p style="margin:4px 0 0; font-size:18px; font-weight:700; color:#ffffff;">
+                {% if critico %}Alerta de segurança — avaria crítica{% else %}Aviso de avaria registrada{% endif %}
+            </p>
+        </td>
+    </tr>
+
+    <!-- Dados do veículo -->
+    <tr>
+        <td style="padding:24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px; color:#24292f;">
+                <tr>
+                    <td style="padding:4px 0; color:#57606a; width:110px;">Veículo</td>
+                    <td style="padding:4px 0; font-weight:600;">{{ checklist.veiculo.marca }} {{ checklist.veiculo.modelo }} ({{ checklist.veiculo.placa }})</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 0; color:#57606a;">Motorista</td>
+                    <td style="padding:4px 0;">{{ checklist.motorista.nome_completo|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 0; color:#57606a;">Data</td>
+                    <td style="padding:4px 0;">{{ checklist.data_realizada|date:"d/m/Y H:i" }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 0; color:#57606a;">KM</td>
+                    <td style="padding:4px 0;">{{ checklist.km_atual|intcomma }}</td>
+                </tr>
+            </table>
+
+            {% if aviso_bloqueio %}
+            <p style="margin:16px 0 0; padding:12px 14px; background:#fff1f0; border:1px solid #f85149; border-radius:8px; font-size:13px; color:#82231c;">
+                Veículo bloqueado automaticamente para despacho até a resolução da(s) avaria(s) crítica(s).
+            </p>
+            {% endif %}
+
+            {% if itens_criticos_falhos %}
+            <div style="margin-top:20px;">
+                <p style="margin:0 0 6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#f85149;">Itens críticos com falha</p>
+                <ul style="margin:0; padding-left:18px; font-size:14px; color:#24292f;">
+                    {% for item in itens_criticos_falhos %}
+                    <li style="padding:2px 0;">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div style="margin-top:20px;">
+                <p style="margin:0 0 6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#57606a;">Todos os itens com falha</p>
+                <ul style="margin:0; padding-left:18px; font-size:14px; color:#24292f;">
+                    {% for item in itens %}
+                    <li style="padding:2px 0;">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Fotos -->
+            {% if fotos %}
+            <div style="margin-top:20px;">
+                <p style="margin:0 0 8px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#57606a;">
+                    Registro fotográfico ({{ fotos|length }})
+                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    {% for foto in fotos %}
+                    {% if forloop.counter0|divisibleby:2 %}<tr>{% endif %}
+                        <td width="50%" style="padding:0 {% if forloop.counter0|divisibleby:2 %}4px 8px 0{% else %}0 0 8px 4px{% endif %};">
+                            <a href="{{ foto.url }}" style="display:block; border-radius:8px; overflow:hidden; border:1px solid #e3e6ea;">
+                                <img src="{{ foto.url }}" alt="Foto de avaria" width="100%" style="display:block; width:100%; height:auto; max-height:220px; object-fit:cover;">
+                            </a>
+                            {% if foto.descricao %}
+                            <p style="margin:4px 0 0; font-size:11px; color:#57606a;">{{ foto.descricao }}</p>
+                            {% endif %}
+                        </td>
+                    {% if forloop.counter|divisibleby:2 or forloop.last %}</tr>{% endif %}
+                    {% endfor %}
+                </table>
+            </div>
+            {% endif %}
+
+            <div style="margin-top:20px;">
+                <p style="margin:0 0 6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#57606a;">Observações</p>
+                <p style="margin:0; font-size:14px; color:#24292f;">{{ checklist.observacoes|default:"Nenhuma" }}</p>
+            </div>
+
+            {% if checklist_url %}
+            <div style="margin-top:28px; text-align:center;">
+                <a href="{{ checklist_url }}" style="display:inline-block; padding:12px 24px; background:#238636; color:#ffffff; font-size:14px; font-weight:600; text-decoration:none; border-radius:8px;">
+                    Acessar inspeção no sistema
+                </a>
+            </div>
+            {% endif %}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:14px 24px; background:#f6f8fa; border-top:1px solid #e3e6ea;">
+            <p style="margin:0; font-size:11px; color:#8b949e;">Este é um e-mail automático do FrotaCheck. Não responda.</p>
+        </td>
+    </tr>
+
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>

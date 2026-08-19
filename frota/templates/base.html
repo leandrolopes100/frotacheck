@@ -479,6 +479,14 @@
         .card-hover-lift { box-shadow: none; transition: box-shadow 0.2s, border-color 0.2s; }
         .card-hover-lift:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.14); }
 
+        /* ── Card inteiro clicável ── */
+        .stretched-link::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
         /* Botão flutuante sobre imagem (ex.: ações no card de veículo) */
         .overlay-btn--yellow:hover { color: var(--yellow) !important; }
         .overlay-btn--red:hover { color: var(--red) !important; }

@@ -3,6 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from datetime import timedelta
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
@@ -93,6 +94,25 @@ class Veiculo(models.Model):
 
     def __str__(self):
         return f"{self.modelo} - {self.placa}"
+
+    @property
+    def documentacao_vencida(self):
+        hoje = timezone.now().date()
+        return bool(
+            (self.vencimento_crlv and self.vencimento_crlv < hoje) or
+            (self.vencimento_seguro and self.vencimento_seguro < hoje)
+        )
+
+    @property
+    def documentacao_vencendo(self):
+        if self.documentacao_vencida:
+            return False
+        hoje = timezone.now().date()
+        limite = hoje + timedelta(days=30)
+        return bool(
+            (self.vencimento_crlv and hoje <= self.vencimento_crlv <= limite) or
+            (self.vencimento_seguro and hoje <= self.vencimento_seguro <= limite)
+        )
 
 
 # ── CHECKLIST ─────────────────────────────────────────────────────────────────

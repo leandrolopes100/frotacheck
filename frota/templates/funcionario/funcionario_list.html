@@ -20,12 +20,38 @@
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
-            {% include "frota/_busca_simples.html" with placeholder="Nome ou CPF..." %}
             <a href="{% url 'funcionario_add' %}" class="btn-primary text-xs flex-shrink-0">
                 <i class="fas fa-plus"></i>
                 Novo Colaborador
             </a>
         </div>
+    </div>
+
+    <!-- ── Filtros ── -->
+    <div class="card p-3 mb-6">
+        <form method="GET" class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
+            <div class="relative w-full sm:flex-1 sm:min-w-[200px]">
+                <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs" style="color:#484f58"></i>
+                <input type="text" name="busca" value="{{ request.GET.busca }}" placeholder="Nome ou CPF..."
+                       class="form-input pl-9 text-sm">
+            </div>
+            <select name="status" class="form-input w-full sm:w-auto sm:min-w-[180px] text-sm cursor-pointer">
+                <option value="">Todos os Status</option>
+                <option value="valida" {% if request.GET.status == 'valida' %}selected{% endif %}>CNH válida</option>
+                <option value="vencendo" {% if request.GET.status == 'vencendo' %}selected{% endif %}>Vencendo em 30 dias</option>
+                <option value="vencida" {% if request.GET.status == 'vencida' %}selected{% endif %}>CNH vencida</option>
+            </select>
+            <div class="flex gap-2">
+                <button type="submit" class="btn-primary text-xs flex-1 sm:flex-initial justify-center">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                {% if request.GET.busca or request.GET.status %}
+                <a href="?" class="btn-secondary text-xs" style="color:#f85149">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
     </div>
 
     <!-- ── Grid de colaboradores ── -->
