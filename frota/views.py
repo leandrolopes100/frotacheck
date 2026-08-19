@@ -359,6 +359,20 @@ class ChecklistCreateView(LoginRequiredMixin, QrCodeMixin, CheckListBaseView, Cr
             if self.object.tem_avaria:
                 _enviar_email_avaria(self.object, request=self.request)
 
+            if itens_criticos_falhos:
+                messages.error(
+                    self.request,
+                    f"Inspeção enviada. Item crítico reprovado — veículo {self.object.veiculo.placa} "
+                    "bloqueado automaticamente para despacho até a resolução.",
+                )
+            elif self.object.tem_avaria:
+                messages.warning(
+                    self.request,
+                    "Inspeção enviada com sucesso. Uma ocorrência foi registrada para acompanhamento.",
+                )
+            else:
+                messages.success(self.request, "Inspeção enviada com sucesso.")
+
             return redirect(self.success_url)
 
         return self.render_to_response(self.get_context_data(form=form, fotos=fotos))

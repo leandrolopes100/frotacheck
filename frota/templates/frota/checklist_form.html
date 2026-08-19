@@ -262,14 +262,14 @@
         <!-- PASSO 3 — Evidências Fotográficas -->
         <section id="step-evidencias" class="card overflow-hidden scroll-mt-20">
 
-            <div class="flex items-center justify-between px-5 py-3.5" style="border-bottom:1px solid rgba(255,255,255,0.05)">
-                <div class="flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5" style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
                          style="background:#3fb950; color:#0d1117">3</div>
-                    <span class="text-xs font-bold uppercase tracking-wider" style="color:#e6edf3">Evidências Fotográficas</span>
-                    <span class="text-[10px] font-medium" style="color:#484f58">Opcional</span>
+                    <span class="text-xs font-bold uppercase tracking-wider truncate" style="color:#e6edf3">Evidências Fotográficas</span>
+                    <span class="text-[10px] font-medium flex-shrink-0" style="color:#484f58">Opcional</span>
                 </div>
-                <button type="button" id="add-foto" class="btn-primary text-xs">
+                <button type="button" id="add-foto" class="btn-primary text-xs flex-shrink-0">
                     <i class="fas fa-plus"></i> Adicionar foto
                 </button>
             </div>
@@ -281,7 +281,7 @@
                     {% for hidden in foto_form.hidden_fields %}{{ hidden }}{% endfor %}
 
                     <button type="button" onclick="removeFoto(this)"
-                            class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--red"
+                            class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--red">
                         <i class="fas fa-xmark text-sm"></i>
                     </button>
 
@@ -379,7 +379,7 @@
 <template id="foto-template">
     <div class="foto-item relative rounded-xl overflow-hidden foto-new" style="border:1px solid rgba(255,255,255,0.08); background:#1c2128">
         <button type="button" onclick="removeFoto(this)"
-                class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--red"
+                class="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-lg transition-colors icon-btn icon-btn--red">
             <i class="fas fa-xmark text-sm"></i>
         </button>
 

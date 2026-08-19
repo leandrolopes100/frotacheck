@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from .forms import ChecklistForm
 from .models import Abastecimento, Checklist, Funcionario, OcorrenciaAvaria, Veiculo
-from .utils import CAMPOS_AVARIA
+from .utils import CAMPOS_AVARIA, ITENS_CRITICOS
 from .views import _enviar_email_avaria
 
 Usuario = get_user_model()
@@ -436,6 +436,61 @@ class ChecklistAvariaEmailTests(TestCase):
         # Tabela da grade de fotos precisa fechar todas as linhas que abre,
         # senão o HTML fica malformado em qualquer contagem de fotos.
         self.assertEqual(html.count('<tr>'), html.count('</tr>'))
+
+
+class ChecklistToastMessageTests(TestCase):
+    """Regressão: o envio do checklist redirecionava direto pro dashboard
+    sem nenhuma confirmação — o motorista não tinha como saber se a
+    inspeção realmente foi salva."""
+
+    def setUp(self):
+        self.veiculo = Veiculo.objects.create(
+            placa='MSG1T23', marca='Ford', modelo='Cargo',
+            ano=2022, renavam='22233344455',
+        )
+        self.motorista = _criar_motorista('motorista_msg')
+
+    def _dados_base(self, campos_ok=()):
+        dados = {
+            'veiculo': self.veiculo.pk, 'nome_checklist': 'Checklist Msg',
+            'km_atual': 5000, 'nivel_combustivel': 'Cheio', 'tipo': 'geral',
+            'latitude': -23.55, 'longitude': -46.63,
+            'itens_tocados': ','.join(CAMPOS_AVARIA),
+            'fotos-TOTAL_FORMS': '0', 'fotos-INITIAL_FORMS': '0',
+            'fotos-MIN_NUM_FORMS': '0', 'fotos-MAX_NUM_FORMS': '1000',
+        }
+        for campo in campos_ok:
+            dados[campo] = 'on'
+        return dados
+
+    def test_inspecao_sem_avaria_mostra_mensagem_de_sucesso(self):
+        self.client.login(username='motorista_msg', password='senha-teste-123')
+        response = self.client.post(reverse('checklist_add'), self._dados_base(CAMPOS_AVARIA), follow=True)
+        msgs = list(response.context['messages'])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(msgs[0].tags, 'success')
+        self.assertIn('sucesso', str(msgs[0]).lower())
+
+    def test_inspecao_com_avaria_nao_critica_mostra_aviso_de_ocorrencia(self):
+        self.assertNotIn('oleo', ITENS_CRITICOS)
+        campos_ok = [c for c in CAMPOS_AVARIA if c != 'oleo']
+        self.client.login(username='motorista_msg', password='senha-teste-123')
+        response = self.client.post(reverse('checklist_add'), self._dados_base(campos_ok), follow=True)
+        msgs = list(response.context['messages'])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(msgs[0].tags, 'warning')
+        self.assertIn('ocorrência', str(msgs[0]).lower())
+
+    def test_inspecao_com_item_critico_mostra_erro_de_bloqueio(self):
+        campos_ok = [c for c in CAMPOS_AVARIA if c != ITENS_CRITICOS[0]]
+        self.client.login(username='motorista_msg', password='senha-teste-123')
+        response = self.client.post(reverse('checklist_add'), self._dados_base(campos_ok), follow=True)
+        msgs = list(response.context['messages'])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(msgs[0].tags, 'error')
+        self.assertIn('bloqueado', str(msgs[0]).lower())
+        self.veiculo.refresh_from_db()
+        self.assertTrue(self.veiculo.bloqueado)
 
 
 @override_settings(EMAIL_HOST_USER='remetente@exemplo.com')
