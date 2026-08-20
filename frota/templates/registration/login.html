@@ -5,6 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entrar | FrotaCheck</title>
+    <meta name="description" content="FrotaCheck — sistema de gestão de frota com checklist veicular digital, verificação por GPS, evidências fotográficas e controle de conformidade em tempo real.">
+    <meta name="theme-color" content="#0d1117">
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="FrotaCheck">
+    <meta property="og:title" content="FrotaCheck — Gestão de frota, sem complicação.">
+    <meta property="og:description" content="Checklists digitais com verificação por GPS, evidências fotográficas e controle de conformidade da sua operação em tempo real.">
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{% url 'login' %}">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'frota/img/og-card.png' %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='rgb(35,134,54)'/><polyline points='8,17 13.5,23 25,9' fill='none' stroke='white' stroke-width='4.6' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
